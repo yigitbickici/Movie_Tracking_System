@@ -12,14 +12,16 @@ public class Movie {
 
     private String title;
     private String genre;
+    private String director;
     private int releaseYear;
 
     public Movie() {
     }
 
-    public Movie(String title, String genre, int releaseYear) {
+    public Movie(String title, String genre, String direcotor, int releaseYear) {
         this.title = title;
         this.genre = genre;
+        this.director = director;
         this.releaseYear = releaseYear;
     }
 
@@ -50,6 +52,14 @@ public class Movie {
 
     public int getReleaseYear() {
         return releaseYear;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public String getDirector() {
+        return director;
     }
 
     public void setReleaseYear(int releaseYear) {
