@@ -22,11 +22,18 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-            name = "user_favorite_movies", // Name of the join table
-            joinColumns = @JoinColumn(name = "user_id"), // Foreign key for User
-            inverseJoinColumns = @JoinColumn(name = "movie_id") // Foreign key for Movie
+            name = "user_favorite_movies",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
     private List<Movie> favoriteMovies;
+    @ManyToMany
+    @JoinTable(
+            name = "user_watched_movies",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns =   @JoinColumn(name = "movie_id")
+    )
+    private List<Movie> watchedMovies;
 
     // Getters and Setters
     public Long getId() {
@@ -67,5 +74,13 @@ public class User {
 
     public void setFavoriteMovies(List<Movie> favoriteMovies) {
         this.favoriteMovies = favoriteMovies;
+    }
+
+    public List<Movie> getWatchedMovies() {
+        return watchedMovies;
+    }
+
+    public void setWatchedMovies(List<Movie> watchedMovies) {
+        this.watchedMovies = watchedMovies;
     }
 }
