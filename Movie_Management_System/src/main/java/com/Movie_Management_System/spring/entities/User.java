@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "users") // Using "users" instead of "user" to avoid conflicts with SQL reserved keywords
+@Table(name = "users")
 public class User {
 
     @Id

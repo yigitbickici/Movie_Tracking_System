@@ -15,13 +15,15 @@ public class Movie {
     private String director;
     private int releaseYear;
 
+    private String cast = "";
     public Movie() {
     }
 
-    public Movie(String title, String genre, String director, int releaseYear) {
+    public Movie(String title, String genre, String director, String cast, int releaseYear) {
         this.title = title;
         this.genre = genre;
         this.director = director;
+        this.cast = cast;
         this.releaseYear = releaseYear;
     }
 
@@ -53,7 +55,15 @@ public class Movie {
     public int getReleaseYear() {
         return releaseYear;
     }
-
+    public String getCast() {
+        return cast;
+    }
+    public void setCast(String cast) {
+        if (!this.cast.isEmpty()) {
+            this.cast += ", ";
+        }
+        this.cast += cast;
+    }
     public void setDirector(String director) {
         this.director = director;
     }
