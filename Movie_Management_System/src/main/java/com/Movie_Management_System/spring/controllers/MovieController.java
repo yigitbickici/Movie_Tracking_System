@@ -9,23 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/movies") // Base URL for movie-related requests
+@RequestMapping("/api/movies")
 public class MovieController {
 
     private final MovieService movieService;
 
-    // Constructor Injection for MovieService
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
     }
 
-    // GET: Retrieve all movies
     @GetMapping
     public List<Movie> getAllMovies() {
         return movieService.getAllMovies();
     }
 
-    // GET: Retrieve a specific movie by ID
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
         Optional<Movie> movie = movieService.getMovieById(id);
@@ -33,13 +30,11 @@ public class MovieController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // POST: Create a new movie
     @PostMapping
     public Movie createMovie(@RequestBody Movie movie) {
         return movieService.createMovie(movie);
     }
 
-    // PUT: Update an existing movie
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
         try {
@@ -50,7 +45,6 @@ public class MovieController {
         }
     }
 
-    // DELETE: Remove a movie by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);

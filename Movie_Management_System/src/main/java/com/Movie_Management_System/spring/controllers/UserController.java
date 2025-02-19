@@ -9,23 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users") // Base URL for user-related requests
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
-    // Constructor Injection for UserService
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    // GET: Retrieve all users
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // GET: Retrieve a specific user by ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
@@ -33,13 +30,11 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // POST: Create a new user
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    // PUT: Update an existing user
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
@@ -50,7 +45,6 @@ public class UserController {
         }
     }
 
-    // DELETE: Remove a user by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
