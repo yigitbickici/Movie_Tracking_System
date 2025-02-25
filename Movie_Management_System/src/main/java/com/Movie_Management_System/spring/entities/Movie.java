@@ -13,6 +13,7 @@ public class Movie {
     private String title;
     private String genre;
     private String director;
+    private String photoUrl;
     private int releaseYear;
 
     private String cast = "";
@@ -74,5 +75,13 @@ public class Movie {
 
     public void setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }
