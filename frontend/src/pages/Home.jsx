@@ -5,10 +5,9 @@ import './Home.css';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
-
 const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=tr-TR&page=${page}`;
 
-const MovieList = () => {
+const Home = () => {
   const [movies, setMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -26,12 +25,10 @@ const MovieList = () => {
 
   const goToNextPage = () => {
       setCurrentPage(currentPage + 1);
-
   };
 
   const goToPrevPage = () => {
       setCurrentPage(currentPage - 1);
-
   };
 
   const handleMovieClick = (movie) => {
@@ -41,7 +38,7 @@ const MovieList = () => {
   return (
       <div className="home">
         <header className="home-header">
-          <h1>Movie Management System</h1>
+          <h1>Movie Tracking System</h1>
           <div className="search-bar">
             <input type="text" placeholder="Search movies..." />
           </div>
@@ -74,4 +71,4 @@ const MovieList = () => {
   );
 };
 
-export default MovieList;
+export default Home;

@@ -1,7 +1,8 @@
 .home {
-  min-height: 100vh;
+  min-height: calc(100vh - 70px);
   background: #141414;
   color: white;
+  padding-bottom: 70px;
 }
 
 .home-header {
@@ -47,6 +48,7 @@
   justify-content: center;
   gap: 1rem;
   padding: 2rem;
+  margin-bottom: 60px;
 }
 
 .add-movie-button {
@@ -64,5 +66,33 @@
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 100;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+    padding-bottom: 70px; /* Navbar'ın üzerine gelmemesi için */
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px 20px;
+}
+
+.pagination button:disabled {
+    color: #666;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    color: white;
+    font-size: 16px;
 }
 

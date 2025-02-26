@@ -17,6 +17,9 @@
 body {
   background-color: #14181c;
   color: #ffffff;
+  margin: 0;
+  padding: 0;
+  background: #141414;
 }
 
 /* Genel konteyner stili */
@@ -57,4 +60,9 @@ button {
 
 button:hover {
   background-color: #40bcf4;
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
 } 
