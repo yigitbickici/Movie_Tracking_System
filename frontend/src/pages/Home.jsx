@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MovieCard from "../components/MovieCard";
+import MovieDetail from "../components/MovieDetail";
 import './Home.css';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
@@ -11,6 +12,7 @@ const MovieList = () => {
   const [movies, setMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
     fetch(API_URL(currentPage))
@@ -22,17 +24,18 @@ const MovieList = () => {
         .catch((error) => console.error("Hata:", error));
   }, [currentPage]);
 
-  // Sayfa değişimini yöneten fonksiyonlar
   const goToNextPage = () => {
-    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-    }
+
   };
 
   const goToPrevPage = () => {
-    if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
-    }
+
+  };
+
+  const handleMovieClick = (movie) => {
+    setSelectedMovie(movie);
   };
 
   return (
@@ -46,9 +49,20 @@ const MovieList = () => {
 
         <div className="movie-list">
           {movies.map(movie => (
-              <MovieCard key={movie.id} movie={movie} />
+              <MovieCard 
+                key={movie.id} 
+                movie={movie} 
+                onClick={handleMovieClick}
+              />
           ))}
         </div>
+
+        {selectedMovie && (
+          <MovieDetail 
+            movie={selectedMovie} 
+            onClose={() => setSelectedMovie(null)}
+          />
+        )}
 
         <div className="pagination">
           <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>

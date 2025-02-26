@@ -1,9 +1,9 @@
 import React from "react";
 import './MovieCard.css';
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, onClick }) => {
     return (
-        <div className="movie-card">
+        <div className="movie-card" onClick={() => onClick(movie)}>
             <img
                 className="movie-poster"
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -15,7 +15,6 @@ const MovieCard = ({ movie }) => {
                 <p className="movie-year">{movie.release_date.split("-")[0]}</p>
                 <p className="movie-rating">⭐ {movie.vote_average}</p>
             </div>
-
         </div>
     );
 };
