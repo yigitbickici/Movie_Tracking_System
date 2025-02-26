@@ -65,4 +65,22 @@
 .overview {
     line-height: 1.6;
     color: #e0e0e0;
+}
+
+.detail-add-button {
+    margin-top: 20px;
+    background-color: #FFD700;
+    color: black;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.detail-add-button:hover {
+    background-color: #FFC800;
+    transform: scale(1.05);
 } 

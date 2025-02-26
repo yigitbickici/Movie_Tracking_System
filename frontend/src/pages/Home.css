@@ -47,4 +47,22 @@
   justify-content: center;
   gap: 1rem;
   padding: 2rem;
-} 
+}
+
+.add-movie-button {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FFD700;
+    color: black;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+

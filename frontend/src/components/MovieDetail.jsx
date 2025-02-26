@@ -22,6 +22,9 @@ const MovieDetail = ({ movie, onClose }) => {
                             <span>⭐ {movie.vote_average}</span>
                         </div>
                         <p className="overview">{movie.overview}</p>
+                        <button className="detail-add-button" onClick={() => console.log("Film listeye eklendi:", movie.title)}>
+                            + ADD TO MY LIST
+                        </button>
                     </div>
                 </div>
             </div>

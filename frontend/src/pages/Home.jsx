@@ -69,6 +69,7 @@ const MovieList = () => {
           <span>{currentPage} / {totalPages}</span>
           <button onClick={goToNextPage} disabled={currentPage === totalPages}>→</button>
         </div>
+
       </div>
   );
 };
