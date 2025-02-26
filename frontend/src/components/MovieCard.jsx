@@ -10,10 +10,12 @@ const MovieCard = ({ movie }) => {
                 alt={movie.title}
             />
             <div className="movie-info">
-                <h3>{movie.title}</h3>
+                <h3>{movie.original_title}</h3>
+                <h5>({movie.title})</h5>
                 <p className="movie-year">{movie.release_date.split("-")[0]}</p>
                 <p className="movie-rating">⭐ {movie.vote_average}</p>
             </div>
+
         </div>
     );
 };
