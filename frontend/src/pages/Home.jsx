@@ -1,46 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import MovieCard from '../components/MovieCard';
+import { useEffect, useState } from "react";
+import MovieCard from "../components/MovieCard";
 import './Home.css';
 
-const Home = () => {
+const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
+
+
+const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=tr-TR&page=${page}`;
+
+const MovieList = () => {
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetch(API_URL(currentPage))
+        .then((response) => response.json())
+        .then((data) => {
+          setMovies(data.results);
+          setTotalPages(data.total_pages);
+        })
+        .catch((error) => console.error("Hata:", error));
+  }, [currentPage]);
 
-  const fetchMovies = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/movies');
-      const data = await response.json();
-      setMovies(data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching movies:', error);
-      setLoading(false);
+  // Sayfa değişimini yöneten fonksiyonlar
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
-    <div className="home">
-      <header className="home-header">
-        <h1>Movie Management System</h1>
-        <div className="search-bar">
-          <input type="text" placeholder="Search movies..." />
+      <div className="home">
+        <header className="home-header">
+          <h1>Movie Management System</h1>
+          <div className="search-bar">
+            <input type="text" placeholder="Search movies..." />
+          </div>
+        </header>
+
+        <div className="movie-list">
+          {movies.map(movie => (
+              <MovieCard key={movie.id} movie={movie} />
+          ))}
         </div>
-      </header>
-      <div className="movies-grid">
-        {movies.map(movie => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
+
+        <div className="pagination">
+          <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>
+          <span>{currentPage} / {totalPages}</span>
+          <button onClick={goToNextPage} disabled={currentPage === totalPages}>→</button>
+        </div>
       </div>
-    </div>
   );
 };
 
-export default Home; 
+export default MovieList;
