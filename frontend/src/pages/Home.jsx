@@ -32,7 +32,21 @@ const Home = () => {
   };
 
   const handleMovieClick = (movie) => {
-    setSelectedMovie(movie);
+    // Fetch both movie details and credits in parallel
+    Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=tr-TR`),
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=tr-TR`)
+    ])
+      .then(([detailsRes, creditsRes]) => Promise.all([detailsRes.json(), creditsRes.json()]))
+      .then(([detailedMovie, credits]) => {
+        // Combine movie data with runtime and first 5 cast members
+        setSelectedMovie({
+          ...movie,
+          runtime: detailedMovie.runtime,
+          cast: credits.cast.slice(0, 5) // Get only first 5 cast members
+        });
+      })
+      .catch(error => console.error("Error fetching movie details:", error));
   };
 
   return (
