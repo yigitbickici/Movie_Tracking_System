@@ -131,4 +131,51 @@
     font-size: 0.8rem;
     margin: 4px 0 0;
     color: #9e9e9e;
+}
+
+.providers-section {
+    margin: 20px 0;
+}
+
+.providers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.provider-category h4 {
+    color: #9e9e9e;
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+}
+
+.provider-items {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.provider-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.no-providers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #9e9e9e;
+}
+
+.sad-face {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.no-providers p {
+    margin: 0;
+    text-align: center;
 } 

@@ -32,7 +32,75 @@ const MovieDetail = ({ movie, onClose }) => {
                         </div>
                         <p className="overview">{movie.overview}</p>
                         
-                        {/* Add cast section */}
+                        {/* Add providers section */}
+                        {movie.providers && (
+                            <div className="providers-section">
+                                <h3>Mevcut Platformlar(Türkiye):</h3>
+                                <div className="providers-list">
+                                    {(!movie.providers.flatrate && !movie.providers.rent && !movie.providers.buy) ? (
+                                        <div className="no-providers">
+                                            <span className="sad-face">😔</span>
+                                            <p>Henüz Türkiye'de izleme seçeneği mevcut değil.</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {movie.providers.flatrate && (
+                                                <div className="provider-category">
+                                                    <h4>Abonelik</h4>
+                                                    <div className="provider-items">
+                                                        {movie.providers.flatrate.map(provider => (
+                                                            <div key={provider.provider_id} className="provider-item">
+                                                                <img 
+                                                                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                                                                    alt={provider.provider_name}
+                                                                    title={provider.provider_name}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            {movie.providers.rent && (
+                                                <div className="provider-category">
+                                                    <h4>Kiralama</h4>
+                                                    <div className="provider-items">
+                                                        {movie.providers.rent.map(provider => (
+                                                            <div key={provider.provider_id} className="provider-item">
+                                                                <img 
+                                                                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                                                                    alt={provider.provider_name}
+                                                                    title={provider.provider_name}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            {movie.providers.buy && (
+                                                <div className="provider-category">
+                                                    <h4>Satın Alma</h4>
+                                                    <div className="provider-items">
+                                                        {movie.providers.buy.map(provider => (
+                                                            <div key={provider.provider_id} className="provider-item">
+                                                                <img 
+                                                                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                                                                    alt={provider.provider_name}
+                                                                    title={provider.provider_name}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Cast section */}
                         {movie.cast && (
                             <div className="cast-section">
                                 <h3>Oyuncular:</h3>

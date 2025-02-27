@@ -32,18 +32,22 @@ const Home = () => {
   };
 
   const handleMovieClick = (movie) => {
-    // Fetch both movie details and credits in parallel
+    // Fetch movie details, credits, and watch providers in parallel
     Promise.all([
       fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=tr-TR`),
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=tr-TR`)
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=tr-TR`),
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=${API_KEY}`)
     ])
-      .then(([detailsRes, creditsRes]) => Promise.all([detailsRes.json(), creditsRes.json()]))
-      .then(([detailedMovie, credits]) => {
-        // Combine movie data with runtime and first 5 cast members
+      .then(([detailsRes, creditsRes, providersRes]) => 
+        Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
+      )
+      .then(([detailedMovie, credits, providers]) => {
+        // Combine all data
         setSelectedMovie({
           ...movie,
           runtime: detailedMovie.runtime,
-          cast: credits.cast.slice(0, 5) // Get only first 5 cast members
+          cast: credits.cast.slice(0, 5),
+          providers: providers.results.TR || {} // Get Turkish providers if available
         });
       })
       .catch(error => console.error("Error fetching movie details:", error));
