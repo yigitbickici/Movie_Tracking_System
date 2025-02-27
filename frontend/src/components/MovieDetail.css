@@ -155,11 +155,21 @@
     flex-wrap: wrap;
 }
 
+.provider-item {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.provider-item:hover {
+    transform: scale(1.1);
+}
+
 .provider-item img {
     width: 40px;
     height: 40px;
     border-radius: 8px;
     object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .no-providers {

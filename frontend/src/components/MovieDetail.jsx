@@ -1,6 +1,18 @@
 import React from 'react';
 import './MovieDetail.css';
 
+// To route user to the related platform
+const PLATFORM_URLS = {
+    8: "https://www.netflix.com/tr/", // Netflix
+    119: "https://www.primevideo.com/tr/", // Amazon Prime
+    337: "https://www.disneyplus.com/tr-tr", // Disney+
+    531: "https://www.blutv.com/", // BluTV
+    1870: "https://www.exxen.com/", // EXXEN
+    2: "https://www.apple.com/tr/apple-tv-plus/", // Apple TV
+    3: "https://play.google.com/store/movies?hl=tr", // Google Play Movies
+    11: "https://mubi.com/tr/tr/", // MUBI
+};
+
 const MovieDetail = ({ movie, onClose }) => {
     if (!movie) return null;
 
@@ -10,6 +22,14 @@ const MovieDetail = ({ movie, onClose }) => {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return `${hours}s ${mins}dk`;
+    };
+
+    const handleProviderClick = (providerId) => {
+        //console.log(providerId);
+        const url = PLATFORM_URLS[providerId];
+        if (url) {
+            window.open(url, '_blank');
+        }
     };
 
     return (
@@ -49,11 +69,15 @@ const MovieDetail = ({ movie, onClose }) => {
                                                     <h4>Abonelik</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.flatrate.map(provider => (
-                                                            <div key={provider.provider_id} className="provider-item">
+                                                            <div 
+                                                                key={provider.provider_id} 
+                                                                className="provider-item"
+                                                                onClick={() => handleProviderClick(provider.provider_id)}
+                                                                title={`${provider.provider_name}'de izle`}
+                                                            >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                                                                     alt={provider.provider_name}
-                                                                    title={provider.provider_name}
                                                                 />
                                                             </div>
                                                         ))}
@@ -66,11 +90,15 @@ const MovieDetail = ({ movie, onClose }) => {
                                                     <h4>Kiralama</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.rent.map(provider => (
-                                                            <div key={provider.provider_id} className="provider-item">
+                                                            <div 
+                                                                key={provider.provider_id} 
+                                                                className="provider-item"
+                                                                onClick={() => handleProviderClick(provider.provider_id)}
+                                                                title={`${provider.provider_name}'de izle`}
+                                                            >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                                                                     alt={provider.provider_name}
-                                                                    title={provider.provider_name}
                                                                 />
                                                             </div>
                                                         ))}
@@ -83,11 +111,15 @@ const MovieDetail = ({ movie, onClose }) => {
                                                     <h4>Satın Alma</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.buy.map(provider => (
-                                                            <div key={provider.provider_id} className="provider-item">
+                                                            <div 
+                                                                key={provider.provider_id} 
+                                                                className="provider-item"
+                                                                onClick={() => handleProviderClick(provider.provider_id)}
+                                                                title={`${provider.provider_name}'de izle`}
+                                                            >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                                                                     alt={provider.provider_name}
-                                                                    title={provider.provider_name}
                                                                 />
                                                             </div>
                                                         ))}

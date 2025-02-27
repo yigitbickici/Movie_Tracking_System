@@ -1,5 +1,7 @@
 import React from 'react';
 import './Profile.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const Profile = () => {
     const userStats = {
@@ -20,16 +22,22 @@ const Profile = () => {
         episodesWatched: 0
     };
 
+    const navigate = useNavigate();
+    
+    const handleEditClick = () => {
+        navigate('/profile/edit');
+    };
+
     return (
         <div className="profile-container">
             <div className="profile-header">
                 <div className="profile-info">
                     <div className="profile-avatar">
-                        <img src="/frontend/public/potc.png" alt="Profile" />
+                        <img src="https://eu.ui-avatars.com/api/?name=John+Doe&size=250" alt="Profile" />
                     </div>
                     <div className="profile-username">
                         <h2>USER1</h2>
-                        <button className="edit-profile-btn">EDIT</button>
+                        <button className="edit-profile-btn" onClick={handleEditClick}>EDIT</button>
                     </div>
                 </div>
 
