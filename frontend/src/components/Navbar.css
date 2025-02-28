@@ -35,4 +35,29 @@
 
 .nav-item:hover {
     color: white;
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+    .navbar {
+        padding: 10px;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
+
+    .nav-link {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .nav-links {
+        gap: 10px;
+    }
+
+    .nav-link {
+        padding: 5px 10px;
+    }
 } 

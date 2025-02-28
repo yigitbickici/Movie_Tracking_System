@@ -1,11 +1,12 @@
 .movie-card {
+  position: relative;
   width: 200px;
   background: #1f1f1f;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.2s;
-  margin: 1rem;
-  display: inline-block;
+  transition: transform 0.3s ease;
+  margin: 10px;
+  cursor: pointer;
 }
 
 .movie-card:hover {
@@ -37,4 +38,18 @@
 .movie-rating {
   color: #00b020;
   font-weight: bold;
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+  .movie-card {
+    width: 160px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .movie-card {
+    width: 140px;
+    margin: 5px;
+  }
 }
