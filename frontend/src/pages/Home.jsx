@@ -5,7 +5,7 @@ import './Home.css';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
-const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=tr-TR&page=${page}`;
+const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-TR&page=${page}`;
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
@@ -34,8 +34,8 @@ const Home = () => {
   const handleMovieClick = (movie) => {
     // Fetch movie details, credits, and watch providers in parallel
     Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=tr-TR`),
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=tr-TR`),
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-TR`),
+      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=en-TR`),
       fetch(`https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=${API_KEY}`)
     ])
       .then(([detailsRes, creditsRes, providersRes]) => 
@@ -76,7 +76,7 @@ const Home = () => {
           <MovieDetail 
             movie={selectedMovie} 
             onClose={() => setSelectedMovie(null)}
-            isInList={false} // when true movie detail page will show with rating section
+            isInList={true}
           />
         )}
 

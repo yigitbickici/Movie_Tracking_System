@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MovieDetail.css';
+import MovieSocialPage from './MovieSocialPage';
 
 // To route user to the related platform
 const PLATFORM_URLS = {
@@ -8,15 +10,17 @@ const PLATFORM_URLS = {
     337: "https://www.disneyplus.com/tr-tr", // Disney+
     531: "https://www.blutv.com/", // BluTV
     1870: "https://www.exxen.com/", // EXXEN
-    2: "https://www.apple.com/tr/apple-tv-plus/", // Apple TV
+    2: "https://tv.apple.com", // Apple TV
     3: "https://play.google.com/store/movies?hl=tr", // Google Play Movies
     11: "https://mubi.com/tr/tr/", // MUBI
 };
 
 const MovieDetail = ({ movie, onClose, isInList = false }) => {
+    const navigate = useNavigate();
     // Move useState hooks to the top of the component
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedRating, setSelectedRating] = useState(0);
+    const [showSocialPage, setShowSocialPage] = useState(false);
 
     if (!movie) return null;
 
@@ -39,7 +43,10 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
     const handleRatingChange = (rating) => {
         setSelectedRating(rating);
         console.log("New rating:", rating);
-        // Here you'll add the logic to update the rating in your backend
+    };
+
+    const handleSeePostsClick = () => {
+        navigate(`/movies/${movie.id}/social`);
     };
 
     return (
@@ -172,7 +179,7 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
                         {isInList ? (
                             <div className="user-interaction">
                                 <div className="rating-section">
-                                    <h4>Your Rating</h4>
+                                    <h4>Rate</h4>
                                     <div className="star-rating">
                                         {[...Array(10)].map((_, index) => {
                                             const ratingValue = index + 1;
@@ -198,7 +205,10 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
                                         )}
                                     </div>
                                 </div>
-                                <button className="see-posts-button">
+                                <button 
+                                    className="see-posts-button"
+                                    onClick={handleSeePostsClick}
+                                >
                                     SEE POSTS
                                 </button>
                             </div>
@@ -213,6 +223,13 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
                     </div>
                 </div>
             </div>
+            
+            {showSocialPage && (
+                <MovieSocialPage 
+                    movie={movie} 
+                    onClose={() => setShowSocialPage(false)}
+                />
+            )}
         </div>
     );
 };
