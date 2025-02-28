@@ -76,6 +76,7 @@ const Home = () => {
           <MovieDetail 
             movie={selectedMovie} 
             onClose={() => setSelectedMovie(null)}
+            isInList={false} // when true movie detail page will show with rating section
           />
         )}
 

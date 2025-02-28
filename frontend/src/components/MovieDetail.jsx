@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './MovieDetail.css';
 
 // To route user to the related platform
@@ -13,7 +13,11 @@ const PLATFORM_URLS = {
     11: "https://mubi.com/tr/tr/", // MUBI
 };
 
-const MovieDetail = ({ movie, onClose }) => {
+const MovieDetail = ({ movie, onClose, isInList = false }) => {
+    // Move useState hooks to the top of the component
+    const [hoveredRating, setHoveredRating] = useState(0);
+    const [selectedRating, setSelectedRating] = useState(0);
+
     if (!movie) return null;
 
     // Convert runtime to hours and minutes
@@ -30,6 +34,12 @@ const MovieDetail = ({ movie, onClose }) => {
         if (url) {
             window.open(url, '_blank');
         }
+    };
+
+    const handleRatingChange = (rating) => {
+        setSelectedRating(rating);
+        console.log("New rating:", rating);
+        // Here you'll add the logic to update the rating in your backend
     };
 
     return (
@@ -158,9 +168,48 @@ const MovieDetail = ({ movie, onClose }) => {
                             </div>
                         )}
                         
-                        <button className="detail-add-button" onClick={() => console.log("Film listeye eklendi:", movie.title)}>
-                            + ADD TO MY LIST
-                        </button>
+                        {/* Replace the ADD TO LIST button with rating and see posts when movie is in list */}
+                        {isInList ? (
+                            <div className="user-interaction">
+                                <div className="rating-section">
+                                    <h4>Your Rating</h4>
+                                    <div className="star-rating">
+                                        {[...Array(10)].map((_, index) => {
+                                            const ratingValue = index + 1;
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={ratingValue}
+                                                    className={`star-button ${
+                                                        ratingValue <= (hoveredRating || selectedRating) 
+                                                            ? 'active' 
+                                                            : ''
+                                                    }`}
+                                                    onClick={() => handleRatingChange(ratingValue)}
+                                                    onMouseEnter={() => setHoveredRating(ratingValue)}
+                                                    onMouseLeave={() => setHoveredRating(0)}
+                                                >
+                                                    ★
+                                                </button>
+                                            );
+                                        })}
+                                        {selectedRating > 0 && (
+                                            <span className="rating-number">{selectedRating}/10</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <button className="see-posts-button">
+                                    SEE POSTS
+                                </button>
+                            </div>
+                        ) : (
+                            <button 
+                                className="detail-add-button" 
+                                onClick={() => console.log("Film listeye eklendi:", movie.title)}
+                            >
+                                + ADD TO MY LIST
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

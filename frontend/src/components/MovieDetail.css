@@ -188,4 +188,72 @@
 .no-providers p {
     margin: 0;
     text-align: center;
+}
+
+.user-interaction {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rating-section {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.rating-section h4 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.star-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.star-button:hover {
+    transform: scale(1.1);
+}
+
+.star-button.active {
+    color: #FFD700;
+}
+
+.rating-number {
+    margin-left: 10px;
+    color: #FFD700;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.see-posts-button {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.see-posts-button:hover {
+    background: #1976D2;
+    transform: scale(1.02);
 } 
