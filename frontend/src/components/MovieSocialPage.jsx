@@ -34,6 +34,8 @@ const MovieSocialPage = () => {
             timestamp: '2 saat önce'
         }
     ]);
+    const [selectedMedia, setSelectedMedia] = useState(null);
+    const [mediaPreview, setMediaPreview] = useState(null);
 
     useEffect(() => {
         setLoading(true);
@@ -49,9 +51,21 @@ const MovieSocialPage = () => {
             });
     }, [movieId]);
 
+    const handleMediaSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedMedia(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setMediaPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handlePostSubmit = (e) => {
         e.preventDefault();
-        if (!newPost.trim()) return;
+        if (!newPost.trim() && !selectedMedia) return;
 
         const newPostObj = {
             id: posts.length + 1,
@@ -60,6 +74,7 @@ const MovieSocialPage = () => {
                 avatar: 'https://eu.ui-avatars.com/api/?name=User1'
             },
             content: newPost,
+            media: mediaPreview,
             likes: 0,
             comments: [],
             timestamp: 'Şimdi'
@@ -67,6 +82,8 @@ const MovieSocialPage = () => {
 
         setPosts([newPostObj, ...posts]);
         setNewPost('');
+        setSelectedMedia(null);
+        setMediaPreview(null);
     };
 
     const handleLike = (postId) => {
@@ -141,7 +158,46 @@ const MovieSocialPage = () => {
                             onChange={(e) => setNewPost(e.target.value)}
                             placeholder="Bu film hakkında ne düşünüyorsun?"
                         />
-                        <button type="submit">Paylaş</button>
+                        
+                        {mediaPreview && (
+                            <div className="media-preview">
+                                <img src={mediaPreview} alt="Preview" />
+                                <button 
+                                    type="button" 
+                                    className="remove-media"
+                                    onClick={() => {
+                                        setSelectedMedia(null);
+                                        setMediaPreview(null);
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
+                        
+                        <div className="post-actions-row">
+                            <div className="media-upload-buttons">
+                                <label className="media-upload-button">
+                                    <input
+                                        type="file"
+                                        accept="image/*,image/gif"
+                                        onChange={handleMediaSelect}
+                                        style={{ display: 'none' }}
+                                    />
+                                    📷 Fotoğraf
+                                </label>
+                                <label className="media-upload-button">
+                                    <input
+                                        type="file"
+                                        accept="image/gif"
+                                        onChange={handleMediaSelect}
+                                        style={{ display: 'none' }}
+                                    />
+                                    🎭 GIF
+                                </label>
+                            </div>
+                            <button type="submit">Paylaş</button>
+                        </div>
                     </form>
                 </div>
 
@@ -157,6 +213,11 @@ const MovieSocialPage = () => {
                             </div>
                             <div className="post-content">
                                 {post.content}
+                                {post.media && (
+                                    <div className="post-media">
+                                        <img src={post.media} alt="Post media" />
+                                    </div>
+                                )}
                             </div>
                             <div className="post-actions">
                                 <button onClick={() => handleLike(post.id)}>
