@@ -15,12 +15,14 @@ const PLATFORM_URLS = {
     11: "https://mubi.com/tr/tr/", // MUBI
 };
 
-const MovieDetail = ({ movie, onClose, isInList = false }) => {
+const MovieDetail = ({ movie, onClose }) => {
     const navigate = useNavigate();
-    // Move useState hooks to the top of the component
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedRating, setSelectedRating] = useState(0);
     const [showSocialPage, setShowSocialPage] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isInWatchlist, setIsInWatchlist] = useState(false);
+    const [isWatched, setIsWatched] = useState(false);
 
     if (!movie) return null;
 
@@ -49,16 +51,43 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
         navigate(`/movies/${movie.id}/social`);
     };
 
+    const handleAddToWatchlist = () => {
+        setIsInWatchlist(true);
+        console.log("Film izleme listesine eklendi:", movie.title);
+    };
+
+    const handleMarkAsWatched = () => {
+        setIsWatched(!isWatched);
+        console.log("Film izlendi durumu değiştirildi:", movie.title);
+    };
+
+    const handleRemoveFromList = () => {
+        setIsInWatchlist(false);
+        setIsWatched(false);
+        console.log("Film listeden kaldırıldı:", movie.title);
+    };
+
     return (
         <div className="movie-detail-overlay">
             <div className="movie-detail-content">
                 <button className="close-button" onClick={onClose}>×</button>
                 <div className="movie-detail-header">
-                    <img 
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-                        alt={movie.title} 
-                        className="detail-poster"
-                    />
+                    <div className="poster-container">
+                        <img 
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                            alt={movie.title} 
+                            className="detail-poster"
+                        />
+                        {isInWatchlist && (
+                            <button 
+                                className={`watched-button ${isWatched ? 'active' : ''}`}
+                                onClick={handleMarkAsWatched}
+                                title="İzledim olarak işaretle"
+                            >
+                                ✓
+                            </button>
+                        )}
+                    </div>
                     <div className="movie-detail-info">
                         <h1>{movie.title}</h1>
                         <p className="original-title">{movie.original_title}</p>
@@ -175,8 +204,22 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
                             </div>
                         )}
                         
-                        {/* Replace the ADD TO LIST button with rating and see posts when movie is in list */}
-                        {isInList ? (
+                        {/* Watch status section */}
+                        {!isInWatchlist ? (
+                            <button 
+                                className="detail-add-button" 
+                                onClick={handleAddToWatchlist}
+                            >
+                                + ADD TO WATCHLIST
+                            </button>
+                        ) : !isWatched ? (
+                            <button 
+                                className="detail-remove-button" 
+                                onClick={handleRemoveFromList}
+                            >
+                                - REMOVE FROM LIST
+                            </button>
+                        ) : (
                             <div className="user-interaction">
                                 <div className="rating-section">
                                     <h4>Rate</h4>
@@ -205,20 +248,21 @@ const MovieDetail = ({ movie, onClose, isInList = false }) => {
                                         )}
                                     </div>
                                 </div>
-                                <button 
-                                    className="see-posts-button"
-                                    onClick={handleSeePostsClick}
-                                >
-                                    SEE POSTS
-                                </button>
+                                <div className="interaction-buttons">
+                                    <button 
+                                        className={`favorite-button ${isFavorite ? 'active' : ''}`}
+                                        onClick={() => setIsFavorite(!isFavorite)}
+                                    >
+                                        ♥
+                                    </button>
+                                    <button 
+                                        className="see-posts-button"
+                                        onClick={handleSeePostsClick}
+                                    >
+                                        SEE POSTS
+                                    </button>
+                                </div>
                             </div>
-                        ) : (
-                            <button 
-                                className="detail-add-button" 
-                                onClick={() => console.log("Film listeye eklendi:", movie.title)}
-                            >
-                                + ADD TO MY LIST
-                            </button>
                         )}
                     </div>
                 </div>

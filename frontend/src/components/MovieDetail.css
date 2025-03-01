@@ -38,6 +38,14 @@
     gap: 20px;
 }
 
+.poster-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
 .detail-poster {
     width: 300px;
     height: 450px;
@@ -82,6 +90,86 @@
 
 .detail-add-button:hover {
     background-color: #FFC800;
+    transform: scale(1.05);
+}
+
+.list-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.watched-button {
+    background: none;
+    border: 2px solid #4CAF50;
+    color: #4CAF50;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+    position: relative;
+}
+
+.watched-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.watched-button:hover {
+    transform: scale(1.1);
+}
+
+.watched-button::after {
+    content: 'İzledim olarak işaretle';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    margin-bottom: 5px;
+}
+
+.watched-button:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+.watched-button.active::after {
+    content: 'İzlenmedi olarak işaretle';
+}
+
+.detail-remove-button {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.detail-remove-button:hover {
+    background-color: #ff3333;
     transform: scale(1.05);
 }
 
@@ -241,7 +329,68 @@
     font-weight: bold;
 }
 
+.interaction-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.favorite-button {
+    background: none;
+    border: 2px solid #ff4081;
+    color: #ff4081;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+    position: relative;
+}
+
+.favorite-button.active {
+    background-color: #ff4081;
+    color: white;
+}
+
+.favorite-button::after {
+    content: 'Add to Favorites';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s;
+    margin-bottom: 5px;
+}
+
+.favorite-button:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+.favorite-button.active::after {
+    content: 'Remove from Favorites';
+}
+
+.favorite-button:hover {
+    transform: scale(1.1);
+}
+
 .see-posts-button {
+    flex: 1;
     background: #2196F3;
     color: white;
     border: none;
@@ -250,12 +399,6 @@
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    width: 100%;
-}
-
-.see-posts-button:hover {
-    background: #1976D2;
-    transform: scale(1.02);
 }
 
 /* Responsive düzenlemeler */
@@ -276,10 +419,13 @@
         flex-direction: column;
     }
 
+    .poster-container {
+        margin: 0 auto;
+    }
+
     .detail-poster {
         width: 200px;
         height: 300px;
-        margin: 0 auto;
     }
 
     .movie-detail-info {
@@ -292,6 +438,12 @@
 
     .provider-items {
         justify-content: center;
+    }
+
+    .watched-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
 }
 
