@@ -85,14 +85,13 @@ const Profile = () => {
                 </div>
             </section>
 
-            
+       
 
             <section className="movies-section">
                 <h3>Movies</h3>
                 <div className="add-shows">
                     <button className="add-movies-btn">
-                        <span>+</span>
-                        ADD MOVIES
+                        NO MOVIES
                     </button>
                 </div>
             </section>
@@ -101,8 +100,7 @@ const Profile = () => {
                 <h3>Favorite movies</h3>
                 <div className="add-favorite-movies">
                     <button className="add-favorite-movies-btn">
-                        <span>+</span>
-                        ADD FAVORITE MOVIES
+                        NO MOVIES
                     </button>
                 </div>
             </section>

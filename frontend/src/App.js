@@ -5,6 +5,8 @@ import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import ProfileEdit from './components/ProfileEdit';
 import MovieSocialPage from './components/MovieSocialPage';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import './App.css';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
           <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </Router>

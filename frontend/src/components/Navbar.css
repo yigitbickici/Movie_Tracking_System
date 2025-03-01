@@ -60,4 +60,26 @@
     .nav-link {
         padding: 5px 10px;
     }
+}
+
+.nav-right {
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.logout-button {
+    background: orange;
+    border: 1px solid #fff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-right: 20px;
+}
+
+.logout-button:hover {
+    background: black;
+    color: #141414;
 } 
