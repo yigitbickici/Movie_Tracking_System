@@ -70,6 +70,7 @@ button:hover {
 .app-container {
     min-height: 100vh;
     background-color: #141414;
+    padding-bottom: 50px;
 }
 
 /* Eğer login/register gibi navbar'ın görünmemesi gereken sayfalarda padding istemiyorsak */
