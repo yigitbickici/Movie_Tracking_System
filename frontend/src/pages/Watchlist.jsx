@@ -9,6 +9,7 @@ const Watchlist = () => {
     const [activeTab, setActiveTab] = useState('watchlist');
     const [isGridView, setIsGridView] = useState(true);
     const [selectedMovie, setSelectedMovie] = useState(null);
+    const [watchedMovies, setWatchedMovies] = useState(new Set());
 
     // Örnek veri - Backend entegrasyonunda burası API'dan gelecek
     const watchlistMovies = [
@@ -104,35 +105,61 @@ const Watchlist = () => {
         }
     ];
 
-    const watchedMovies = [
+    const watchedMoviesData = [
+        {
+            id: 27205,
+            title: "Inception",
+            release_date: "2010-07-16",
+            poster_path: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+            overview: "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life.",
+            vote_average: 8.4
+        },
+        {
+            id: 157336,
+            title: "Interstellar",
+            release_date: "2014-11-07",
+            poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+            overview: "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel.",
+            vote_average: 8.4
+        },
         {
             id: 680,
             title: "Pulp Fiction",
-            release_date: "1994-10-14",
+            release_date: "1994-09-10",
             poster_path: "/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
             overview: "A burger-loving hit man, his philosophical partner, a drug-addled gangster's moll and a washed-up boxer converge in this sprawling, comedic crime caper.",
-            vote_average: 8.7,
-            isWatched: true
+            vote_average: 8.5
         },
         {
-            id: 129,
-            title: "Spirited Away",
-            release_date: "2001-07-20",
-            poster_path: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
-            overview: "A young girl, Chihiro, becomes trapped in a strange new world of spirits. When her parents undergo a mysterious transformation, she must call upon the courage she never knew she had to free her family.",
-            vote_average: 8.5,
-            isWatched: true
+            id: 603,
+            title: "The Matrix",
+            release_date: "1999-03-30",
+            poster_path: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+            overview: "Set in the 22nd century, The Matrix tells the story of a computer hacker who joins a group of underground insurgents fighting the vast and powerful computers who now rule the earth.",
+            vote_average: 8.2
         },
         {
-            id: 122,
-            title: "The Lord of the Rings: The Return of the King",
-            release_date: "2003-12-01",
-            poster_path: "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
-            overview: "Aragorn is revealed as the heir to the ancient kings as he, Gandalf and the other members of the broken fellowship struggle to save Gondor.",
-            vote_average: 8.5,
-            isWatched: true
+            id: 769,
+            title: "Goodfellas",
+            release_date: "1990-09-12",
+            poster_path: "/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
+            overview: "The true story of Henry Hill, a half-Irish, half-Sicilian Brooklyn kid who is adopted by neighbourhood gangsters at an early age and climbs the ranks of a Mafia family.",
+            vote_average: 8.5
         }
     ];
+
+    const handleWatchedToggle = (movieId, event) => {
+        event.stopPropagation();
+        setWatchedMovies(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(movieId)) {
+                newSet.delete(movieId);
+            } else {
+                newSet.add(movieId);
+            }
+            return newSet;
+        });
+    };
 
     const handleMovieClick = (movie) => {
         // Fetch movie details, credits, and watch providers in parallel
@@ -159,6 +186,27 @@ const Watchlist = () => {
         setIsGridView(!isGridView);
     };
 
+    const MovieCard = ({ movie, onClick }) => (
+        <div className="movie-card" onClick={onClick}>
+            <img 
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                alt={movie.title}
+            />
+            {activeTab === 'watchlist' && (
+                <button 
+                    className={`watched-indicator ${watchedMovies.has(movie.id) ? 'active' : ''}`}
+                    onClick={(e) => handleWatchedToggle(movie.id, e)}
+                >
+                    ✓
+                </button>
+            )}
+            <div className="movie-info">
+                <h4>{movie.title}</h4>
+                <p>{movie.release_date?.split('-')[0]}</p>
+            </div>
+        </div>
+    );
+
     return (
         <div className="watchlist-container">
             <div className="watchlist-header">
@@ -182,7 +230,7 @@ const Watchlist = () => {
             </div>
 
             <div className={`movies-container ${isGridView ? 'grid-view' : 'list-view'}`}>
-                {(activeTab === 'watchlist' ? watchlistMovies : watchedMovies).map(movie => (
+                {(activeTab === 'watchlist' ? watchlistMovies : watchedMoviesData).map(movie => (
                     <MovieCard 
                         key={movie.id}
                         movie={movie}

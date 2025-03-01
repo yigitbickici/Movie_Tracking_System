@@ -2,7 +2,13 @@
     background-color: #141414;
     min-height: calc(100vh - 65px); /* viewport height - navbar height */
     color: white;
-    margin-top: 65px; /* navbar'ın yüksekliği */
+    margin-top: 20px; /* navbar'ın yüksekliği */
+    padding: 20px;
+}
+
+.watchlist-container h2 {
+    margin-bottom: 20px;
+    padding: 0 20px;
 }
 
 .watchlist-header {
@@ -53,6 +59,98 @@
 
 .view-toggle:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.movie-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: visible;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+}
+
+.movie-card img {
+    width: 100%;
+    height: 270px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.movie-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    color: white;
+}
+
+.movie-info h4 {
+    margin: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.movie-info p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.watched-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #666;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 10;
+    padding: 0;
+    user-select: none;
+}
+
+.watched-indicator:hover {
+    transform: scale(1.1);
+    border-color: #4CAF50;
+    color: #4CAF50;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.watched-indicator.active {
+    background: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.watched-indicator.active:hover {
+    background: #45a049;
+    border-color: #45a049;
 }
 
 .movies-container {
@@ -133,10 +231,14 @@
         font-size: 18px;
     }
 
-    .movies-container {
-        padding: 15px 20px;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 15px;
+        padding: 15px;
+    }
+
+    .movie-card img {
+        height: 225px;
     }
 }
 
@@ -149,9 +251,19 @@
         font-size: 16px;
     }
 
-    .movies-container {
-        padding: 10px 15px;
+    .movies-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 10px;
+        padding: 10px;
+    }
+
+    .movie-card img {
+        height: 180px;
+    }
+
+    .watched-indicator {
+        width: 25px;
+        height: 25px;
+        font-size: 16px;
     }
 } 
