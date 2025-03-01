@@ -1,7 +1,8 @@
 .watchlist-container {
     background-color: #141414;
-    min-height: 100vh;
+    min-height: calc(100vh - 65px); /* viewport height - navbar height */
     color: white;
+    margin-top: 65px; /* navbar'ın yüksekliği */
 }
 
 .watchlist-header {
@@ -9,7 +10,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(20,20,20,1) 100%);
+    background: #141414; /* Gradient'i kaldırıp düz renk yaptım */
 }
 
 .tab-buttons {

@@ -65,4 +65,14 @@ button:hover {
 .app {
   position: relative;
   min-height: 100vh;
+}
+
+.app-container {
+    min-height: 100vh;
+    background-color: #141414;
+}
+
+/* Eğer login/register gibi navbar'ın görünmemesi gereken sayfalarda padding istemiyorsak */
+.auth-page {
+    padding-top: 0;
 } 

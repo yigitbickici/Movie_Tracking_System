@@ -1,32 +1,38 @@
 .navbar {
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
-    background: #1f1f1f;
-    padding: 10px 0;
+    background: rgba(31, 31, 31, 0.95);
+    padding: 15px 0;
     z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .nav-items {
     display: flex;
-    justify-content: space-around;
-    max-width: 600px;
+    justify-content: center;
+    align-items: center;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
 }
 
 .nav-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     color: #999;
     text-decoration: none;
-    font-size: 12px;
-    gap: 4px;
+    font-size: 14px;
+    gap: 8px;
+    padding: 0 20px;
 }
 
 .nav-item i {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .nav-item.active {
@@ -40,46 +46,56 @@
 /* Responsive düzenlemeler */
 @media screen and (max-width: 768px) {
     .navbar {
-        padding: 10px;
+        padding: 12px 0;
     }
 
-    .nav-links {
-        gap: 15px;
+    .nav-item {
+        font-size: 13px;
+        padding: 0 15px;
     }
 
-    .nav-link {
-        font-size: 14px;
+    .nav-item i {
+        font-size: 16px;
     }
 }
 
 @media screen and (max-width: 480px) {
-    .nav-links {
-        gap: 10px;
+    .nav-item span {
+        display: none;
     }
 
-    .nav-link {
-        padding: 5px 10px;
+    .nav-item {
+        padding: 0 10px;
+    }
+
+    .nav-item i {
+        font-size: 20px;
+    }
+
+    .logout-button {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }
 
 .nav-right {
-    margin-left: auto;
-    display: flex;
-    justify-content: flex-end;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .logout-button {
-    background: orange;
-    border: 1px solid #fff;
-    color: white;
+    background: transparent;
+    border: 1px solid orange;
+    color: orange;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s;
-    margin-right: 20px;
 }
 
 .logout-button:hover {
-    background: black;
+    background: orange;
     color: #141414;
 } 

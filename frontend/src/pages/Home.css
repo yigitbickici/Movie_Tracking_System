@@ -1,13 +1,14 @@
 .home {
-  min-height: calc(100vh - 70px);
-  background: #141414;
+  margin-top: 65px;
+  min-height: calc(100vh - 65px);
+  background-color: #141414;
   color: white;
   padding-bottom: 70px;
 }
 
 .home-header {
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.3);
+  background: #141414;
+  padding: 20px 40px;
   text-align: center;
 }
 
@@ -49,23 +50,6 @@
   gap: 1rem;
   padding: 2rem;
   margin-bottom: 60px;
-}
-
-.add-movie-button {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #FFD700;
-    color: black;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 100;
 }
 
 .pagination {
