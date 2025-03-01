@@ -11,7 +11,7 @@ const MovieSocialPage = () => {
     const [loading, setLoading] = useState(true);
     const [newPost, setNewPost] = useState('');
     const [posts, setPosts] = useState([
-        // Örnek veriler
+        // İlk örnek post
         {
             id: 1,
             user: {
@@ -32,6 +32,29 @@ const MovieSocialPage = () => {
                 }
             ],
             timestamp: '2 saat önce'
+        },
+        // Yeni eklenen post
+        {
+            id: 2,
+            user: {
+                name: 'USER3',
+                avatar: 'https://eu.ui-avatars.com/api/?name=User3'
+            },
+            content: 'Başyapıt 😄',
+            media: '/very-nice-nice.gif',  // Local gif'i kullanıyoruz
+            likes: 8,
+            comments: [
+                {
+                    id: 1,
+                    user: {
+                        name: 'USER4',
+                        avatar: 'https://eu.ui-avatars.com/api/?name=User4'
+                    },
+                    content: '👏',
+                    likes: 2
+                }
+            ],
+            timestamp: '45 dakika önce'
         }
     ]);
     const [selectedMedia, setSelectedMedia] = useState(null);
