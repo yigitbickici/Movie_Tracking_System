@@ -7,6 +7,7 @@ import ProfileEdit from './components/ProfileEdit';
 import MovieSocialPage from './components/MovieSocialPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Watchlist from './pages/Watchlist';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/watchlist" element={<Watchlist />} />
         </Routes>
       </div>
     </Router>

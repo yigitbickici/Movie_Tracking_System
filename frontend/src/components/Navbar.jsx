@@ -13,7 +13,7 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="nav-items">
-                <Link to="/movies" className="nav-item">
+                <Link to="/watchlist" className="nav-item">
                     <i className="fas fa-film"></i>
                     <span>My WatchList</span>
                 </Link>
