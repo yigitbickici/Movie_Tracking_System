@@ -61,7 +61,7 @@ const Home = () => {
   return (
       <div className="home">
         <header className="home-header">
-          <h1>SELAM İSİM BULUN</h1>
+          <h1>SELAM İSİM BULALIM PROJEYE</h1>
           <div className="search-bar">
             <input type="text" placeholder="Search movies..." />
           </div>
