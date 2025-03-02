@@ -12,6 +12,7 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     fetch(API_URL(currentPage))
@@ -53,12 +54,36 @@ const Home = () => {
       .catch(error => console.error("Error fetching movie details:", error));
   };
 
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+  };
+
   return (
       <div className="home">
         <header className="home-header">
           <h1>SELAM İSİM BULUN</h1>
           <div className="search-bar">
             <input type="text" placeholder="Search movies..." />
+          </div>
+          <div className="categories-container">
+            <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
+              All
+            </button>
+            <button className={`category-button ${selectedCategory === 'action' ? 'active' : ''}`} onClick={() => handleCategoryClick('action')}>
+              Action
+            </button>
+            <button className={`category-button ${selectedCategory === 'drama' ? 'active' : ''}`} onClick={() => handleCategoryClick('drama')}>
+              Drama
+            </button>
+            <button className={`category-button ${selectedCategory === 'comedy' ? 'active' : ''}`} onClick={() => handleCategoryClick('comedy')}>
+              Comedy
+            </button>
+            <button className={`category-button ${selectedCategory === 'horror' ? 'active' : ''}`} onClick={() => handleCategoryClick('horror')}>
+              Horror
+            </button>
+            <button className={`category-button ${selectedCategory === 'sci-fi' ? 'active' : ''}`} onClick={() => handleCategoryClick('sci-fi')}>
+              Sci-Fi
+            </button>
           </div>
         </header>
 

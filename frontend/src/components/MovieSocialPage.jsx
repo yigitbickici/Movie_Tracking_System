@@ -16,7 +16,8 @@ const MovieSocialPage = () => {
             id: 1,
             user: {
                 name: 'USER1',
-                avatar: 'https://eu.ui-avatars.com/api/?name=User1'
+                avatar: 'https://eu.ui-avatars.com/api/?name=User1',
+                isFollowing: false
             },
             content: 'Bu film gerçekten muhteşemdi! Özellikle son sahne...',
             likes: 15,
@@ -25,7 +26,8 @@ const MovieSocialPage = () => {
                     id: 1,
                     user: {
                         name: 'USER2',
-                        avatar: 'https://eu.ui-avatars.com/api/?name=User2'
+                        avatar: 'https://eu.ui-avatars.com/api/?name=User2',
+                        isFollowing: false
                     },
                     content: 'Kesinlikle katılıyorum!',
                     likes: 3
@@ -38,7 +40,8 @@ const MovieSocialPage = () => {
             id: 2,
             user: {
                 name: 'USER3',
-                avatar: 'https://eu.ui-avatars.com/api/?name=User3'
+                avatar: 'https://eu.ui-avatars.com/api/?name=User3',
+                isFollowing: false
             },
             content: 'Başyapıt 😄',
             media: '/very-nice-nice.gif',  // Local gif'i kullanıyoruz
@@ -48,7 +51,8 @@ const MovieSocialPage = () => {
                     id: 1,
                     user: {
                         name: 'USER4',
-                        avatar: 'https://eu.ui-avatars.com/api/?name=User4'
+                        avatar: 'https://eu.ui-avatars.com/api/?name=User4',
+                        isFollowing: false
                     },
                     content: '👏',
                     likes: 2
@@ -130,6 +134,21 @@ const MovieSocialPage = () => {
                 return {
                     ...post,
                     comments: [...post.comments, newComment]
+                };
+            }
+            return post;
+        }));
+    };
+
+    const handleFollow = (postId, userId) => {
+        setPosts(posts.map(post => {
+            if (post.id === postId) {
+                return {
+                    ...post,
+                    user: {
+                        ...post.user,
+                        isFollowing: !post.user.isFollowing
+                    }
                 };
             }
             return post;
@@ -231,6 +250,12 @@ const MovieSocialPage = () => {
                                 <img src={post.user.avatar} alt={post.user.name} className="user-avatar" />
                                 <div className="post-info">
                                     <span className="username">{post.user.name}</span>
+                                    <button 
+                                        className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
+                                        onClick={() => handleFollow(post.id, post.user.name)}
+                                    >
+                                        {post.user.isFollowing ? '✓ Following' : '+ Follow'}
+                                    </button>
                                     <span className="timestamp">{post.timestamp}</span>
                                 </div>
                             </div>

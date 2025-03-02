@@ -259,7 +259,7 @@ const MovieDetail = ({ movie, onClose }) => {
                                         className="see-posts-button"
                                         onClick={handleSeePostsClick}
                                     >
-                                        See Discussion
+                                        Join Discussion
                                     </button>
                                 </div>
                             </div>

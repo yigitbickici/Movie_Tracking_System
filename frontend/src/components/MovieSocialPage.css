@@ -133,6 +133,7 @@
 .post-info {
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .username {
@@ -371,4 +372,30 @@
         width: 100%;
         justify-content: center;
     }
+
+    .follow-button {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+}
+
+.follow-button {
+    background: none;
+    border: 1px solid #2196F3;
+    color: #2196F3;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    margin-top: 4px;
+}
+
+.follow-button.following {
+    background: #2196F3;
+    color: white;
+}
+
+.follow-button:hover {
+    transform: scale(1.05);
 } 

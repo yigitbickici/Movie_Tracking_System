@@ -1,5 +1,4 @@
 .home {
-  margin-top: 20px;
   min-height: calc(100vh - 65px);
   background-color: #141414;
   color: white;
@@ -31,7 +30,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 2rem;
-  padding: 2rem;
+  padding: 1rem 2rem;
 }
 
 .loading {
@@ -48,7 +47,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  padding: 2rem;
+  padding: 1rem 2rem;
   margin-bottom: 60px;
 }
 
@@ -78,6 +77,39 @@
 .pagination span {
     color: white;
     font-size: 16px;
+}
+
+.categories-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 15px auto 5px auto;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.category-button {
+  padding: 8px 16px;
+  border: 2px solid #ffffff3d;
+  border-radius: 20px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.category-button:hover {
+  background: #ffffff1a;
+  transform: translateY(-2px);
+}
+
+.category-button.active {
+  background: orange;
+  border-color: black;
 }
 
 /* Responsive düzenlemeler */
@@ -138,6 +170,16 @@
         padding: 12px 25px;
         font-size: 14px;
     }
+
+    .categories-container {
+        gap: 8px;
+        padding: 0 10px;
+    }
+
+    .category-button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 }
 
 @media screen and (max-width: 576px) {
@@ -182,6 +224,15 @@
         padding: 10px 20px;
         font-size: 13px;
         bottom: 25px;
+    }
+
+    .categories-container {
+        gap: 6px;
+    }
+
+    .category-button {
+        padding: 5px 10px;
+        font-size: 11px;
     }
 }
 
