@@ -8,7 +8,7 @@ const Home = () => {
   const isLoggedIn = localStorage.getItem('userType');
 
   React.useEffect(() => {
-    // Eğer kullanıcı giriş yapmışsa, explore sayfasına yönlendir
+    
     if (isLoggedIn) {
       navigate('/explore');
     }
@@ -30,12 +30,11 @@ const Home = () => {
         <div className="hero-content">
           <h1>SENİ BAŞKA DÜNYALARA GÖTÜRECEK</h1>
           <div className="subscription-box">
-            <h2>İlk 7 Gün Ücretsiz</h2>
+            <h2>Hemen Kaydol</h2>
             <div className="email-input-container">
               <input type="email" placeholder="E-posta adresi" />
               <button onClick={handleExplore}>BAŞLA</button>
             </div>
-            <p className="subscription-note">7 günün sonunda ödemeye başla. Dilediğin zaman iptal et.</p>
           </div>
         </div>
       </section>
@@ -43,7 +42,7 @@ const Home = () => {
       <section className="features-section">
         <div className="feature-container">
           <div className="feature-text">
-            <h2>TÜM FİLMLERİ İZLE YA DA İNDİR,<br />NE ZAMAN İSTERSEN. TÜM<br />EKRAN VE CİHAZLARDA, NEREDE<br />İSTERSEN.</h2>
+            <h2>FİLM TUTKUNLARININ ARASINA KATIL.</h2>
           </div>
           <div className="device-frames">
             <div className="device phone"></div>
