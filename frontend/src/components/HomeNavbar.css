@@ -14,7 +14,7 @@
 }
 
 .login-button {
-    background: #e50914;
+    background: #3489C0;
     color: white;
     border: none;
     padding: 8px 20px;
@@ -26,7 +26,7 @@
 }
 
 .login-button:hover {
-    background: #f40612;
+    background: #2a6d9a;
 }
 
 @media (max-width: 768px) {
