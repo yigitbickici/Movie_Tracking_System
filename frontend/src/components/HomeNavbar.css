@@ -14,19 +14,19 @@
 }
 
 .login-button {
-    background: #e50914;
+    background-color: #FF8C00;
     color: white;
     border: none;
     padding: 8px 20px;
     border-radius: 4px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: bold;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background-color 0.3s;
 }
 
 .login-button:hover {
-    background: #f40612;
+    background-color: #FFA500;
 }
 
 @media (max-width: 768px) {

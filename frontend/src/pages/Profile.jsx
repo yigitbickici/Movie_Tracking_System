@@ -211,7 +211,6 @@ const Profile = () => {
                 <div className="movies-section">
                     <h2>Movies</h2>
                     <div className="section-header">
-                        <h3>Movies</h3>
                         {movies.length > 5 && (
                             <button className="see-all-button" onClick={handleSeeAllMovies}>
                                 {showAllMovies ? 'Show Less' : 'See All'} <FaChevronRight className={showAllMovies ? 'rotate-icon' : ''} />
@@ -237,7 +236,7 @@ const Profile = () => {
 
                 <div className="favorite-movies-section">
                     <div className="section-header">
-                        <h3>Favorite Movies</h3>
+                        <h2>Favorite Movies</h2>
                         {favoriteMovies.length > 5 && (
                             <button className="see-all-button" onClick={handleSeeAllFavorites}>
                                 {showAllFavorites ? 'Show Less' : 'See All'} <FaChevronRight className={showAllFavorites ? 'rotate-icon' : ''} />

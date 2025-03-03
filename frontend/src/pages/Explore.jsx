@@ -59,7 +59,7 @@ const Explore = () => {
   return (
       <div className="explore">
         <header className="explore-header">
-          <h1>Filmleri Keşfet</h1>
+          <h1 style={{ textAlign: 'center' }}>CHECK POPULAR MOVIES</h1>
           <div className="search-bar">
             <input type="text" placeholder="Film ara..." />
           </div>

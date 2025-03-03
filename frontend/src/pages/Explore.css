@@ -5,4 +5,8 @@
   padding-bottom: 70px;
 }
 
+.explore-header h1 {
+    text-align: center;
+}
+
 /* Diğer stiller buraya gelecek (eski Home.css'teki film listesi stilleri) */ 
