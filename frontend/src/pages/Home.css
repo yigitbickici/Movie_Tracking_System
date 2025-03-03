@@ -337,7 +337,7 @@
 
 .email-input-container button {
   padding: 1rem 2rem;
-  background: #FF8C00;
+  background: #3489C0;
   color: white;
   border: none;
   border-radius: 4px;
@@ -347,7 +347,7 @@
 }
 
 .email-input-container button:hover {
-  background: #FFA500;
+  background: #2a6d9a;
 }
 
 .subscription-note {
