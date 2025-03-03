@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Profile.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FaChevronRight } from 'react-icons/fa';
 import MovieDetail from '../components/MovieDetail';
 
@@ -156,111 +156,111 @@ const Profile = () => {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                <div className="profile-info">
-                    <div className="profile-avatar">
-                        <img src="https://eu.ui-avatars.com/api/?name=John+Doe&size=250" alt="Profile" />
-                    </div>
-                    <div className="profile-username">
-                        <h2>USER1</h2>
-                        <button className="edit-profile-btn" onClick={handleEditClick}>EDIT</button>
-                    </div>
+                <div className="profile-avatar">
+                    <span>JD</span>
                 </div>
-
+                <h1 className="profile-username">USER1</h1>
+                <Link to="/profile/edit" className="edit-button">
+                    EDIT
+                </Link>
                 <div className="profile-stats">
                     <div className="stat-item">
-                        <span className="stat-number">{userStats.following}</span>
-                        <span className="stat-label">following</span>
+                        <div className="stat-value">{userStats.following}</div>
+                        <div className="stat-label">following</div>
                     </div>
                     <div className="stat-item">
-                        <span className="stat-number">{userStats.followers}</span>
-                        <span className="stat-label">follower</span>
+                        <div className="stat-value">{userStats.followers}</div>
+                        <div className="stat-label">follower</div>
                     </div>
                     <div className="stat-item">
-                        <span className="stat-number">{userStats.comments}</span>
-                        <span className="stat-label">comments</span>
+                        <div className="stat-value">{userStats.comments}</div>
+                        <div className="stat-label">comments</div>
                     </div>
                 </div>
             </div>
 
-            <section className="stats-section">
-                <h3>Stats</h3>
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <h4>Movie time</h4>
-                        <div className="time-stats">
-                            <div className="time-stat">
-                                <span>{userStats.movieTime.months}</span>
-                                <label>MONTHS</label>
+            <div className="profile-content">
+                <div className="stats-section">
+                    <h2>Stats</h2>
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <h4>Movie time</h4>
+                            <div className="time-stats">
+                                <div className="time-stat">
+                                    <span>{userStats.movieTime.months}</span>
+                                    <label>MONTHS</label>
+                                </div>
+                                <div className="time-stat">
+                                    <span>{userStats.movieTime.days}</span>
+                                    <label>DAYS</label>
+                                </div>
+                                <div className="time-stat">
+                                    <span>{userStats.movieTime.hours}</span>
+                                    <label>HOURS</label>
+                                </div>
                             </div>
-                            <div className="time-stat">
-                                <span>{userStats.movieTime.days}</span>
-                                <label>DAYS</label>
-                            </div>
-                            <div className="time-stat">
-                                <span>{userStats.movieTime.hours}</span>
-                                <label>HOURS</label>
-                            </div>
+                        </div>
+                    
+                        <div className="stat-card">
+                            <h4>Movies watched</h4>
+                            <div className="single-stat">{userStats.moviesWatched}</div>
                         </div>
                     </div>
-                
-                    <div className="stat-card">
-                        <h4>Movies watched</h4>
-                        <div className="single-stat">{userStats.moviesWatched}</div>
+                </div>
+
+                <div className="movies-section">
+                    <h2>Movies</h2>
+                    <div className="section-header">
+                        <h3>Movies</h3>
+                        {movies.length > 5 && (
+                            <button className="see-all-button" onClick={handleSeeAllMovies}>
+                                {showAllMovies ? 'Show Less' : 'See All'} <FaChevronRight className={showAllMovies ? 'rotate-icon' : ''} />
+                            </button>
+                        )}
+                    </div>
+                    <div className="movies-slider">
+                        {movies.length > 0 ? (
+                            <div className="movies-grid">
+                                {(showAllMovies ? movies : movies.slice(0, 5)).map((movie) => (
+                                    <MoviePreview key={movie.id} movie={movie} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state">
+                                <button className="add-movies-btn">
+                                    NO MOVIES
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </section>
 
-            <section className="movies-section">
-                <div className="section-header">
-                    <h3>Movies</h3>
-                    {movies.length > 5 && (
-                        <button className="see-all-button" onClick={handleSeeAllMovies}>
-                            {showAllMovies ? 'Show Less' : 'See All'} <FaChevronRight className={showAllMovies ? 'rotate-icon' : ''} />
-                        </button>
-                    )}
-                </div>
-                <div className="movies-slider">
-                    {movies.length > 0 ? (
-                        <div className="movies-grid">
-                            {(showAllMovies ? movies : movies.slice(0, 5)).map((movie) => (
-                                <MoviePreview key={movie.id} movie={movie} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="empty-state">
-                            <button className="add-movies-btn">
-                                NO MOVIES
+                <div className="favorite-movies-section">
+                    <div className="section-header">
+                        <h3>Favorite Movies</h3>
+                        {favoriteMovies.length > 5 && (
+                            <button className="see-all-button" onClick={handleSeeAllFavorites}>
+                                {showAllFavorites ? 'Show Less' : 'See All'} <FaChevronRight className={showAllFavorites ? 'rotate-icon' : ''} />
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                    <div className="movies-slider">
+                        {favoriteMovies.length > 0 ? (
+                            <div className="movies-grid">
+                                {(showAllFavorites ? favoriteMovies : favoriteMovies.slice(0, 5)).map((movie) => (
+                                    <MoviePreview key={movie.id} movie={movie} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state">
+                                <button className="add-favorite-movies-btn">
+                                    NO MOVIES
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </section>
-
-            <section className="favorite-movies-section">
-                <div className="section-header">
-                    <h3>Favorite Movies</h3>
-                    {favoriteMovies.length > 5 && (
-                        <button className="see-all-button" onClick={handleSeeAllFavorites}>
-                            {showAllFavorites ? 'Show Less' : 'See All'} <FaChevronRight className={showAllFavorites ? 'rotate-icon' : ''} />
-                        </button>
-                    )}
-                </div>
-                <div className="movies-slider">
-                    {favoriteMovies.length > 0 ? (
-                        <div className="movies-grid">
-                            {(showAllFavorites ? favoriteMovies : favoriteMovies.slice(0, 5)).map((movie) => (
-                                <MoviePreview key={movie.id} movie={movie} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="empty-state">
-                            <button className="add-favorite-movies-btn">
-                                NO MOVIES
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </section>
+            </div>
 
             {selectedMovie && (
                 <MovieDetail 

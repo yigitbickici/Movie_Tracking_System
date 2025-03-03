@@ -4,10 +4,13 @@ import './Navbar.css';
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
     const handleLogout = () => {
-        // Şimdilik sadece login sayfasına yönlendirme yapıyoruz
-        navigate('/login');
+        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userName');
+        navigate('/');
     };
 
     return (
@@ -25,6 +28,12 @@ const Navbar = () => {
                     <i className="fas fa-user"></i>
                     <span>Profile</span>
                 </Link>
+                {isAdmin && (
+                    <Link to="/admin" className="nav-item">
+                        <i className="fas fa-cog"></i>
+                        <span>Admin Panel</span>
+                    </Link>
+                )}
             </div>
             <div className="nav-right">
                 <button className="logout-button" onClick={handleLogout}>

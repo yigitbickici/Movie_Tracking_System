@@ -18,8 +18,23 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // only navigate to home page for now
-        navigate('/');
+        
+        // Admin kontrolü
+        if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+            localStorage.setItem('isAdmin', 'true');
+            localStorage.setItem('userType', 'admin');
+            localStorage.setItem('userName', 'Admin');
+            navigate('/admin');
+        }
+        // Normal kullanıcı kontrolü
+        else if (formData.email === 'user@example.com' && formData.password === 'user123') {
+            localStorage.setItem('isAdmin', 'false');
+            localStorage.setItem('userType', 'user');
+            localStorage.setItem('userName', 'User1');
+            navigate('/');
+        } else {
+            alert('Geçersiz email veya şifre!');
+        }
     };
 
     return (
@@ -54,6 +69,19 @@ const Login = () => {
                 <p className="auth-link">
                     Don't have an account? <Link to="/register">Register</Link>
                 </p>
+                <div className="login-info">
+                    <p>Test Hesapları:</p>
+                    <div className="test-account">
+                        <p><strong>Admin Hesabı:</strong></p>
+                        <p>Email: admin@example.com</p>
+                        <p>Şifre: admin123</p>
+                    </div>
+                    <div className="test-account">
+                        <p><strong>Normal Kullanıcı:</strong></p>
+                        <p>Email: user@example.com</p>
+                        <p>Şifre: user123</p>
+                    </div>
+                </div>
             </div>
         </div>
     );

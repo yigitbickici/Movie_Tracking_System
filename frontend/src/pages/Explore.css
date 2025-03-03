@@ -1,0 +1,8 @@
+.explore {
+  min-height: calc(100vh - 65px);
+  background-color: #141414;
+  color: white;
+  padding-bottom: 70px;
+}
+
+/* Diğer stiller buraya gelecek (eski Home.css'teki film listesi stilleri) */ 

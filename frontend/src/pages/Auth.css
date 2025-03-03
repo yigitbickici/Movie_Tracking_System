@@ -77,4 +77,33 @@
 
 .auth-link a:hover {
     text-decoration: underline;
+}
+
+.login-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.login-info p {
+    margin: 5px 0;
+    color: #fff;
+}
+
+.test-account {
+    margin: 10px 0;
+    padding: 10px;
+    border-left: 3px solid #2196f3;
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.test-account p {
+    margin: 3px 0;
+    font-size: 0.9rem;
+}
+
+.test-account strong {
+    color: #2196f3;
 } 

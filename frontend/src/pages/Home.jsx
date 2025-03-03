@@ -1,117 +1,66 @@
-import { useEffect, useState } from "react";
-import MovieCard from "../components/MovieCard";
-import MovieDetail from "../components/MovieDetail";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
-const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
-
-const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-TR&page=${page}`;
-
 const Home = () => {
-  const [movies, setMovies] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem('userType');
 
-  useEffect(() => {
-    fetch(API_URL(currentPage))
-        .then((response) => response.json())
-        .then((data) => {
-          setMovies(data.results);
-          setTotalPages(data.total_pages);
-        })
-        .catch((error) => console.error("Hata:", error));
-  }, [currentPage]);
+  React.useEffect(() => {
+    // Eğer kullanıcı giriş yapmışsa, explore sayfasına yönlendir
+    if (isLoggedIn) {
+      navigate('/explore');
+    }
+  }, [isLoggedIn, navigate]);
 
-  const goToNextPage = () => {
-      setCurrentPage(currentPage + 1);
-  };
-
-  const goToPrevPage = () => {
-      setCurrentPage(currentPage - 1);
-  };
-
-  const handleMovieClick = (movie) => {
-    // Fetch movie details, credits, and watch providers in parallel
-    Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-TR`),
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=en-TR`),
-      fetch(`https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=${API_KEY}`)
-    ])
-      .then(([detailsRes, creditsRes, providersRes]) => 
-        Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
-      )
-      .then(([detailedMovie, credits, providers]) => {
-        // Combine all data
-        setSelectedMovie({
-          ...movie,
-          runtime: detailedMovie.runtime,
-          cast: credits.cast.slice(0, 5),
-          providers: providers.results.TR || {} // Get Turkish providers if available
-        });
-      })
-      .catch(error => console.error("Error fetching movie details:", error));
-  };
-
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
+  const handleExplore = () => {
+    navigate('/login');
   };
 
   return (
-      <div className="home">
-        <header className="home-header">
-          <h1>SELAM İSİM BULALIM PROJEYE</h1>
-          <div className="search-bar">
-            <input type="text" placeholder="Search movies..." />
+    <div className="landing-page">
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1>SENİ BAŞKA DÜNYALARA GÖTÜRECEK</h1>
+          <div className="subscription-box">
+            <h2>İlk 7 Gün Ücretsiz</h2>
+            <div className="email-input-container">
+              <input type="email" placeholder="E-posta adresi" />
+              <button onClick={handleExplore}>BAŞLA</button>
+            </div>
+            <p className="subscription-note">7 günün sonunda ödemeye başla. Dilediğin zaman iptal et.</p>
           </div>
-          <div className="categories-container">
-            <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
-              All
-            </button>
-            <button className={`category-button ${selectedCategory === 'action' ? 'active' : ''}`} onClick={() => handleCategoryClick('action')}>
-              Action
-            </button>
-            <button className={`category-button ${selectedCategory === 'drama' ? 'active' : ''}`} onClick={() => handleCategoryClick('drama')}>
-              Drama
-            </button>
-            <button className={`category-button ${selectedCategory === 'comedy' ? 'active' : ''}`} onClick={() => handleCategoryClick('comedy')}>
-              Comedy
-            </button>
-            <button className={`category-button ${selectedCategory === 'horror' ? 'active' : ''}`} onClick={() => handleCategoryClick('horror')}>
-              Horror
-            </button>
-            <button className={`category-button ${selectedCategory === 'sci-fi' ? 'active' : ''}`} onClick={() => handleCategoryClick('sci-fi')}>
-              Sci-Fi
-            </button>
+        </div>
+      </section>
+
+      <section className="features-section">
+        <div className="feature-container">
+          <div className="feature-text">
+            <h2>TÜM FİLMLERİ İZLE YA DA İNDİR,<br />NE ZAMAN İSTERSEN. TÜM<br />EKRAN VE CİHAZLARDA, NEREDE<br />İSTERSEN.</h2>
           </div>
-        </header>
-
-        <div className="movie-list">
-          {movies.map(movie => (
-              <MovieCard 
-                key={movie.id} 
-                movie={movie} 
-                onClick={handleMovieClick}
-              />
-          ))}
+          <div className="device-frames">
+            <div className="device phone"></div>
+            <div className="device tablet"></div>
+            <div className="device laptop"></div>
+            <div className="device desktop"></div>
+          </div>
         </div>
+      </section>
 
-        {selectedMovie && (
-          <MovieDetail 
-            movie={selectedMovie} 
-            onClose={() => setSelectedMovie(null)}
-            isInList={true}
-          />
-        )}
-
-        <div className="pagination">
-          <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>
-          <span>{currentPage} / {totalPages}</span>
-          <button onClick={goToNextPage} disabled={currentPage === totalPages}>→</button>
+      <section className="collection-section">
+        <div className="collection-content">
+          <div className="collection-logo">
+            <h2>PROJE ADI</h2>
+          </div>
+          <div className="collection-text">
+            <h2>KÜLT KLASİKLERDEN MODERN BAŞYAPITLARA.<br />
+                GELMİŞ GEÇMİŞ EN BÜYÜK SİNEMACILARDAN,<br />
+                GÜNÜMÜZÜN EN İYİ YÖNETMENLERİNE.<br />
+                DÜNYANIN HER KÖŞESİNDEN FİLMLER.</h2>
+          </div>
         </div>
-
-      </div>
+      </section>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
@@ -9,28 +9,45 @@ import MovieSocialPage from './components/MovieSocialPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Watchlist from './pages/Watchlist';
+import AdminDashboard from './pages/AdminDashboard';
+import Explore from './pages/Explore';
+import HomeNavbar from './components/HomeNavbar';
 import './App.css';
+
+const AppLayout = ({ children }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isLoggedIn = localStorage.getItem('userType'); // Kullanıcı girişi kontrolü
+
+  return (
+    <div className="app">
+      <div className={`app-container ${(isHomePage || isAuthPage) ? 'no-padding' : ''}`}>
+        {isHomePage && !isLoggedIn && <HomeNavbar />}
+        {isLoggedIn && !isAuthPage && <Navbar />}
+        {children}
+        {!isAuthPage && <Footer />}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   return (
     <Router>
-      <div className="app">
-        <div className="app-container">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/movies" element={<Home />} />
-            <Route path="/explore" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/edit" element={<ProfileEdit />} />
-            <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/watchlist" element={<Watchlist />} />
-          </Routes>
-          <Footer />
-        </div>
-      </div>
+      <AppLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<ProfileEdit />} />
+          <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+      </AppLayout>
     </Router>
   );
 }
