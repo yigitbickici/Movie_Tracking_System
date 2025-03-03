@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
+import backgroundVideo from '../assets/videos/movie-background.mp4';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,6 +21,12 @@ const Home = () => {
   return (
     <div className="landing-page">
       <section className="hero-section">
+        <div className="video-background">
+          <video autoPlay loop muted playsInline>
+            <source src={backgroundVideo} type="video/mp4" />
+          </video>
+          <div className="overlay"></div>
+        </div>
         <div className="hero-content">
           <h1>SENİ BAŞKA DÜNYALARA GÖTÜRECEK</h1>
           <div className="subscription-box">
