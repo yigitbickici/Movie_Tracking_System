@@ -10,7 +10,7 @@ const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${
 const Explore = () => {
   const [movies, setMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(500);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -19,7 +19,6 @@ const Explore = () => {
         .then((response) => response.json())
         .then((data) => {
           setMovies(data.results);
-          setTotalPages(data.total_pages);
         })
         .catch((error) => console.error("Hata:", error));
   }, [currentPage]);
