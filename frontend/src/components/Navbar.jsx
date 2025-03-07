@@ -50,7 +50,24 @@ const Navbar = () => {
                 </div>
 
                 <div className="nav-links">
-                    {userType === 'editor' ? (
+                    {userType === 'admin' ? (
+                        <>
+                            <Link 
+                                to="/explore" 
+                                className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
+                            >
+                                <FaCompass />
+                                <span>Explore</span>
+                            </Link>
+                            <Link 
+                                to="/admin" 
+                                className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                            >
+                                <FaCog />
+                                <span>Admin Panel</span>
+                            </Link>
+                        </>
+                    ) : userType === 'editor' ? (
                         <>
                             <Link 
                                 to="/explore" 
@@ -83,15 +100,6 @@ const Navbar = () => {
                                 <FaFilm />
                                 <span>WatchList</span>
                             </Link>
-                            {userType === 'admin' && (
-                                <Link 
-                                    to="/admin" 
-                                    className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                                >
-                                    <FaCog />
-                                    <span>Admin Panel</span>
-                                </Link>
-                            )}
                         </>
                     )}
                 </div>
@@ -145,7 +153,7 @@ const Navbar = () => {
 
                         {showProfileMenu && (
                             <div className="profile-dropdown">
-                                {userType !== 'editor' && (
+                                {userType !== 'editor' && userType !=='admin' && (
                                     <Link to="/profile" className="dropdown-item">
                                         <FaUser />
                                         <span>Profile</span>
