@@ -5,12 +5,12 @@ import './ProfileEdit.css';
 const ProfileEdit = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: 'JohnDoe', 
-        email: 'john@example.com',
-        fullName: 'John Doe',
-        avatar: 'https://eu.ui-avatars.com/api/?name=John+Doe&size=250',
-        bio: 'Bir Film Tutkunu.',
-        favoriteGenres: ['Aksiyon', 'Bilim Kurgu']
+        username: 'User1', 
+        email: 'user1@example.com',
+        fullName: 'User1',
+        avatar: 'https://eu.ui-avatars.com/api/?name=User1&size=250',
+        bio: 'Fan of Recep İvedik.',
+        favoriteGenres: ['Action', 'Adventure']
     });
 
     const handleChange = (e) => {

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit } from 'react-icons/fa';
+import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit, FaUsers, FaUserFriends } from 'react-icons/fa';
 import MovieDetail from '../components/MovieDetail';
 
 const Profile = () => {
     const [userProfile, setUserProfile] = useState({
         username: "USER1",
-        avatar: "JD",
+        avatar: "U1",
         stats: {
             following: 10,
             followers: 10,
@@ -37,6 +37,39 @@ const Profile = () => {
         isOpen: false,
         comment: null
     });
+
+    const [followers, setFollowers] = useState([
+        {
+            id: 1,
+            username: "MovieLover",
+            movieCount: 150,
+            isFollowing: true,
+        },
+        {
+            id: 2,
+            username: "CinemaFan",
+            movieCount: 89,
+            isFollowing: false,
+        }
+    ]);
+
+    const [following, setFollowing] = useState([
+        {
+            id: 3,
+            username: "FilmBuff",
+            movieCount: 234,
+        },
+        {
+            id: 4,
+            username: "MovieCritic",
+            movieCount: 567,
+        }
+    ]);
+
+    const [followersModal, setFollowersModal] = useState(false);
+    const [followingModal, setFollowingModal] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserMovies();
@@ -178,6 +211,26 @@ const Profile = () => {
         } catch (error) {
             console.error('Error updating comment:', error);
         }
+    };
+
+    const handleFollow = (userId) => {
+        setFollowers(followers.map(follower => 
+            follower.id === userId 
+                ? {...follower, isFollowing: !follower.isFollowing}
+                : follower
+        ));
+    };
+
+    const handleUnfollow = (userId) => {
+        setFollowing(following.filter(user => user.id !== userId));
+        // Takipçi sayısını güncelle
+        setUserProfile(prev => ({
+            ...prev,
+            stats: {
+                ...prev.stats,
+                following: prev.stats.following - 1
+            }
+        }));
     };
 
     const MoviePreview = ({ movie }) => (
@@ -418,6 +471,72 @@ const Profile = () => {
         </div>
     );
 
+    const UserCard = ({ user, type }) => (
+        <div 
+            className="user-card"
+            onClick={() => navigate(`/user/${user.username}`)}
+        >
+            <div className="user-avatar">
+                {user.avatar || user.username.substring(0, 2).toUpperCase()}
+            </div>
+            <div className="user-info">
+                <h4>{user.username}</h4>
+                <p>{user.movieCount} films</p>
+            </div>
+            <button 
+                className={`follow-button ${type === 'following' || user.isFollowing ? 'following' : ''}`}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    type === 'following' ? handleUnfollow(user.id) : handleFollow(user.id);
+                }}
+            >
+                {type === 'following' || user.isFollowing ? 'Following' : 'Follow'}
+            </button>
+        </div>
+    );
+
+    const ConnectionModal = ({ title, users, isOpen, onClose, icon: Icon, type }) => {
+        const [isActive, setIsActive] = useState(false);
+
+        useEffect(() => {
+            if (isOpen) {
+                requestAnimationFrame(() => {
+                    setIsActive(true);
+                });
+            } else {
+                setIsActive(false);
+            }
+        }, [isOpen]);
+
+        if (!isOpen) return null;
+
+        return (
+            <div 
+                className={`connection-modal-overlay ${isActive ? 'active' : ''}`} 
+                onClick={onClose}
+            >
+                <div className="connection-modal-content" onClick={e => e.stopPropagation()}>
+                    <div className="modal-header">
+                        <h2>
+                            {Icon && <Icon className="section-icon" />}
+                            {title}
+                        </h2>
+                        <button className="modal-close-button" onClick={onClose}>×</button>
+                    </div>
+                    <div className="modal-users-list">
+                        {users.map(user => (
+                            <UserCard 
+                                key={user.id} 
+                                user={user} 
+                                type={type}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -470,6 +589,80 @@ const Profile = () => {
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                     </div>
+                </div>
+
+                <div className="connections-section">
+                    <div className="followers-container">
+                        <div className="connections-header">
+                            <h3>
+                                <FaUsers className="section-icon" />
+                                Followers
+                            </h3>
+                            <div className="connections-header-right">
+                                <span>{userProfile.stats.followers}</span>
+                                <button 
+                                    className="see-all-button modal-button"
+                                    onClick={() => setFollowersModal(true)}
+                                >
+                                    See all <FaChevronRight />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="user-list">
+                            {followers.map(user => (
+                                <UserCard 
+                                    key={user.id} 
+                                    user={user} 
+                                    type="followers"
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="following-container">
+                        <div className="connections-header">
+                            <h3>
+                                <FaUserFriends className="section-icon" />
+                                Following
+                            </h3>
+                            <div className="connections-header-right">
+                                <span>{userProfile.stats.following}</span>
+                                <button 
+                                    className="see-all-button modal-button"
+                                    onClick={() => setFollowingModal(true)}
+                                >
+                                    See all <FaChevronRight />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="user-list">
+                            {following.map(user => (
+                                <UserCard 
+                                    key={user.id} 
+                                    user={user} 
+                                    type="following"
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <ConnectionModal 
+                        title="Followers"
+                        users={followers}
+                        isOpen={followersModal}
+                        onClose={() => setFollowersModal(false)}
+                        icon={FaUsers}
+                        type="followers"
+                    />
+
+                    <ConnectionModal 
+                        title="Following"
+                        users={following}
+                        isOpen={followingModal}
+                        onClose={() => setFollowingModal(false)}
+                        icon={FaUserFriends}
+                        type="following"
+                    />
                 </div>
 
                 <MovieSection 

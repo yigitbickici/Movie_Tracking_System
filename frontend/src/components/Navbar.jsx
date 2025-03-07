@@ -21,9 +21,10 @@ const Navbar = () => {
     };
 
     const mockUsers = [
-        { id: 1, username: 'JohnDoe', avatar: 'JD' },
-        { id: 2, username: 'AliceSmith', avatar: 'AS' },
-        { id: 3, username: 'BobWilson', avatar: 'BW' },
+        { id: 1, username: 'Emircan Çapkan', avatar: 'EC' },
+        { id: 2, username: 'Yiğit Bıçkıcı', avatar: 'YB' },
+        { id: 3, username: 'Elif Gülüm', avatar: 'EG' },
+        { id: 4, username: 'Muhammet Emir Gündoğdu', avatar: 'MEG' }
     ];
 
     const handleSearch = async (e) => {
