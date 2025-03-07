@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -56,14 +56,14 @@ const Navbar = () => {
                                 to="/explore" 
                                 className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
                             >
-                                <i className="fas fa-compass"></i>
+                                <FaCompass />
                                 <span>Explore</span>
                             </Link>
                             <Link 
                                 to="/spoiler-requests" 
                                 className={`nav-link ${location.pathname === '/spoiler-requests' ? 'active' : ''}`}
                             >
-                                <i className="fas fa-shield-alt"></i>
+                                <FaShieldAlt />
                                 <span>Spoiler Reports</span>
                             </Link>
                         </>
@@ -73,14 +73,14 @@ const Navbar = () => {
                                 to="/explore" 
                                 className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
                             >
-                                <i className="fas fa-compass"></i>
+                                <FaCompass />
                                 <span>Explore</span>
                             </Link>
                             <Link 
                                 to="/watchlist" 
                                 className={`nav-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
                             >
-                                <i className="fas fa-film"></i>
+                                <FaFilm />
                                 <span>WatchList</span>
                             </Link>
                             {userType === 'admin' && (
@@ -88,7 +88,7 @@ const Navbar = () => {
                                     to="/admin" 
                                     className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
                                 >
-                                    <i className="fas fa-cog"></i>
+                                    <FaCog />
                                     <span>Admin Panel</span>
                                 </Link>
                             )}
@@ -138,21 +138,21 @@ const Navbar = () => {
                             className="profile-button"
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
                         >
-                            <i className="fas fa-user-circle"></i>
+                            <FaUserCircle />
                             <span>{userName}</span>
-                            <i className="fas fa-chevron-down"></i>
+                            <FaChevronDown />
                         </div>
 
                         {showProfileMenu && (
                             <div className="profile-dropdown">
                                 {userType !== 'editor' && (
                                     <Link to="/profile" className="dropdown-item">
-                                        <i className="fas fa-user"></i>
+                                        <FaUser />
                                         <span>Profile</span>
                                     </Link>
                                 )}
                                 <button onClick={handleLogout} className="dropdown-item logout-item">
-                                    <i className="fas fa-sign-out-alt"></i>
+                                    <FaSignOutAlt />
                                     <span>Log Out</span>
                                 </button>
                             </div>
