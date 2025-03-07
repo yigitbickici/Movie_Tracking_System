@@ -12,6 +12,7 @@ import Watchlist from './pages/Watchlist';
 import AdminDashboard from './pages/AdminDashboard';
 import Explore from './pages/Explore';
 import HomeNavbar from './components/HomeNavbar';
+import SpoilerRequests from './pages/SpoilerRequests';
 import './App.css';
 
 const AppLayout = ({ children }) => {
@@ -46,6 +47,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/spoiler-requests" element={<SpoilerRequests />} />
         </Routes>
       </AppLayout>
     </Router>
