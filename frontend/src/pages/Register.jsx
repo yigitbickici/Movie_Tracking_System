@@ -27,18 +27,17 @@ const Register = () => {
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Anasayfaya Dön
+                ← Back to Main page
             </Link>
             <div className="auth-box">
-                <h2>Hesap Oluştur</h2>
-                <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Film dünyasına katıl!</p>
+                <h2>Create Account</h2>
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="input-container">
                         <input
                             className="auth-input"
                             type="text"
                             name="username"
-                            placeholder="Kullanıcı Adı"
+                            placeholder="Username"
                             value={formData.username}
                             onChange={handleChange}
                             required
@@ -49,7 +48,7 @@ const Register = () => {
                             className="auth-input"
                             type="email"
                             name="email"
-                            placeholder="E-posta"
+                            placeholder="E-mail"
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -60,7 +59,7 @@ const Register = () => {
                             className="auth-input"
                             type="password"
                             name="password"
-                            placeholder="Şifre"
+                            placeholder="Password"
                             value={formData.password}
                             onChange={handleChange}
                             required
@@ -71,18 +70,18 @@ const Register = () => {
                             className="auth-input"
                             type="password"
                             name="confirmPassword"
-                            placeholder="Şifre Tekrar"
+                            placeholder="Re-password"
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <button type="submit" className="auth-button">
-                        Hesap Oluştur
+                        Create
                     </button>
                 </form>
                 <p className="auth-link">
-                    Zaten hesabın var mı? <Link to="/login">Giriş Yap</Link>
+                    I only have a account <Link to="/login">Login</Link>
                 </p>
             </div>
         </div>

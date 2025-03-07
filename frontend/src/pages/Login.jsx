@@ -49,7 +49,7 @@ const Login = () => {
                             className="auth-input"
                             type="email"
                             name="email"
-                            placeholder="E-posta"
+                            placeholder="E-mail"
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -60,7 +60,7 @@ const Login = () => {
                             className="auth-input"
                             type="password"
                             name="password"
-                            placeholder="Şifre"
+                            placeholder="Password"
                             value={formData.password}
                             onChange={handleChange}
                             required
