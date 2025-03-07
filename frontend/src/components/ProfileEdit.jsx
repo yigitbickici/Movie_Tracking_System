@@ -5,7 +5,7 @@ import './ProfileEdit.css';
 const ProfileEdit = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: 'JohnDoe', // Örnek veri
+        username: 'JohnDoe', 
         email: 'john@example.com',
         fullName: 'John Doe',
         avatar: 'https://eu.ui-avatars.com/api/?name=John+Doe&size=250',
@@ -48,7 +48,7 @@ const ProfileEdit = () => {
 
     return (
         <div className="profile-edit-container">
-            <h2>Profili Düzenle</h2>
+            <h2>Edit Profile</h2>
             <form onSubmit={handleSubmit} className="profile-edit-form">
                 <div className="avatar-section">
                     <img 
@@ -58,7 +58,7 @@ const ProfileEdit = () => {
                     />
                     <div className="avatar-upload">
                         <label htmlFor="avatar-input" className="avatar-upload-button">
-                            Fotoğraf Değiştir
+                            Change Photo
                         </label>
                         <input
                             id="avatar-input"
@@ -71,7 +71,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Kullanıcı Adı</label>
+                    <label>Username</label>
                     <input
                         type="text"
                         name="username"
@@ -81,7 +81,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>E-posta</label>
+                    <label>E-Mail</label>
                     <input
                         type="email"
                         name="email"
@@ -91,7 +91,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Ad Soyad</label>
+                    <label>Full Name</label>
                     <input
                         type="text"
                         name="fullName"
@@ -101,7 +101,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Hakkımda</label>
+                    <label>About</label>
                     <textarea
                         name="bio"
                         value={formData.bio}
@@ -112,10 +112,10 @@ const ProfileEdit = () => {
 
                 <div className="form-actions">
                     <button type="button" onClick={handleCancel} className="cancel-button">
-                        İptal
+                        Cancel
                     </button>
                     <button type="submit" className="save-button">
-                        Kaydet
+                        Save
                     </button>
                 </div>
             </form>
