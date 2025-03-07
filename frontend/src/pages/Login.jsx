@@ -31,18 +31,18 @@ const Login = () => {
             localStorage.setItem('userName', 'User1');
             navigate('/');
         } else {
-            alert('Geçersiz email veya şifre!');
+            alert('Invalid email or password!');
         }
     };
 
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Anasayfaya Dön
+                ← Back to Main Page
             </Link>
             <div className="auth-box">
-                <h2>Hoş Geldin</h2>
-                <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Giriş yap ve izlemeye başla!</p>
+                <h2>Welcome</h2>
+                <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Login and Start Now!</p>
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="input-container">
                         <input
@@ -67,14 +67,14 @@ const Login = () => {
                         />
                     </div>
                     <div className="forgot-password">
-                        <Link to="/forgot-password">Şifreni mi unuttun?</Link>
+                        <Link to="/forgot-password">Forgot your password?</Link>
                     </div>
                     <button type="submit" className="auth-button">
-                        Giriş
+                        Login
                     </button>
                 </form>
                 <p className="auth-link">
-                    Bir hesabın yok mu? <Link to="/register">Ücretsiz Hesap Oluştur</Link>
+                    Do not have any account? <Link to="/register">Register Free</Link>
                 </p>
                 
                 {/*

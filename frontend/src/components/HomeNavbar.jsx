@@ -9,7 +9,7 @@ const HomeNavbar = () => {
         <nav className="home-navbar">
             <div className="home-nav-right">
                 <button className="login-button" onClick={() => navigate('/login')}>
-                    Giriş Yap
+                    Login
                 </button>
             </div>
         </nav>

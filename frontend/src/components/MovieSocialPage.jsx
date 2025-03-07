@@ -19,7 +19,7 @@ const MovieSocialPage = () => {
                 avatar: 'https://eu.ui-avatars.com/api/?name=User1',
                 isFollowing: false
             },
-            content: 'Bu film gerçekten muhteşemdi! Özellikle son sahne...',
+            content: 'Movie was wonderful.Especially last scene...',
             likes: 15,
             comments: [
                 {
@@ -29,13 +29,12 @@ const MovieSocialPage = () => {
                         avatar: 'https://eu.ui-avatars.com/api/?name=User2',
                         isFollowing: false
                     },
-                    content: 'Kesinlikle katılıyorum!',
+                    content: 'Agreed!',
                     likes: 3
                 }
             ],
-            timestamp: '2 saat önce'
+            timestamp: '2 hour ago'
         },
-        // Yeni eklenen post
         {
             id: 2,
             user: {
@@ -43,7 +42,7 @@ const MovieSocialPage = () => {
                 avatar: 'https://eu.ui-avatars.com/api/?name=User3',
                 isFollowing: false
             },
-            content: 'Başyapıt 😄',
+            content: 'Masterpiece 😄',
             media: '/very-nice-nice.gif',  // Local gif'i kullanıyoruz
             likes: 8,
             comments: [
@@ -58,7 +57,7 @@ const MovieSocialPage = () => {
                     likes: 2
                 }
             ],
-            timestamp: '45 dakika önce'
+            timestamp: '45 min ago'
         }
     ]);
     const [selectedMedia, setSelectedMedia] = useState(null);
@@ -104,7 +103,7 @@ const MovieSocialPage = () => {
             media: mediaPreview,
             likes: 0,
             comments: [],
-            timestamp: 'Şimdi'
+            timestamp: 'Now'
         };
 
         setPosts([newPostObj, ...posts]);
@@ -198,7 +197,7 @@ const MovieSocialPage = () => {
                         <textarea
                             value={newPost}
                             onChange={(e) => setNewPost(e.target.value)}
-                            placeholder="Bu film hakkında ne düşünüyorsun?"
+                            placeholder="What you think?"
                         />
                         
                         {mediaPreview && (
@@ -226,7 +225,7 @@ const MovieSocialPage = () => {
                                         onChange={handleMediaSelect}
                                         style={{ display: 'none' }}
                                     />
-                                    📷 Fotoğraf
+                                    📷 Photo
                                 </label>
                                 <label className="media-upload-button">
                                     <input
@@ -238,7 +237,7 @@ const MovieSocialPage = () => {
                                     🎭 GIF
                                 </label>
                             </div>
-                            <button type="submit">Paylaş</button>
+                            <button type="submit">Share</button>
                         </div>
                     </form>
                 </div>
@@ -296,7 +295,7 @@ const MovieSocialPage = () => {
                                         name="comment"
                                         placeholder="Yorum yaz..."
                                     />
-                                    <button type="submit">Gönder</button>
+                                    <button type="submit">Send</button>
                                 </form>
                             </div>
                         </div>

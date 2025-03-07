@@ -28,12 +28,12 @@ const Home = () => {
           <div className="overlay"></div>
         </div>
         <div className="hero-content">
-          <h1>SENİ BAŞKA DÜNYALARA GÖTÜRECEK</h1>
+          <h1>Join the Community</h1>
           <div className="subscription-box">
-            <h2>Hemen Kaydol</h2>
+            <h2>Register Now</h2>
             <div className="email-input-container">
-              <input type="email" placeholder="E-posta adresi" />
-              <button onClick={handleExplore}>BAŞLA</button>
+              <input type="email" placeholder="E-mail address" />
+              <button onClick={handleExplore}>Start</button>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@ const Home = () => {
       <section className="features-section">
         <div className="feature-container">
           <div className="feature-text">
-            <h2>FİLM TUTKUNLARININ ARASINA KATIL.</h2>
+            <h2>Take your place among movie enthusiasts.</h2>
           </div>
           <div className="device-frames">
             <div className="device phone"></div>
@@ -56,13 +56,12 @@ const Home = () => {
       <section className="collection-section">
         <div className="collection-content">
           <div className="collection-logo">
-            <h2>PROJE ADI</h2>
+            <h2>NAME</h2>
           </div>
           <div className="collection-text">
-            <h2>KÜLT KLASİKLERDEN MODERN BAŞYAPITLARA.<br />
-                GELMİŞ GEÇMİŞ EN BÜYÜK SİNEMACILARDAN,<br />
-                GÜNÜMÜZÜN EN İYİ YÖNETMENLERİNE.<br />
-                DÜNYANIN HER KÖŞESİNDEN FİLMLER.</h2>
+            <h2>FROM CULT CLASSICS TO MODERN MASTERPIECES.<br />
+              ONE OF THE GREATEST FILMS EVER<br />
+                MOVIES FROM EVERYWHERE.</h2>
           </div>
         </div>
       </section>
