@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaChevronRight, FaHeart, FaEye, FaList, FaComment } from 'react-icons/fa';
+import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit } from 'react-icons/fa';
 import MovieDetail from '../components/MovieDetail';
 
 const Profile = () => {
@@ -27,9 +27,20 @@ const Profile = () => {
         watched: [],
         watchlist: []
     });
+    const [userComments, setUserComments] = useState([]);
+    const [showAllComments, setShowAllComments] = useState(false);
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        commentId: null
+    });
+    const [editModal, setEditModal] = useState({
+        isOpen: false,
+        comment: null
+    });
 
     useEffect(() => {
         fetchUserMovies();
+        fetchUserComments();
     }, []);
 
     const fetchUserMovies = async () => {
@@ -65,6 +76,35 @@ const Profile = () => {
         });
     };
 
+    const fetchUserComments = async () => {
+        try {
+            // Mock data - gerçek API'den gelecek
+            const mockComments = [
+                {
+                    id: 1,
+                    movieId: 27205,
+                    movieTitle: "Inception",
+                    moviePoster: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+                    comment: "Great movie! One of Christopher Nolan's best.",
+                    rating: 4.5,
+                    date: "2024-03-15"
+                },
+                {
+                    id: 2,
+                    movieId: 155,
+                    movieTitle: "The Dark Knight",
+                    moviePoster: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+                    comment: "Heath Ledger's performance as the Joker is unforgettable.",
+                    rating: 5,
+                    date: "2024-03-10"
+                },
+            ];
+            setUserComments(mockComments);
+        } catch (error) {
+            console.error('Error fetching user comments:', error);
+        }
+    };
+
     const handleMovieClick = (movie) => {
         Promise.all([
             fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
@@ -89,8 +129,59 @@ const Profile = () => {
         .catch(error => console.error("Error fetching movie details:", error));
     };
 
+    const handleDeleteComment = async (commentId) => {
+        try {
+            // API çağrısı yapılacak
+            // const response = await fetch(`/api/comments/${commentId}`, {
+            //     method: 'DELETE'
+            // });
+            
+            // Başarılı silme işleminden sonra yorumları güncelle
+            setUserComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+            
+            // Yorum sayısını güncelle
+            setUserProfile(prevProfile => ({
+                ...prevProfile,
+                stats: {
+                    ...prevProfile.stats,
+                    comments: prevProfile.stats.comments - 1
+                }
+            }));
+
+            // Modalı kapat
+            setDeleteModal({ isOpen: false, commentId: null });
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+        }
+    };
+
+    const handleEditComment = async (commentId, newComment, newRating) => {
+        try {
+            // API çağrısı yapılacak
+            // const response = await fetch(`/api/comments/${commentId}`, {
+            //     method: 'PUT',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ comment: newComment, rating: newRating })
+            // });
+
+            // Yorumları güncelle
+            setUserComments(prevComments => prevComments.map(comment => 
+                comment.id === commentId 
+                    ? { ...comment, comment: newComment, rating: newRating }
+                    : comment
+            ));
+
+            // Modalı kapat
+            setEditModal({ isOpen: false, comment: null });
+        } catch (error) {
+            console.error('Error updating comment:', error);
+        }
+    };
+
     const MoviePreview = ({ movie }) => (
-        <div className="movie-preview" onClick={() => setSelectedMovie(movie)}>
+        <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
             <img 
                 src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
                 alt={movie.title}
@@ -188,6 +279,145 @@ const Profile = () => {
         );
     };
 
+    const DeleteConfirmationModal = () => (
+        <div className={`delete-modal-overlay ${deleteModal.isOpen ? 'active' : ''}`}>
+            <div className="delete-modal-content">
+                <h3>Delete Comment</h3>
+                <p>Are you sure you want to delete this comment?</p>
+                <div className="delete-modal-buttons">
+                    <button 
+                        className="delete-modal-button cancel"
+                        onClick={() => setDeleteModal({ isOpen: false, commentId: null })}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        className="delete-modal-button confirm"
+                        onClick={() => handleDeleteComment(deleteModal.commentId)}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    const EditCommentModal = () => {
+        const [editedComment, setEditedComment] = useState(editModal.comment?.comment || '');
+        const [editedRating, setEditedRating] = useState(editModal.comment?.rating || 5);
+        const [hoveredRating, setHoveredRating] = useState(0);
+
+        useEffect(() => {
+            if (editModal.comment) {
+                setEditedComment(editModal.comment.comment);
+                setEditedRating(editModal.comment.rating);
+            }
+        }, [editModal.comment]);
+
+        return (
+            <div className={`edit-modal-overlay ${editModal.isOpen ? 'active' : ''}`}>
+                <div className="edit-modal-content">
+                    <h3>Edit Comment</h3>
+                    <div className="edit-modal-form">
+                        <div className="rating-input">
+                            <label>Rating:</label>
+                            <div className="star-rating">
+                                {[...Array(10)].map((_, index) => {
+                                    const ratingValue = index + 1;
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={ratingValue}
+                                            className={`star-button ${
+                                                ratingValue <= (hoveredRating || editedRating) 
+                                                    ? 'active' 
+                                                    : ''
+                                            }`}
+                                            onClick={() => setEditedRating(ratingValue)}
+                                            onMouseEnter={() => setHoveredRating(ratingValue)}
+                                            onMouseLeave={() => setHoveredRating(0)}
+                                        >
+                                            ★
+                                        </button>
+                                    );
+                                })}
+                                {editedRating > 0 && (
+                                    <span className="rating-number">{editedRating}/10</span>
+                                )}
+                            </div>
+                        </div>
+                        <div className="comment-input">
+                            <label>Comment:</label>
+                            <textarea
+                                value={editedComment}
+                                onChange={(e) => setEditedComment(e.target.value)}
+                                rows="4"
+                                placeholder="Write your comment..."
+                            />
+                        </div>
+                    </div>
+                    <div className="edit-modal-buttons">
+                        <button 
+                            className="edit-modal-button cancel"
+                            onClick={() => setEditModal({ isOpen: false, comment: null })}
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            className="edit-modal-button confirm"
+                            onClick={() => handleEditComment(editModal.comment.id, editedComment, editedRating)}
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const CommentCard = ({ comment }) => (
+        <div className="comment-card">
+            <div className="comment-movie-info" onClick={() => handleMovieClick({ id: comment.movieId })}>
+                <img 
+                    src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`} 
+                    alt={comment.movieTitle}
+                    className="comment-movie-poster"
+                />
+                <div className="comment-movie-details">
+                    <h4>{comment.movieTitle}</h4>
+                    <div className="comment-rating">
+                        <FaStar className="star-icon" />
+                        <span>{comment.rating}</span>
+                    </div>
+                </div>
+            </div>
+            <p className="comment-text">{comment.comment}</p>
+            <div className="comment-footer">
+                <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
+                <div className="comment-actions">
+                    <button 
+                        className="edit-comment-button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setEditModal({ isOpen: true, comment });
+                        }}
+                    >
+                        <FaEdit />
+                    </button>
+                    <button 
+                        className="delete-comment-button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteModal({ isOpen: true, commentId: comment.id });
+                        }}
+                    >
+                        <FaTrash />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -259,6 +489,39 @@ const Profile = () => {
                     movies={userMovies.watchlist}
                     icon={FaList}
                 />
+
+                {/* Yorumlar bölümü */}
+                <div className="comments-section">
+                    <div className="section-header">
+                        <h2>
+                            <FaComment className="section-icon" />
+                            Comments
+                        </h2>
+                        {userComments.length > 3 && (
+                            <button 
+                                className="see-all-button" 
+                                onClick={() => setShowAllComments(!showAllComments)}
+                            >
+                                {showAllComments ? 'Show Less' : 'See All'} 
+                                <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
+                            </button>
+                        )}
+                    </div>
+                    
+                    <div className="comments-container">
+                        {userComments.length > 0 ? (
+                            <div className="comments-grid">
+                                {(showAllComments ? userComments : userComments.slice(0, 3)).map(comment => (
+                                    <CommentCard key={comment.id} comment={comment} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state">
+                                <p>No comments yet</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {selectedMovie && (
@@ -268,6 +531,8 @@ const Profile = () => {
                     isInList={true}
                 />
             )}
+            <DeleteConfirmationModal />
+            <EditCommentModal />
         </div>
     );
 };

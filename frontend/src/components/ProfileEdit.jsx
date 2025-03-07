@@ -51,13 +51,20 @@ const ProfileEdit = () => {
             <h2>Edit Profile</h2>
             <form onSubmit={handleSubmit} className="profile-edit-form">
                 <div className="avatar-section">
-                    <img 
-                        src={formData.avatar} 
-                        alt="Profil" 
-                        className="current-avatar"
-                    />
+                    <div className="current-avatar">
+                        {formData.avatar.includes('http') ? (
+                            <img 
+                                src={formData.avatar} 
+                                alt="Profile" 
+                                className="current-avatar"
+                            />
+                        ) : (
+                            <span>{formData.username.substring(0, 2).toUpperCase()}</span>
+                        )}
+                    </div>
                     <div className="avatar-upload">
                         <label htmlFor="avatar-input" className="avatar-upload-button">
+                            <i className="fas fa-camera"></i>
                             Change Photo
                         </label>
                         <input

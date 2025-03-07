@@ -1,12 +1,18 @@
 .explore {
     margin-top: 50px;
     min-height: calc(100vh - 65px);
-  background-color: #141414;
-  color: white;
-  padding-bottom: 70px;
+    background-color: #141414;
+    color: white;
+    padding-bottom: 70px;
+    display: flex;
+    flex-direction: column;
 }
 
 .explore-header h1 {
     text-align: center;
+}
+
+.movie-list {
+    flex: 1;
 }
 

@@ -370,4 +370,386 @@
     .movies-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Yorumlar bölümü stilleri */
+.comments-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.comments-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.comment-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.comment-movie-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+}
+
+.comment-movie-poster {
+    width: 60px;
+    height: 90px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.comment-movie-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.comment-movie-details h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.comment-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.star-icon {
+    color: #ffd700;
+}
+
+.comment-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.comment-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    position: relative;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.delete-comment-button {
+    position: static;
+    right: auto;
+    bottom: auto;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-comment-button:hover {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+    .comments-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Silme modalı stilleri */
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.delete-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.delete-modal-overlay.active .delete-modal-content {
+    transform: scale(1);
+}
+
+.delete-modal-content h3 {
+    color: white;
+    margin: 0 0 16px 0;
+    font-size: 1.5rem;
+}
+
+.delete-modal-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 24px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.delete-modal-button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-button.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.delete-modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-modal-button.confirm {
+    background: #ff4d4d;
+    color: white;
+}
+
+.delete-modal-button.confirm:hover {
+    background: #ff3333;
+    transform: translateY(-1px);
+}
+
+/* Yorum kartı düzenlemeleri */
+.comment-actions {
+    display: flex;
+    gap: 8px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.edit-comment-button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-comment-button:hover {
+    color: #3489C0;
+    background: rgba(52, 137, 192, 0.1);
+}
+
+/* Düzenleme modalı stilleri */
+.edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.edit-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.edit-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 500px;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+}
+
+.edit-modal-form {
+    margin: 20px 0;
+}
+
+.rating-input, .comment-input {
+    margin-bottom: 16px;
+}
+
+.rating-input label, .comment-input label {
+    display: block;
+    color: white;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+/* Yıldız derecelendirme sistemi */
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.star-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.star-button:hover {
+    transform: scale(1.1);
+}
+
+.star-button.active {
+    color: #FFD700;
+}
+
+.rating-number {
+    margin-left: 10px;
+    color: #FFD700;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Eski star sınıflarını kaldır */
+.star {
+    display: none;
+}
+
+.comment-input textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+    min-height: 100px;
+    max-height: 200px;
+}
+
+.comment-input textarea:focus {
+    outline: none;
+    border-color: #3489C0;
+}
+
+.comment-input textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.edit-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.edit-modal-button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-modal-button.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.edit-modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.edit-modal-button.confirm {
+    background: #3489C0;
+    color: white;
+}
+
+.edit-modal-button.confirm:hover {
+    background: #2196F3;
+    transform: translateY(-1px);
 } 
