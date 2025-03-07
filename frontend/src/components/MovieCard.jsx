@@ -2,8 +2,8 @@ import React from "react";
 import './MovieCard.css';
 
 const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, isGridView }) => {
-    // Eğer watchlist sayfasında ve list view modundaysa
-    if (isWatchlist && !isGridView) {
+    // Liste görünümü için
+    if (!isGridView) {
         return (
             <div className="movie-card" onClick={onClick}>
                 <img 
@@ -14,8 +14,9 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                     <h3>{movie.title}</h3>
                     <p className="movie-overview">{movie.overview}</p>
                     <div className="movie-meta">
-                        <span>{movie.release_date?.split('-')[0]}</span>
-                        <span>⭐ {movie.vote_average}</span>
+                        <span className="year">{movie.release_date?.split('-')[0]}</span>
+                        <span className="rating">⭐ {movie.vote_average?.toFixed(1)}</span>
+                        {movie.runtime && <span className="runtime">{movie.runtime} min</span>}
                     </div>
                 </div>
                 {isWatchlist && (
@@ -33,7 +34,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
         );
     }
 
-    // Normal grid view için orijinal render
+    // Grid görünümü için
     return (
         <div className="movie-card" onClick={onClick}>
             <img 
@@ -53,7 +54,10 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
             )}
             <div className="movie-info">
                 <h4>{movie.title}</h4>
-                <p>{movie.release_date?.split('-')[0]}</p>
+                <p>
+                    <span className="year">{movie.release_date?.split('-')[0]}</span>
+                    <span className="rating">⭐ {movie.vote_average?.toFixed(1)}</span>
+                </p>
             </div>
         </div>
     );
