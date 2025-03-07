@@ -1,5 +1,6 @@
 .explore {
-  min-height: calc(100vh - 65px);
+    margin-top: 50px;
+    min-height: calc(100vh - 65px);
   background-color: #141414;
   color: white;
   padding-bottom: 70px;
@@ -9,4 +10,3 @@
     text-align: center;
 }
 
-/* Diğer stiller buraya gelecek (eski Home.css'teki film listesi stilleri) */ 
