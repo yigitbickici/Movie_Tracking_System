@@ -139,7 +139,10 @@ const Navbar = () => {
                                                 key={user.id} 
                                                 to={`/user/${user.username}`}
                                                 className="search-result-item"
-                                                onClick={() => setShowSearchDropdown(false)}
+                                                onClick={() => {
+                                                    setShowSearchDropdown(false);
+                                                    navigate(`/user/${user.username}`);
+                                                }}
                                             >
                                                 <div className="user-avatar-small">{user.avatar}</div>
                                                 <span className="username">{user.username}</span>

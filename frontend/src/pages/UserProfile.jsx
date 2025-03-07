@@ -37,11 +37,27 @@ const UserProfile = () => {
         watchlist: []
     });
 
+    const checkFollowStatus = async () => {
+        try {
+            // API çağrısı yapılacak
+            // const response = await fetch(`/api/users/${username}/follow-status`);
+            // const data = await response.json();
+            // setIsFollowing(data.isFollowing);
+            
+            // Şimdilik mock data kullanıyoruz
+            setIsFollowing(false);
+        } catch (error) {
+            console.error('Error checking follow status:', error);
+            setIsFollowing(false);
+        }
+    };
+
     useEffect(() => {
         // Kullanıcı bilgilerini API'den çek
         fetchUserProfile();
         fetchUserComments();
         fetchUserMovies();
+        checkFollowStatus(); // Takip durumunu kontrol et
     }, [username]);
 
     const fetchUserProfile = async () => {
@@ -49,7 +65,22 @@ const UserProfile = () => {
             // API çağrısı yapılacak
             // const response = await fetch(`/api/users/${username}`);
             // const data = await response.json();
-            // setUserProfile(data);
+            setUserProfile({
+                username: username,
+                avatar: username.substring(0, 2).toUpperCase(),
+                stats: {
+                    following: 10,
+                    followers: 10,
+                    comments: 2,
+                    movieTime: {
+                        months: 0,
+                        days: 5,
+                        hours: 6
+                    },
+                    moviesWatched: 20,
+                },
+                movies: [],
+            });
         } catch (error) {
             console.error('Error fetching user profile:', error);
         }
