@@ -11,7 +11,8 @@ const SpoilerRequests = () => {
             postContent: "In the end, the totem keeps spinning which means...",
             reportedBy: "User123",
             timestamp: "2 hours ago",
-            status: "pending" 
+            status: "pending",
+            poster_path: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"
         },
         {
             id: 2,
@@ -21,7 +22,8 @@ const SpoilerRequests = () => {
             postContent: "When Harvey Dent becomes Two-Face...",
             reportedBy: "User456",
             timestamp: "5 hours ago",
-            status: "pending"
+            status: "pending",
+            poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
         }
     ]);
 
@@ -47,35 +49,45 @@ const SpoilerRequests = () => {
             <div className="requests-list">
                 {requests.map(request => (
                     <div key={request.id} className={`request-card ${request.status}`}>
-                        <div className="request-header">
-                            <h3>{request.movieTitle}</h3>
-                            <span className="timestamp">{request.timestamp}</span>
-                        </div>
-                        <div className="request-content">
-                            <p className="post-content">{request.postContent}</p>
-                            <p className="reported-by">Reported by: {request.reportedBy}</p>
-                        </div>
-                        {request.status === 'pending' && (
-                            <div className="request-actions">
-                                <button 
-                                    className="approve-button"
-                                    onClick={() => handleApprove(request.id)}
-                                >
-                                    Mark as Spoiler
-                                </button>
-                                <button 
-                                    className="reject-button"
-                                    onClick={() => handleReject(request.id)}
-                                >
-                                    Reject
-                                </button>
+                        <div className="request-content-wrapper">
+                            <div className="movie-poster">
+                                <img 
+                                    src={`https://image.tmdb.org/t/p/w200${request.poster_path}`}
+                                    alt={request.movieTitle}
+                                />
                             </div>
-                        )}
-                        {request.status !== 'pending' && (
-                            <div className="request-status">
-                                Status: {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            <div className="request-details">
+                                <div className="request-header">
+                                    <h3>{request.movieTitle}</h3>
+                                    <span className="timestamp">{request.timestamp}</span>
+                                </div>
+                                <div className="request-content">
+                                    <p className="post-content">{request.postContent}</p>
+                                    <p className="reported-by">Reported by: {request.reportedBy}</p>
+                                </div>
+                                {request.status === 'pending' && (
+                                    <div className="request-actions">
+                                        <button 
+                                            className="approve-button"
+                                            onClick={() => handleApprove(request.id)}
+                                        >
+                                            Mark as Spoiler
+                                        </button>
+                                        <button 
+                                            className="reject-button"
+                                            onClick={() => handleReject(request.id)}
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
+                                )}
+                                {request.status !== 'pending' && (
+                                    <div className="request-status">
+                                        Status: {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </div>
                 ))}
             </div>

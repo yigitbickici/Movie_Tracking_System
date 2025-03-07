@@ -100,6 +100,35 @@
     color: #888;
 }
 
+.request-content-wrapper {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.movie-poster {
+    flex-shrink: 0;
+    width: 120px;
+    height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.movie-poster:hover {
+    transform: scale(1.05);
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.request-details {
+    flex-grow: 1;
+}
+
 @media screen and (max-width: 768px) {
     .spoiler-requests-container {
         padding: 1rem;
@@ -112,5 +141,21 @@
 
     .approve-button, .reject-button {
         width: 100%;
+    }
+
+    .request-content-wrapper {
+        flex-direction: column;
+    }
+
+    .movie-poster {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 1rem;
+    }
+
+    .movie-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 } 
