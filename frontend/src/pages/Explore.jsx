@@ -6,6 +6,7 @@ import './Explore.css';
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
 const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-TR&page=${page}`;
+const SEARCH_API_URL = (query) => `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-TR&query=${query}`;
 
 const Explore = () => {
   const [movies, setMovies] = useState([]);
@@ -13,15 +14,26 @@ const Explore = () => {
   const [totalPages, setTotalPages] = useState(500);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetch(API_URL(currentPage))
+    if (searchTerm) {
+      fetch(SEARCH_API_URL(searchTerm))
+        .then((response) => response.json())
+        .then((data) => {
+          setMovies(data.results);
+          setTotalPages(data.total_pages);
+        })
+        .catch((error) => console.error("Error:", error));
+    } else {
+      fetch(API_URL(currentPage))
         .then((response) => response.json())
         .then((data) => {
           setMovies(data.results);
         })
         .catch((error) => console.error("Error:", error));
-  }, [currentPage]);
+    }
+  }, [currentPage, searchTerm]);
 
   const goToNextPage = () => {
       setCurrentPage(currentPage + 1);
@@ -58,11 +70,21 @@ const Explore = () => {
     setSelectedCategory(category);
   };
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
+
   return (
       <div className="explore">
         <header className="explore-header">
           <div className="search-bar">
-            <input type="text" placeholder="Search a movie..." />
+            <input 
+              type="text" 
+              placeholder="Search the movies..." 
+              value={searchTerm}
+              onChange={handleSearch}
+            />
           </div>
           <div className="categories-container">
             <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
