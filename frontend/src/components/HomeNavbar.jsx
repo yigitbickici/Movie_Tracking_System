@@ -8,6 +8,9 @@ const HomeNavbar = () => {
     return (
         <nav className="home-navbar">
             <div className="home-nav-right">
+                <button className="register-button" onClick={() => navigate('/register')}>
+                    Register
+                </button>
                 <button className="login-button" onClick={() => navigate('/login')}>
                     Login
                 </button>

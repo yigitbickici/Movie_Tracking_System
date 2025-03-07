@@ -45,7 +45,7 @@ const Navbar = () => {
             <div className="nav-container">
                 <div className="nav-brand">
                     <Link to="/explore">
-                        <span className="brand-text">MOVIEAPP</span>
+                        <span className="brand-text">.MOVIARY</span>
                     </Link>
                 </div>
 

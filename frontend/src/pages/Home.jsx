@@ -56,7 +56,7 @@ const Home = () => {
       <section className="collection-section">
         <div className="collection-content">
           <div className="collection-logo">
-            <h2>NAME</h2>
+            <h2>.MOVIARY</h2>
           </div>
           <div className="collection-text">
             <h2>FROM CULT CLASSICS TO MODERN MASTERPIECES.<br />

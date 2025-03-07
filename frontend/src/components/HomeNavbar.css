@@ -11,22 +11,67 @@
 .home-nav-right {
     display: flex;
     justify-content: flex-end;
+    gap: 16px;
+}
+
+.register-button {
+    background: transparent;
+    color: #3489C0;
+    border: 2px solid #3489C0;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: auto;
+    height: auto;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.register-button:hover {
+    background: rgba(52, 137, 192, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 137, 192, 0.1);
+}
+
+.register-button:active {
+    transform: translateY(1px);
 }
 
 .login-button {
-    background: #3489C0;
+    background: linear-gradient(135deg, #3489C0, #2196F3);
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
+    padding: 12px 24px;
+    border-radius: 8px;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
+    width: auto;
+    height: auto;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(52, 137, 192, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
 }
 
 .login-button:hover {
-    background: #2a6d9a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 137, 192, 0.3);
+    background: linear-gradient(135deg, #2196F3, #3489C0);
+}
+
+.login-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(52, 137, 192, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -34,8 +79,9 @@
         padding: 15px 20px;
     }
 
-    .login-button {
-        padding: 6px 16px;
+    .login-button,
+    .register-button {
+        padding: 8px 16px;
         font-size: 14px;
     }
 } 
