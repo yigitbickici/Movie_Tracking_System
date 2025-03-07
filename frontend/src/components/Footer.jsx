@@ -1,34 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaTwitter, FaInstagram, FaGithub, FaHeart } from 'react-icons/fa';
 import './Footer.css';
 
 const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer-content">
-                <div className="footer-section">
-                    <h4>About Us</h4>
-                    <p>Your movie tracking companion</p>
+                <div className="footer-section brand-section">
+                    <h3>.MOVIARY</h3>
+                    <p>Your best movie tracking companion ❤️</p>
                 </div>
                 <div className="footer-section">
-                    <h4>Quick Links</h4>
+                    <h4>Navigation</h4>
                     <ul>
                         <li><Link to="/">Home</Link></li>
-                        <li><Link to="/watchlist">My Watchlist</Link></li>
                         <li><Link to="/explore">Explore</Link></li>
+                        <li><Link to="/watchlist">Watchlist</Link></li>
+                        <li><Link to="/profile">Profile</Link></li>
                     </ul>
                 </div>
                 <div className="footer-section">
                     <h4>Connect</h4>
                     <div className="social-links">
-                        <a href="#"><i className="fab fa-twitter"></i></a>
-                        <a href="#"><i className="fab fa-instagram"></i></a>
-                        <a href="#"><i className="fab fa-github"></i></a>
+                        <a href="#" aria-label="Twitter"><FaTwitter /></a>
+                        <a href="#" aria-label="Instagram"><FaInstagram /></a>
+                        <a href="#" aria-label="Github"><FaGithub /></a>
                     </div>
                 </div>
             </div>
             <div className="footer-bottom">
-                <p>&copy; 2024 Moviary. All rights reserved.</p>
+                <p>Made in Türkiye</p>
+                <p>&copy; 2024 .MOVIARY - All rights reserved</p>
             </div>
         </footer>
     );

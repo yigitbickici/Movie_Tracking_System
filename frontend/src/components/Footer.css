@@ -1,27 +1,64 @@
 .footer {
-    background: #141414;
+    background: linear-gradient(to top, #0a0a0a, #141414);
     color: #fff;
-    padding: 5px 0; /* Minimuma indirdim */
-    border-top: 1px solid #2a2a2a;
-    bottom: 0; /* En alta sabitle */
-    left: 0;
-    right: 0;
-    z-index: 999; /* Navbar'dan düşük ama diğer içerikten yüksek */
+    padding: 40px 0 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    width: 100%;
+    margin-top: 50px;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+#root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+main, .app-container, .content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .footer-content {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 0 15px;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    padding: 0 20px;
+}
+
+.brand-section h3 {
+    font-size: 28px;
+    margin: 0 0 10px;
+    background: #2196F3;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.brand-section p {
+    color: #999;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .footer-section h4 {
     color: #fff;
-    margin-bottom: 4px;
-    font-size: 12px; /* Daha da küçülttüm */
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .footer-section ul {
@@ -30,49 +67,73 @@
 }
 
 .footer-section ul li {
-    margin-bottom: 2px;
-    font-size: 11px;
+    margin-bottom: 10px;
 }
 
 .footer-section a {
     color: #999;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    display: inline-block;
 }
 
 .footer-section a:hover {
     color: #fff;
+    transform: translateX(5px);
 }
 
 .social-links {
     display: flex;
-    gap: 20px;
+    gap: 15px;
 }
 
 .social-links a {
     color: #999;
     font-size: 20px;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .social-links a:hover {
     color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
 }
 
 .footer-bottom {
     text-align: center;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px solid #2a2a2a;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #999;
-    font-size: 10px;
+    font-size: 14px;
 }
 
-/* Responsive düzenlemeler */
+.heart-icon {
+    color: #ff4d4d;
+    margin: 0 5px;
+    animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+
 @media screen and (max-width: 768px) {
     .footer-content {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr;
         gap: 30px;
+    }
+
+    .brand-section {
+        grid-column: 1 / -1;
+        text-align: center;
     }
 }
 
@@ -86,7 +147,7 @@
         justify-content: center;
     }
 
-    .footer {
-        padding: 30px 0 15px;
+    .footer-section a:hover {
+        transform: none;
     }
 } 
