@@ -67,7 +67,7 @@ const UserProfile = () => {
                     movieId: 27205,
                     movieTitle: "Inception",
                     moviePoster: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-                    comment: "Harika bir film! Christopher Nolan'ın en iyi eserlerinden biri.",
+                    comment: "Great movie! One of Christopher Nolan's best.",
                     rating: 4.5,
                     date: "2024-03-15"
                 },
@@ -76,7 +76,7 @@ const UserProfile = () => {
                     movieId: 155,
                     movieTitle: "The Dark Knight",
                     moviePoster: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-                    comment: "Heath Ledger'ın Joker performansı unutulmaz.",
+                    comment: "Heath Ledger's performance as the Joker is unforgettable.",
                     rating: 5,
                     date: "2024-03-10"
                 },
