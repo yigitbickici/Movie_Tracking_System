@@ -67,7 +67,7 @@ const AdminDashboard = () => {
                         {topMovies.map((movie, index) => (
                             <li key={index}>
                                 <span>{movie.title}</span>
-                                <span>{movie.favorites} favori</span>
+                                <span>{movie.favorites} favourite</span>
                             </li>
                         ))}
                     </ul>
