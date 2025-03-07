@@ -186,27 +186,6 @@ const Watchlist = () => {
         setIsGridView(!isGridView);
     };
 
-    const MovieCard = ({ movie, onClick }) => (
-        <div className="movie-card" onClick={onClick}>
-            <img 
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-                alt={movie.title}
-            />
-            {activeTab === 'watchlist' && (
-                <button 
-                    className={`watched-indicator ${watchedMovies.has(movie.id) ? 'active' : ''}`}
-                    onClick={(e) => handleWatchedToggle(movie.id, e)}
-                >
-                    ✓
-                </button>
-            )}
-            <div className="movie-info">
-                <h4>{movie.title}</h4>
-                <p>{movie.release_date?.split('-')[0]}</p>
-            </div>
-        </div>
-    );
-
     return (
         <div className="watchlist-container">
             <div className="watchlist-header">
@@ -235,6 +214,10 @@ const Watchlist = () => {
                         key={movie.id}
                         movie={movie}
                         onClick={() => handleMovieClick(movie)}
+                        isWatchlist={activeTab === 'watchlist'}
+                        isWatched={watchedMovies.has(movie.id)}
+                        onWatchedToggle={(e) => handleWatchedToggle(movie.id, e)}
+                        isGridView={isGridView}
                     />
                 ))}
             </div>

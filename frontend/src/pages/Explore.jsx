@@ -45,7 +45,10 @@ const Explore = () => {
           ...movie,
           runtime: detailedMovie.runtime,
           cast: credits.cast.slice(0, 5),
-          providers: providers.results.TR || {}
+          providers: providers.results.TR || {},
+          overview: detailedMovie.overview,
+          vote_average: detailedMovie.vote_average,
+          original_title: detailedMovie.original_title
         });
       })
       .catch(error => console.error("Error fetching movie details:", error));
@@ -89,7 +92,8 @@ const Explore = () => {
               <MovieCard 
                 key={movie.id} 
                 movie={movie} 
-                onClick={handleMovieClick}
+                onClick={() => handleMovieClick(movie)}
+                isGridView={true}
               />
           ))}
         </div>
@@ -98,7 +102,7 @@ const Explore = () => {
           <MovieDetail 
             movie={selectedMovie} 
             onClose={() => setSelectedMovie(null)}
-            isInList={true}
+            isInList={false}
           />
         )}
 

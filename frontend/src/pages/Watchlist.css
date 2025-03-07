@@ -1,9 +1,11 @@
 .watchlist-container {
     background-color: #141414;
-    min-height: calc(100vh - 65px); /* viewport height - navbar height */
+    min-height: calc(100vh - 65px); 
     color: white;
-    margin-top: 20px; /* navbar'ın yüksekliği */
-    padding: 20px;
+    margin-top: 20px; 
+    padding: 0;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .watchlist-container h2 {
@@ -16,7 +18,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #141414; /* Gradient'i kaldırıp düz renk yaptım */
+    background: #141414; 
 }
 
 .tab-buttons {
@@ -165,61 +167,68 @@
     flex-direction: column;
     gap: 20px;
     padding: 20px;
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .movies-container.list-view .movie-card {
-    width: 100%;
-    max-width: none;
-    height: 200px;
     display: flex;
-    flex-direction: row;
-    padding: 15px;
-    gap: 20px;
-    background: rgba(32, 32, 32, 0.8);
+    background: #2d2d2d;
     border-radius: 8px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.movies-container.list-view .movie-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    height: 200px;
+    width: 100%;
+    transform: none !important;
 }
 
 .movies-container.list-view .movie-card img {
-    width: 130px;
-    height: 100%;
+    width: 133px;
+    height: 200px;
     object-fit: cover;
-    border-radius: 4px;
+    flex-shrink: 0;
 }
 
-.movies-container.list-view .movie-info {
+.movies-container.list-view .list-view-info {
     flex: 1;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    text-align: left;
-    padding: 10px 0;
 }
 
-.movies-container.list-view .movie-title {
+.movies-container.list-view .list-view-info h3 {
+    margin: 0 0 10px 0;
     font-size: 1.5rem;
-    margin-bottom: 10px;
+    color: white;
 }
 
 .movies-container.list-view .movie-overview {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #ccc;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin-bottom: 10px;
+    margin: 0 0 10px 0;
+    line-height: 1.5;
 }
 
 .movies-container.list-view .movie-meta {
     display: flex;
     gap: 20px;
     color: #00b020;
+    font-size: 0.9rem;
+}
+
+.movies-container.list-view .watched-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Grid görünümündeki hover efektini koru */
+.movies-container:not(.list-view) .movie-card:hover {
+    transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
@@ -239,6 +248,28 @@
 
     .movie-card img {
         height: 225px;
+    }
+
+    .movies-container.list-view {
+        padding: 10px;
+    }
+
+    .movies-container.list-view .movie-card {
+        height: 180px;
+    }
+
+    .movies-container.list-view .movie-card img {
+        width: 120px;
+        height: 180px;
+    }
+
+    .movies-container.list-view .list-view-info h3 {
+        font-size: 1.2rem;
+    }
+
+    .movies-container.list-view .movie-overview {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
     }
 }
 
