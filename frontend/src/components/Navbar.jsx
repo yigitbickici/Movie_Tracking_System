@@ -26,15 +26,24 @@ const Navbar = () => {
         { id: 3, username: 'BobWilson', avatar: 'BW' },
     ];
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         const query = e.target.value;
         setSearchQuery(query);
         
         if (query.trim()) {
-            const results = mockUsers.filter(user => 
-                user.username.toLowerCase().includes(query.toLowerCase())
-            );
-            setSearchResults(results);
+            try {
+                // Gerçek API çağrısı yapılacak
+                const response = await fetch(`/api/users/search?query=${query}`);
+                const data = await response.json();
+                setSearchResults(data);
+            } catch (error) {
+                console.error('Error searching users:', error);
+                // Geçici mock data
+                const results = mockUsers.filter(user => 
+                    user.username.toLowerCase().includes(query.toLowerCase())
+                );
+                setSearchResults(results);
+            }
         } else {
             setSearchResults([]);
         }
@@ -127,7 +136,7 @@ const Navbar = () => {
                                         {searchResults.map(user => (
                                             <Link 
                                                 key={user.id} 
-                                                to={`/profile/${user.username}`} 
+                                                to={`/user/${user.username}`}
                                                 className="search-result-item"
                                                 onClick={() => setShowSearchDropdown(false)}
                                             >

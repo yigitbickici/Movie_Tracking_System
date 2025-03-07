@@ -13,6 +13,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Explore from './pages/Explore';
 import HomeNavbar from './components/HomeNavbar';
 import SpoilerRequests from './pages/SpoilerRequests';
+import UserProfile from './pages/UserProfile';
 import './App.css';
 
 const AppLayout = ({ children }) => {
@@ -42,6 +43,7 @@ function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<ProfileEdit />} />
+          <Route path="/user/:username" element={<UserProfile />} />
           <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
