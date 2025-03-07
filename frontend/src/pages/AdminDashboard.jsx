@@ -6,16 +6,14 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Burada normalde API'den admin kontrolü yapılır
         const isAdmin = localStorage.getItem('isAdmin'); // örnek kontrol
         
         if (!isAdmin) {
             navigate('/login');
-            alert('Bu sayfaya erişim yetkiniz yok!');
+            alert('You do not have acces to this page!');
         }
     }, [navigate]);
 
-    // Örnek veriler (gerçek uygulamada API'den gelecek)
     const stats = {
         totalUsers: 1250,
         dailyVisitors: 456,
@@ -31,8 +29,8 @@ const AdminDashboard = () => {
     ];
 
     const recentComments = [
-        { user: "John Doe", movie: "Inception", comment: "Harika bir film!", date: "2024-03-20" },
-        { user: "Jane Smith", movie: "The Matrix", comment: "Klasik!", date: "2024-03-19" }
+        { user: "USER1", movie: "Inception", comment: "Wonderful movie!", date: "2024-03-20" },
+        { user: "USER2", movie: "The Matrix", comment: "CLASSIC!", date: "2024-03-19" }
     ];
 
     return (
@@ -42,29 +40,29 @@ const AdminDashboard = () => {
             <div className="stats-container">
                 <div className="stat-card">
                     <i className="fas fa-users"></i>
-                    <h3>Toplam Kullanıcı</h3>
+                    <h3>Total User</h3>
                     <p>{stats.totalUsers}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-eye"></i>
-                    <h3>Günlük Ziyaretçi</h3>
+                    <h3>Daily Visitors</h3>
                     <p>{stats.dailyVisitors}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-film"></i>
-                    <h3>Toplam Film</h3>
+                    <h3>Total Movies</h3>
                     <p>{stats.totalMovies}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-comments"></i>
-                    <h3>Toplam Yorum</h3>
+                    <h3>Total Reviews</h3>
                     <p>{stats.totalReviews}</p>
                 </div>
             </div>
 
             <div className="dashboard-grid">
                 <div className="dashboard-card">
-                    <h2>En Çok Favorilenen Filmler</h2>
+                    <h2>Top Favorited Movies</h2>
                     <ul className="top-movies-list">
                         {topMovies.map((movie, index) => (
                             <li key={index}>
@@ -76,7 +74,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="dashboard-card">
-                    <h2>Son Yorumlar</h2>
+                    <h2>Recent comments</h2>
                     <div className="recent-comments">
                         {recentComments.map((comment, index) => (
                             <div key={index} className="comment-card">

@@ -53,7 +53,7 @@ const MovieDetail = ({ movie, onClose }) => {
 
     const handleAddToWatchlist = () => {
         setIsInWatchlist(true);
-        console.log("Film izleme listesine eklendi:", movie.title);
+        console.log("Added to watchlist:", movie.title);
     };
 
     const handleMarkAsWatched = () => {
@@ -64,7 +64,7 @@ const MovieDetail = ({ movie, onClose }) => {
     const handleRemoveFromList = () => {
         setIsInWatchlist(false);
         setIsWatched(false);
-        console.log("Film listeden kaldırıldı:", movie.title);
+        console.log("Removed from list:", movie.title);
     };
 
     return (
@@ -82,7 +82,7 @@ const MovieDetail = ({ movie, onClose }) => {
                             <button 
                                 className={`watched-button ${isWatched ? 'active' : ''}`}
                                 onClick={handleMarkAsWatched}
-                                title="İzledim olarak işaretle"
+                                title="Watched"
                             >
                                 ✓
                             </button>
@@ -101,18 +101,18 @@ const MovieDetail = ({ movie, onClose }) => {
                         {/* Add providers section */}
                         {movie.providers && (
                             <div className="providers-section">
-                                <h3>Mevcut Platformlar(Türkiye):</h3>
+                                <h3>Available Platforms(Türkiye):</h3>
                                 <div className="providers-list">
                                     {(!movie.providers.flatrate && !movie.providers.rent && !movie.providers.buy) ? (
                                         <div className="no-providers">
                                             <span className="sad-face">😔</span>
-                                            <p>Henüz Türkiye'de izleme seçeneği mevcut değil.</p>
+                                            <p>No platforms available in Türkiye.</p>
                                         </div>
                                     ) : (
                                         <>
                                             {movie.providers.flatrate && (
                                                 <div className="provider-category">
-                                                    <h4>Abonelik</h4>
+                                                    <h4>Subs</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.flatrate.map(provider => (
                                                             <div 
@@ -133,7 +133,7 @@ const MovieDetail = ({ movie, onClose }) => {
                                             
                                             {movie.providers.rent && (
                                                 <div className="provider-category">
-                                                    <h4>Kiralama</h4>
+                                                    <h4>Renting</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.rent.map(provider => (
                                                             <div 
@@ -154,7 +154,7 @@ const MovieDetail = ({ movie, onClose }) => {
                                             
                                             {movie.providers.buy && (
                                                 <div className="provider-category">
-                                                    <h4>Satın Alma</h4>
+                                                    <h4>Purchase</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.buy.map(provider => (
                                                             <div 
@@ -181,7 +181,7 @@ const MovieDetail = ({ movie, onClose }) => {
                         {/* Cast section */}
                         {movie.cast && (
                             <div className="cast-section">
-                                <h3>Oyuncular:</h3>
+                                <h3>Cast:</h3>
                                 <div className="cast-list">
                                     {movie.cast.map(actor => (
                                         <div key={actor.id} className="cast-item">

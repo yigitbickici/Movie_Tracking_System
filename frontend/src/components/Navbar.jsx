@@ -31,14 +31,14 @@ const Navbar = () => {
                         className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
                     >
                         <i className="fas fa-compass"></i>
-                        <span>Keşfet</span>
+                        <span>Explore</span>
                     </Link>
                     <Link 
                         to="/watchlist" 
                         className={`nav-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
                     >
                         <i className="fas fa-film"></i>
-                        <span>İzleme Listem</span>
+                        <span>WatchList</span>
                     </Link>
                     {isAdmin && (
                         <Link 
@@ -65,16 +65,16 @@ const Navbar = () => {
                         <div className="profile-dropdown">
                             <Link to="/profile" className="dropdown-item">
                                 <i className="fas fa-user"></i>
-                                <span>Profil</span>
+                                <span>Profile</span>
                             </Link>
                             <Link to="/settings" className="dropdown-item">
                                 <i className="fas fa-cog"></i>
-                                <span>Ayarlar</span>
+                                <span>Settings</span>
                             </Link>
                             <div className="dropdown-divider"></div>
                             <button onClick={handleLogout} className="dropdown-item logout-item">
                                 <i className="fas fa-sign-out-alt"></i>
-                                <span>Çıkış Yap</span>
+                                <span>Log Out</span>
                             </button>
                         </div>
                     )}

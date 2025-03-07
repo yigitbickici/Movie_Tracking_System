@@ -20,7 +20,7 @@ const Explore = () => {
         .then((data) => {
           setMovies(data.results);
         })
-        .catch((error) => console.error("Hata:", error));
+        .catch((error) => console.error("Error:", error));
   }, [currentPage]);
 
   const goToNextPage = () => {
@@ -60,26 +60,26 @@ const Explore = () => {
         <header className="explore-header">
           <h1 style={{ textAlign: 'center' }}>CHECK POPULAR MOVIES</h1>
           <div className="search-bar">
-            <input type="text" placeholder="Film ara..." />
+            <input type="text" placeholder="Search a movie..." />
           </div>
           <div className="categories-container">
             <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
-              Tümü
+              All
             </button>
             <button className={`category-button ${selectedCategory === 'action' ? 'active' : ''}`} onClick={() => handleCategoryClick('action')}>
-              Aksiyon
+              Action
             </button>
             <button className={`category-button ${selectedCategory === 'drama' ? 'active' : ''}`} onClick={() => handleCategoryClick('drama')}>
               Drama
             </button>
             <button className={`category-button ${selectedCategory === 'comedy' ? 'active' : ''}`} onClick={() => handleCategoryClick('comedy')}>
-              Komedi
+              Comedy
             </button>
             <button className={`category-button ${selectedCategory === 'horror' ? 'active' : ''}`} onClick={() => handleCategoryClick('horror')}>
-              Korku
+              Horror
             </button>
             <button className={`category-button ${selectedCategory === 'sci-fi' ? 'active' : ''}`} onClick={() => handleCategoryClick('sci-fi')}>
-              Bilim Kurgu
+              Sci-Fi
             </button>
           </div>
         </header>
