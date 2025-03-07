@@ -122,7 +122,7 @@
 
 .dropdown-item:hover {
     background: rgba(52, 137, 192, 0.1);
-    color: white;
+    color:  #2196F3;
 }
 
 .dropdown-divider {
@@ -180,11 +180,11 @@
 }
 
 .navbar .nav-links a:hover {
-    color: white;
+    color: #2196F3;
 }
 
 .navbar .nav-links a.active {
-    color: white;
+    color: #2196F3;
 }
 
 .nav-actions {

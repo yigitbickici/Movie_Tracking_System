@@ -58,7 +58,7 @@ const MovieDetail = ({ movie, onClose }) => {
 
     const handleMarkAsWatched = () => {
         setIsWatched(!isWatched);
-        console.log("Film izlendi durumu değiştirildi:", movie.title);
+        console.log("Movie watched status changed:", movie.title);
     };
 
     const handleRemoveFromList = () => {
@@ -101,7 +101,7 @@ const MovieDetail = ({ movie, onClose }) => {
                         {/* Add providers section */}
                         {movie.providers && (
                             <div className="providers-section">
-                                <h3>Available Platforms(Türkiye):</h3>
+                                <h3>Available Platforms (Türkiye):</h3>
                                 <div className="providers-list">
                                     {(!movie.providers.flatrate && !movie.providers.rent && !movie.providers.buy) ? (
                                         <div className="no-providers">

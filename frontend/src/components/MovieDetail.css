@@ -129,7 +129,7 @@
 }
 
 .watched-button::after {
-    content: 'İzledim olarak işaretle';
+    content: 'Mark as Watched';
     position: absolute;
     bottom: 100%;
     left: 50%;
@@ -152,7 +152,7 @@
 }
 
 .watched-button.active::after {
-    content: 'İzlenmedi olarak işaretle';
+    content: 'Mark as Unwatched';
 }
 
 .detail-remove-button {
