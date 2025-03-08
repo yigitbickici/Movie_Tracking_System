@@ -90,7 +90,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaUsers />
-                        <span>Kullanıcılar</span>
+                        <span>Users</span>
                     </Link>
                     <Link 
                         to="/spoiler-requests" 

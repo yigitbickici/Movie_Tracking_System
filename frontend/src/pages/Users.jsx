@@ -111,7 +111,7 @@ const Users = () => {
     // User Card komponenti
     const UserCard = ({ user }) => (
         <div className="user-card">
-            <div className="user-info-section" onClick={() => navigate(`/user/${user.username}`)}>
+            <div className="user-info-section" onClick={() => navigate(`/UserProfile/${user.username}`)}>
                 <div className="user-avatar">
                     {getInitials(user.username)}
                 </div>
