@@ -9,7 +9,7 @@ const Footer = () => {
             <div className="footer-content">
                 <div className="footer-section brand-section">
                     <h3>.MOVIARY</h3>
-                    <p>Your best movie tracking companion ❤️</p>
+                    <p>Your best movie tracking companion <img src="https://cdn-icons-png.flaticon.com/512/860/860349.png" alt="" style={{ width: '20px', height: '20px' }} /></p>
                 </div>
                 <div className="footer-section">
                     <h4>Navigation</h4>

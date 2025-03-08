@@ -167,7 +167,7 @@
 }
 
 .comments-section {
-    margin-top: 15px;
+    margin-top: revert ;
     padding-top: 15px;
     border-top: 1px solid #444;
 }

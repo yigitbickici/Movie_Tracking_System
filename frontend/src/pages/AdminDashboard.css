@@ -9,6 +9,7 @@
     background-color: #1a1a1a;
     width: 100%;
     box-sizing: border-box;
+    
 }
 
 @media (min-width: 768px) {
@@ -121,42 +122,111 @@
 }
 
 .dashboard-card {
-    background: #2d2d2d;
+    background: rgba(0, 0, 0, 0.2);
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     color: #fff;
+    border-top: 1px solid #444;
 }
 
 .dashboard-card h2 {
     color: #fff;
-    margin-bottom: 1.5rem;
+    margin: 0;
     font-size: 1.2rem;
 }
 
 .top-movies-list {
-    list-style: none;
-    padding: 0;
+    margin-top: 1rem;
 }
 
-.top-movies-list li {
+.movie-list-item {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #404040;
+    align-items: center;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.movie-list-item:hover {
+    background: #404040;
+    transform: translateX(5px);
+}
+
+.movie-list-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.movie-list-poster {
+    width: 45px;
+    height: 68px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.movie-list-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.movie-list-details h4 {
+    margin: 0;
     color: #fff;
+    font-size: 1rem;
+}
+
+.movie-list-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.star-icon {
+    color: #ffd700;
     font-size: 0.9rem;
 }
 
-@media (min-width: 768px) {
-    .top-movies-list li {
-        padding: 0.8rem 0;
-        font-size: 1rem;
-    }
+.movie-list-rating span {
+    color: #ffd700;
+    font-size: 0.9rem;
 }
 
-.top-movies-list li span {
-    color: #fff;
+.movie-list-favorites {
+    color: #bbb;
+    font-size: 0.9rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.see-all-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #2196f3;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.see-all-button:hover {
+    background: #1976d2;
 }
 
 .recent-comments .comment-card {
@@ -195,4 +265,476 @@
 
 .comment-text {
     color: #fff;
+}
+
+/* Yorumlar modalı stilleri */
+.comments-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.comments-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.comments-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.comments-modal-overlay.active .comments-modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.modal-close-button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-comments-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.modal-comments-container .comments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+    .modal-comments-container .comments-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comments-modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-comments-container {
+        padding: 16px;
+    }
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #000000;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.user-info-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex: 1;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ban-reason {
+    font-size: 0.8rem;
+    color: #dc3545;
+    margin-top: 0.2rem;
+}
+
+.user-actions {
+    margin-left: 1rem;
+}
+
+.ban-button, .unban-button {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.ban-button {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-button:hover {
+    background: #c82333;
+}
+
+.unban-button {
+    background: #28a745;
+    color: white;
+}
+
+.unban-button:hover {
+    background: #218838;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.user-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.user-stats {
+    margin-top: 0.2rem;
+    color: #808080;
+    font-size: 0.8rem;
+}
+
+.user-join-date {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.section-icon {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Users Modal styles */
+.users-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.users-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.users-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-users-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.users-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+@media screen and (max-width: 768px) {
+    .users-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Movies Modal styles */
+.movies-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.movies-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.movies-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-movies-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.movies-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+@media screen and (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Delete Modal z-index değerini daha yüksek yap */
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100; /* Comments modal'dan daha yüksek */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.delete-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 24px;
+}
+
+.delete-modal-button {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-button.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.delete-modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-modal-button.confirm {
+    background: #dc3545;
+    color: #fff;
+}
+
+.delete-modal-button.confirm:hover {
+    background: #c82333;
+}
+
+/* Ban Modal stilleri */
+.ban-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.ban-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ban-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.ban-form {
+    margin: 20px 0;
+}
+
+.ban-reason-select {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.custom-reason-input {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    min-height: 80px;
+    resize: vertical;
+    margin-top: 12px;
+}
+
+.ban-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.ban-modal-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.ban-modal-button.cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.ban-modal-button.cancel:hover {
+    background: #5a6268;
+}
+
+.ban-modal-button.confirm {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-modal-button.confirm:hover {
+    background: #c82333;
+}
+
+.ban-modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 } 

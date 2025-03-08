@@ -188,6 +188,7 @@
         min-height: calc(100vh - 125px);
         margin: 20px;
         padding: 30px;
+        width: auto;
     }
 
     .profile-edit-container h2 {
