@@ -10,6 +10,8 @@ const MovieSocialPage = () => {
     const [movie, setMovie] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newPost, setNewPost] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
     const [posts, setPosts] = useState([
         // İlk örnek post
         {
@@ -21,6 +23,7 @@ const MovieSocialPage = () => {
             },
             content: 'Movie was wonderful.Especially last scene...',
             likes: 15,
+            isSpoiler: false,
             comments: [
                 {
                     id: 1,
@@ -30,7 +33,8 @@ const MovieSocialPage = () => {
                         isFollowing: false
                     },
                     content: 'Agreed!',
-                    likes: 3
+                    likes: 3,
+                    isSpoiler: false
                 }
             ],
             timestamp: '2 hour ago'
@@ -154,6 +158,35 @@ const MovieSocialPage = () => {
         }));
     };
 
+    const handleSpoilerReport = (postId, commentId = null) => {
+        setPosts(posts.map(post => {
+            if (postId === post.id) {
+                if (commentId === null) {
+                    // Post için spoiler işaretleme
+                    const newSpoilerState = !post.isSpoiler;
+                    setModalMessage(newSpoilerState ? 'Content marked as spoiler' : 'Spoiler removed');
+                    setShowModal(true);
+                    setTimeout(() => setShowModal(false), 2000);
+                    return { ...post, isSpoiler: newSpoilerState };
+                } else {
+                    // Yorum için spoiler işaretleme
+                    const updatedComments = post.comments.map(comment => {
+                        if (comment.id === commentId) {
+                            const newSpoilerState = !comment.isSpoiler;
+                            setModalMessage(newSpoilerState ? 'Comment marked as spoiler' : 'Spoiler removed from comment');
+                            setShowModal(true);
+                            setTimeout(() => setShowModal(false), 2000);
+                            return { ...comment, isSpoiler: newSpoilerState };
+                        }
+                        return comment;
+                    });
+                    return { ...post, comments: updatedComments };
+                }
+            }
+            return post;
+        }));
+    };
+
     if (loading) {
         return (
             <div className="social-page-overlay">
@@ -168,8 +201,8 @@ const MovieSocialPage = () => {
         return (
             <div className="social-page-overlay">
                 <div className="social-page-content">
-                    <div className="error">Film bulunamadı</div>
-                    <button onClick={() => navigate(-1)}>Geri Dön</button>
+                    <div className="error">Movie not found</div>
+                    <button onClick={() => navigate(-1)}>Back</button>
                 </div>
             </div>
         );
@@ -178,6 +211,14 @@ const MovieSocialPage = () => {
     return (
         <div className="social-page-overlay">
             <div className="social-page-content">
+                {showModal && (
+                    <div className="spoiler-modal">
+                        <div className="spoiler-modal-content">
+                            <span className="modal-icon">ℹ️</span>
+                            {modalMessage}
+                        </div>
+                    </div>
+                )}
                 <button className="close-button" onClick={() => navigate(-1)}>×</button>
                 
                 <div className="movie-header">
@@ -259,7 +300,11 @@ const MovieSocialPage = () => {
                                 </div>
                             </div>
                             <div className="post-content">
-                                {post.content}
+                                {post.isSpoiler ? (
+                                    <div className="spoiler-warning">
+                                        ⚠️ This post may contain spoilers
+                                    </div>
+                                ) : post.content}
                                 {post.media && (
                                     <div className="post-media">
                                         <img src={post.media} alt="Post media" />
@@ -271,6 +316,12 @@ const MovieSocialPage = () => {
                                     ❤️ {post.likes}
                                 </button>
                                 <button>💬 {post.comments.length}</button>
+                                <button 
+                                    onClick={() => handleSpoilerReport(post.id)} 
+                                    className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
+                                >
+                                    {post.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
+                                </button>
                             </div>
                             <div className="comments-section">
                                 {post.comments.map(comment => (
@@ -278,7 +329,19 @@ const MovieSocialPage = () => {
                                         <img src={comment.user.avatar} alt={comment.user.name} className="user-avatar-small" />
                                         <div className="comment-content">
                                             <span className="username">{comment.user.name}</span>
-                                            <p>{comment.content}</p>
+                                            {comment.isSpoiler ? (
+                                                <div className="spoiler-warning">
+                                                    ⚠️ Bu yorum spoiler içerebilir
+                                                </div>
+                                            ) : (
+                                                <p>{comment.content}</p>
+                                            )}
+                                            <button 
+                                                onClick={() => handleSpoilerReport(post.id, comment.id)}
+                                                className={`spoiler-button-small ${comment.isSpoiler ? 'active' : ''}`}
+                                            >
+                                                {comment.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -293,7 +356,7 @@ const MovieSocialPage = () => {
                                     <input
                                         type="text"
                                         name="comment"
-                                        placeholder="Yorum yaz..."
+                                        placeholder="Write a comment..."
                                     />
                                     <button type="submit">Send</button>
                                 </form>
