@@ -2,28 +2,21 @@
     min-height: calc(100vh - 65px);
     display: flex;
     flex-direction: column;
-    padding: 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    color: #fff;
-    background-color: #1a1a1a;
+    padding: 0.5rem;
     width: 100%;
     box-sizing: border-box;
-    
+    color: #fff;
+    background-color: #1a1a1a;
 }
 
 @media (min-width: 768px) {
     .admin-dashboard {
-        padding: 2rem;
-        margin: 0 auto;
-        width: 95%;
+        padding: 1rem;
     }
 }
 
 @media (min-width: 1200px) {
     .admin-dashboard {
-        width: 90%;
-        max-width: 1200px;
         padding: 2rem;
     }
 }
@@ -43,22 +36,23 @@
 
 .stats-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
     .stats-container {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
     }
 }
 
 .stat-card {
     background: #2d2d2d;
-    padding: 1rem;
-    border-radius: 10px;
+    padding: 0.75rem;
+    border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     text-align: center;
     transition: transform 0.2s;
@@ -107,16 +101,21 @@
 }
 
 .dashboard-grid {
-    flex: 1;
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    margin-bottom: 2rem;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 768px) {
     .dashboard-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
     }
 }
@@ -133,7 +132,13 @@
 .dashboard-card h2 {
     color: #fff;
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-card h2 {
+        font-size: 1.2rem;
+    }
 }
 
 .top-movies-list {
@@ -144,9 +149,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
     border-radius: 8px;
-    margin-bottom: 0.8rem;
     transition: all 0.2s ease;
 }
 
@@ -162,8 +167,8 @@
 }
 
 .movie-list-poster {
-    width: 45px;
-    height: 68px;
+    width: 40px;
+    height: 60px;
     border-radius: 4px;
     object-fit: cover;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -218,10 +223,10 @@
     background: #2196f3;
     border: none;
     color: white;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     transition: background-color 0.2s ease;
 }
 
@@ -293,9 +298,9 @@
 .comments-modal-content {
     background: #2d2d2d;
     border-radius: 12px;
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
     display: flex;
     flex-direction: column;
     transform: scale(0.95);
@@ -348,23 +353,14 @@
 }
 
 .modal-comments-container .comments-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
 }
 
-/* Responsive düzenlemeler */
-@media screen and (max-width: 768px) {
-    .modal-comments-container .comments-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .comments-modal-content {
-        width: 95%;
-        max-height: 95vh;
-    }
-
-    .modal-comments-container {
-        padding: 16px;
+@media (min-width: 768px) {
+    .comments-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
 }
 
@@ -379,7 +375,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 0.75rem;
     background: #000000;
     border-radius: 8px;
     transition: all 0.3s ease;
@@ -409,14 +405,14 @@
 }
 
 .ban-button, .unban-button {
-    padding: 6px 16px;
+    padding: 4px 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     transition: all 0.2s ease;
-    min-width: 80px;
+    min-width: 60px;
 }
 
 .ban-button {
@@ -438,8 +434,8 @@
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: #1a1a1a;
     display: flex;
@@ -447,7 +443,7 @@
     justify-content: center;
     font-weight: 500;
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .user-info h4 {
@@ -501,9 +497,9 @@
 .users-modal-content {
     background: #2d2d2d;
     border-radius: 12px;
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
     display: flex;
     flex-direction: column;
 }
@@ -517,12 +513,13 @@
 .users-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
 }
 
-@media screen and (max-width: 768px) {
+@media (min-width: 768px) {
     .users-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
 }
 
@@ -552,9 +549,9 @@
 .movies-modal-content {
     background: #2d2d2d;
     border-radius: 12px;
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
     display: flex;
     flex-direction: column;
 }
@@ -568,12 +565,13 @@
 .movies-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
 }
 
-@media screen and (max-width: 768px) {
+@media (min-width: 768px) {
     .movies-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
 }
 
@@ -737,4 +735,85 @@
 .ban-modal-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+    .modal-comments-container .comments-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comments-modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-comments-container {
+        padding: 16px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .users-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Modal içerikleri için responsive düzenlemeler */
+.comments-modal-content,
+.users-modal-content,
+.movies-modal-content {
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
+}
+
+@media (min-width: 768px) {
+    .comments-modal-content,
+    .users-modal-content,
+    .movies-modal-content {
+        width: 90%;
+        margin: 2rem;
+        max-height: 90vh;
+    }
+}
+
+/* Modal grid yapıları için responsive düzenlemeler */
+.comments-grid,
+.users-grid,
+.movies-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .comments-grid,
+    .users-grid,
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Ban/Unban butonları için responsive düzenlemeler */
+.ban-button, 
+.unban-button {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    min-width: 60px;
+}
+
+@media (min-width: 768px) {
+    .ban-button, 
+    .unban-button {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        min-width: 80px;
+    }
 } 

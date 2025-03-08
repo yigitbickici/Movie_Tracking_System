@@ -379,8 +379,6 @@ const Profile = () => {
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
-        const [showAll, setShowAll] = useState(false);
-        const visibleMovies = showAll ? movies : movies.slice(0, 5);
 
         return (
             <div className="movies-section">
@@ -390,15 +388,6 @@ const Profile = () => {
                         {title}
                     </h2>
                     <div className="section-buttons">
-                        {movies.length > 5 && (
-                            <button 
-                                className="see-all-button" 
-                                onClick={() => setShowAll(!showAll)}
-                            >
-                                {showAll ? 'Show Less' : 'See All'} 
-                                <FaChevronRight className={showAll ? 'rotate-icon' : ''} />
-                            </button>
-                        )}
                         <button 
                             className="see-all-button modal-button" 
                             onClick={() => setIsModalOpen(true)}
@@ -409,7 +398,7 @@ const Profile = () => {
                 </div>
                 
                 <div className="movies-grid">
-                    {visibleMovies.map(movie => (
+                    {movies.slice(0, 5).map(movie => (
                         <MoviePreview key={movie.id} movie={movie} />
                     ))}
                 </div>

@@ -54,13 +54,14 @@ const Explore = () => {
       )
       .then(([detailedMovie, credits, providers]) => {
         setSelectedMovie({
-          ...movie,
-          runtime: detailedMovie.runtime,
-          cast: credits.cast.slice(0, 5),
-          providers: providers.results.TR || {},
-          overview: detailedMovie.overview,
-          vote_average: detailedMovie.vote_average,
-          original_title: detailedMovie.original_title
+            ...movie,
+            ...detailedMovie,
+            overview: detailedMovie.overview,
+            vote_average: detailedMovie.vote_average,
+            original_title: detailedMovie.original_title,
+            runtime: detailedMovie.runtime,
+            cast: credits.cast.slice(0, 5),
+            providers: providers.results.TR || {}
         });
       })
       .catch(error => console.error("Error fetching movie details:", error));
