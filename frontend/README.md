@@ -15,7 +15,7 @@ Before running the project, make sure you have the following software installed 
 
 1. Clone the project:
    ```bash
-   git clone https://github.com/[username]/Movie_Management_System.git
+   git clone https://github.com/yigitbickici/Movie_Management_System.git
    ```
 
 2. Navigate to the frontend directory:
