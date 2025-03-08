@@ -77,7 +77,6 @@ const Profile = () => {
     }, []);
 
     const fetchUserMovies = async () => {
-        // Mock data - gerçek API'den gelecek
         setUserMovies({
             favorites: [
                 {
@@ -86,7 +85,48 @@ const Profile = () => {
                     poster_path: "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
                     release_date: "1972-03-14"
                 },
-                // ... diğer favori filmler
+                {
+                    id: 155,
+                    title: "The Dark Knight",
+                    poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+                    release_date: "2008-07-18"
+                },
+                {
+                    id: 550,
+                    title: "Fight Club",
+                    poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+                    release_date: "1999-10-15"
+                },
+                {
+                    id: 278,
+                    title: "The Shawshank Redemption",
+                    poster_path: "/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+                    release_date: "1994-09-23"
+                },
+                {
+                    id: 13,
+                    title: "Forrest Gump",
+                    poster_path: "/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+                    release_date: "1994-07-06"
+                },
+                {
+                    id: 497,
+                    title: "The Green Mile",
+                    poster_path: "/velWPhVMQeQKcxggNEU8YmIo52R.jpg",
+                    release_date: "1999-12-10"
+                },
+                {
+                    id: 429,
+                    title: "The Good, the Bad and the Ugly",
+                    poster_path: "/bX2xnavhMYjWDoZp1VM6VnU1xwe.jpg",
+                    release_date: "1966-12-23"
+                },
+                {
+                    id: 389,
+                    title: "12 Angry Men",
+                    poster_path: "/ppd84D2i9W8jXmsyInGyihiSyqz.jpg",
+                    release_date: "1957-04-10"
+                }
             ],
             watched: [
                 {
@@ -95,7 +135,60 @@ const Profile = () => {
                     poster_path: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
                     release_date: "2010-07-16"
                 },
-                // ... diğer izlenen filmler
+                {
+                    id: 157336,
+                    title: "Interstellar",
+                    poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+                    release_date: "2014-11-07"
+                },
+                {
+                    id: 680,
+                    title: "Pulp Fiction",
+                    poster_path: "/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+                    release_date: "1994-09-10"
+                },
+                {
+                    id: 603,
+                    title: "The Matrix",
+                    poster_path: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+                    release_date: "1999-03-30"
+                },
+                {
+                    id: 769,
+                    title: "Goodfellas",
+                    poster_path: "/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
+                    release_date: "1990-09-12"
+                },
+                {
+                    id: 122,
+                    title: "The Lord of the Rings: The Return of the King",
+                    poster_path: "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
+                    release_date: "2003-12-17"
+                },
+                {
+                    id: 240,
+                    title: "The Godfather Part II",
+                    poster_path: "/hek3koDUyRQk7FIhPXsa6mT2Zc3.jpg",
+                    release_date: "1974-12-20"
+                },
+                {
+                    id: 424,
+                    title: "Schindler's List",
+                    poster_path: "/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
+                    release_date: "1993-12-15"
+                },
+                {
+                    id: 129,
+                    title: "Spirited Away",
+                    poster_path: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+                    release_date: "2001-07-20"
+                },
+                {
+                    id: 372058,
+                    title: "Your Name.",
+                    poster_path: "/q719jXXEzOoYaps6babgKnONONX.jpg",
+                    release_date: "2016-08-26"
+                }
             ],
             watchlist: [
                 {
@@ -104,7 +197,7 @@ const Profile = () => {
                     poster_path: "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
                     release_date: "1977-05-25"
                 },
-                // ... diğer watchlist filmleri
+
             ]
         });
     };

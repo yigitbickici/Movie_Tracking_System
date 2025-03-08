@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,6 +12,7 @@ const Navbar = () => {
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
         localStorage.removeItem('isAdmin');
@@ -50,6 +51,73 @@ const Navbar = () => {
         }
     };
 
+    const toggleMobileMenu = () => {
+        setMobileMenuOpen(!mobileMenuOpen);
+    };
+
+    const renderNavLinks = () => (
+        <>
+            {userType === 'admin' ? (
+                <>
+                    <Link 
+                        to="/explore" 
+                        className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaCompass />
+                        <span>Explore</span>
+                    </Link>
+                    <Link 
+                        to="/admin" 
+                        className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaCog />
+                        <span>Admin Panel</span>
+                    </Link>
+                </>
+            ) : userType === 'editor' ? (
+                <>
+                    <Link 
+                        to="/explore" 
+                        className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaCompass />
+                        <span>Explore</span>
+                    </Link>
+                    <Link 
+                        to="/spoiler-requests" 
+                        className={`nav-link ${location.pathname === '/spoiler-requests' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaShieldAlt />
+                        <span>Spoiler Reports</span>
+                    </Link>
+                </>
+            ) : (
+                <>
+                    <Link 
+                        to="/explore" 
+                        className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaCompass />
+                        <span>Explore</span>
+                    </Link>
+                    <Link 
+                        to="/watchlist" 
+                        className={`nav-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaFilm />
+                        <span>WatchList</span>
+                    </Link>
+                </>
+            )}
+        </>
+    );
+
     return (
         <nav className="navbar">
             <div className="nav-container">
@@ -59,59 +127,9 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                <div className="nav-links">
-                    {userType === 'admin' ? (
-                        <>
-                            <Link 
-                                to="/explore" 
-                                className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
-                            >
-                                <FaCompass />
-                                <span>Explore</span>
-                            </Link>
-                            <Link 
-                                to="/admin" 
-                                className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                            >
-                                <FaCog />
-                                <span>Admin Panel</span>
-                            </Link>
-                        </>
-                    ) : userType === 'editor' ? (
-                        <>
-                            <Link 
-                                to="/explore" 
-                                className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
-                            >
-                                <FaCompass />
-                                <span>Explore</span>
-                            </Link>
-                            <Link 
-                                to="/spoiler-requests" 
-                                className={`nav-link ${location.pathname === '/spoiler-requests' ? 'active' : ''}`}
-                            >
-                                <FaShieldAlt />
-                                <span>Spoiler Reports</span>
-                            </Link>
-                        </>
-                    ) : (
-                        <>
-                            <Link 
-                                to="/explore" 
-                                className={`nav-link ${location.pathname === '/explore' ? 'active' : ''}`}
-                            >
-                                <FaCompass />
-                                <span>Explore</span>
-                            </Link>
-                            <Link 
-                                to="/watchlist" 
-                                className={`nav-link ${location.pathname === '/watchlist' ? 'active' : ''}`}
-                            >
-                                <FaFilm />
-                                <span>WatchList</span>
-                            </Link>
-                        </>
-                    )}
+                {/* Desktop Navigation */}
+                <div className="nav-links desktop-menu">
+                    {renderNavLinks()}
                 </div>
 
                 <div className="nav-actions">
@@ -179,7 +197,37 @@ const Navbar = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* Hamburger Menu Button - Only visible on mobile */}
+                    <button className="hamburger-button" onClick={toggleMobileMenu}>
+                        {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+                    </button>
                 </div>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                {renderNavLinks()}
+                {userType !== 'editor' && userType !=='admin' && (
+                    <Link 
+                        to="/profile" 
+                        className="nav-link"
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaUser />
+                        <span>Profile</span>
+                    </Link>
+                )}
+                <button 
+                    onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                    }} 
+                    className="mobile-logout-button"
+                >
+                    <FaSignOutAlt />
+                    <span>Log Out</span>
+                </button>
             </div>
         </nav>
     );
