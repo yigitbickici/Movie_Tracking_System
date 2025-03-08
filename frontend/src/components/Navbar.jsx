@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes, FaUsers } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -85,6 +85,14 @@ const Navbar = () => {
                         <span>Explore</span>
                     </Link>
                     <Link 
+                        to="/users" 
+                        className={`nav-link ${location.pathname === '/users' ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaUsers />
+                        <span>Kullanıcılar</span>
+                    </Link>
+                    <Link 
                         to="/spoiler-requests" 
                         className={`nav-link ${location.pathname === '/spoiler-requests' ? 'active' : ''}`}
                         onClick={() => setMobileMenuOpen(false)}
@@ -153,11 +161,11 @@ const Navbar = () => {
                                         {searchResults.map(user => (
                                             <Link 
                                                 key={user.id} 
-                                                to={`/user/${user.username}`}
+                                                to={`/UserProfile/${user.username}`}
                                                 className="search-result-item"
                                                 onClick={() => {
                                                     setShowSearchDropdown(false);
-                                                    navigate(`/user/${user.username}`);
+                                                    navigate(`/UserProfile/${user.username}`);
                                                 }}
                                             >
                                                 <div className="user-avatar-small">{user.avatar}</div>

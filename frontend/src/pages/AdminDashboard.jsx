@@ -235,13 +235,13 @@ const AdminDashboard = () => {
                         className="delete-modal-button cancel"
                         onClick={() => setDeleteModal({ isOpen: false, commentId: null })}
                     >
-                        İptal
+                        Cancel
                     </button>
                     <button 
                         className="delete-modal-button confirm"
                         onClick={() => handleDeleteComment(deleteModal.commentId)}
                     >
-                        Sil
+                        Delete
                     </button>
                 </div>
             </div>

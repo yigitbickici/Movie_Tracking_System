@@ -1,0 +1,321 @@
+.users-page {
+    min-height: calc(100vh - 65px);
+    padding: 2rem;
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+.users-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.users-header h1 {
+    font-size: 2rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    color: #3489C0;
+}
+
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.user-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.user-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(52, 137, 192, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-info-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    flex: 1;
+    min-width: 200px;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #3489C0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-stats {
+    color: #bbb;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.user-join-date {
+    color: #808080;
+    font-size: 0.8rem;
+}
+
+.ban-reason {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.ban-button,
+.unban-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.ban-button {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-button:hover {
+    background: #c82333;
+}
+
+.unban-button {
+    background: #28a745;
+    color: white;
+}
+
+.unban-button:hover {
+    background: #218838;
+}
+
+/* Ban Modal Styles */
+.ban-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.ban-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ban-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+}
+
+.ban-modal-content h3 {
+    color: #fff;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.ban-form {
+    margin: 1.5rem 0;
+}
+
+.ban-reason-select {
+    width: 100%;
+    padding: 0.8rem;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.ban-reason-select:focus {
+    outline: none;
+    border-color: #3489C0;
+}
+
+.custom-reason-input {
+    width: 100%;
+    padding: 0.8rem;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: white;
+    min-height: 100px;
+    resize: vertical;
+    font-size: 0.9rem;
+}
+
+.custom-reason-input:focus {
+    outline: none;
+    border-color: #3489C0;
+}
+
+.ban-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.ban-modal-button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.ban-modal-button.cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.ban-modal-button.cancel:hover {
+    background: #5a6268;
+}
+
+.ban-modal-button.confirm {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-modal-button.confirm:hover {
+    background: #c82333;
+}
+
+.ban-modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .users-page {
+        padding: 1rem;
+    }
+
+    .users-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .users-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .user-card {
+        padding: 0.8rem;
+        flex-direction: column;
+    }
+
+    .user-info-section {
+        width: 100%;
+    }
+
+    .user-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .ban-button,
+    .unban-button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .user-info h4 {
+        font-size: 1rem;
+    }
+
+    .ban-modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+
+    .user-stats span:nth-child(2) {
+        display: none;
+    }
+} 

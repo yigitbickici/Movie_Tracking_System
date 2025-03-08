@@ -281,7 +281,7 @@ const UserProfile = () => {
     };
 
     const MoviePreview = ({ movie }) => (
-        <div className="movie-preview" onClick={() => setSelectedMovie(movie)}>
+        <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
             <img 
                 src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
                 alt={movie.title}
