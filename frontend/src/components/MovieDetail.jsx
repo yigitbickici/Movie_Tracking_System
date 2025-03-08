@@ -67,6 +67,12 @@ const MovieDetail = ({ movie, onClose }) => {
         console.log("Removed from list:", movie.title);
     };
 
+    // Yeni fonksiyon: Oyuncu ismine tıklandığında Google'da arama yap
+    const handleActorClick = (actorName) => {
+        const searchQuery = encodeURIComponent(actorName);
+        window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+    };
+
     return (
         <div className="movie-detail-overlay">
             <div className="movie-detail-content">
@@ -178,13 +184,18 @@ const MovieDetail = ({ movie, onClose }) => {
                             </div>
                         )}
 
-                        {/* Cast section */}
+                        {/* Cast section - Tıklanabilir hale getirildi */}
                         {movie.cast && (
                             <div className="cast-section">
                                 <h3>Cast:</h3>
                                 <div className="cast-list">
                                     {movie.cast.map(actor => (
-                                        <div key={actor.id} className="cast-item">
+                                        <div 
+                                            key={actor.id} 
+                                            className="cast-item"
+                                            onClick={() => handleActorClick(actor.name)}
+                                            title={`Search for ${actor.name} on Google`}
+                                        >
                                             {actor.profile_path ? (
                                                 <img 
                                                     src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}

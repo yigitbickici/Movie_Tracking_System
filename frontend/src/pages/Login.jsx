@@ -34,7 +34,7 @@ const Login = () => {
         else if (formData.email === 'editor@example.com' && formData.password === 'editor123') {
             localStorage.setItem('isAdmin', 'false');
             localStorage.setItem('userType', 'editor');
-            localStorage.setItem('userName', 'User1');
+            localStorage.setItem('userName', 'Editor');
             navigate('/');
         }else {
             alert('Invalid email or password!');

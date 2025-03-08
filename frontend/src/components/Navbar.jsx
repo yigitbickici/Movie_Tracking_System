@@ -34,13 +34,11 @@ const Navbar = () => {
         
         if (query.trim()) {
             try {
-                // Gerçek API çağrısı yapılacak
                 const response = await fetch(`/api/users/search?query=${query}`);
                 const data = await response.json();
                 setSearchResults(data);
             } catch (error) {
                 console.error('Error searching users:', error);
-                // Geçici mock data
                 const results = mockUsers.filter(user => 
                     user.username.toLowerCase().includes(query.toLowerCase())
                 );
@@ -198,14 +196,14 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Hamburger Menu Button - Only visible on mobile */}
+                    {}
                     <button className="hamburger-button" onClick={toggleMobileMenu}>
                         {mobileMenuOpen ? <FaTimes /> : <FaBars />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+            {}
             <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
                 {renderNavLinks()}
                 {userType !== 'editor' && userType !=='admin' && (
