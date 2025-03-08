@@ -14,7 +14,7 @@ Before running the project, ensure you have:
 INSTALLATION STEPS
 -----------------
 1. Clone the project repository:
-   > git clone https://github.com/[username]/Movie_Management_System.git
+   > git clone https://github.com/yigitbickici/Movie_Management_System.git
 
 2. Navigate to the frontend directory:
    > cd Movie_Management_System/frontend
