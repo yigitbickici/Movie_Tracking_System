@@ -11,6 +11,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private Role role;
+
     @Column(nullable = false, unique = true)
     private String username;
 

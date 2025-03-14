@@ -8,7 +8,7 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // we only need Id to fetch the data for each list
+    private Long id; // TMDB ID
 
     public Movie() {
     }

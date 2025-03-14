@@ -18,6 +18,13 @@ public class Discussion {
     @OneToMany
     List<Posts> posts;
 
+    Boolean spoilerRequested = false;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    Boolean isSpoiler = false;
+
     public Movie getMovie() {
         return movie;
     }
