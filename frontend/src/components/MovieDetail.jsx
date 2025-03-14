@@ -67,7 +67,6 @@ const MovieDetail = ({ movie, onClose }) => {
         console.log("Removed from list:", movie.title);
     };
 
-    // Yeni fonksiyon: Oyuncu ismine tıklandığında Google'da arama yap
     const handleActorClick = (actorName) => {
         const searchQuery = encodeURIComponent(actorName);
         window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
@@ -184,7 +183,7 @@ const MovieDetail = ({ movie, onClose }) => {
                             </div>
                         )}
 
-                        {/* Cast section - Tıklanabilir hale getirildi */}
+                        {/* Cast section */}
                         {movie.cast && (
                             <div className="cast-section">
                                 <h3>Cast:</h3>

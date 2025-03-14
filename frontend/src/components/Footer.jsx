@@ -31,7 +31,7 @@ const Footer = () => {
             </div>
             <div className="footer-bottom">
                 <p>Made in Türkiye</p>
-                <p>&copy; 2024 .MOVIARY - All rights reserved</p>
+                <p>&copy; 2025 .MOVIARY - All rights reserved</p>
             </div>
         </footer>
     );

@@ -27,6 +27,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
     private List<Movie> favoriteMovies;
+
     @ManyToMany
     @JoinTable(
             name = "user_watched_movies",
@@ -72,15 +73,15 @@ public class User {
         return favoriteMovies;
     }
 
-    public void setFavoriteMovies(List<Movie> favoriteMovies) {
-        this.favoriteMovies = favoriteMovies;
+    public void add_to_favorite(List<Movie> favoriteMovies,  Movie movie) {
+        favoriteMovies.add(movie);
     }
 
     public List<Movie> getWatchedMovies() {
         return watchedMovies;
     }
 
-    public void setWatchedMovies(List<Movie> watchedMovies) {
-        this.watchedMovies = watchedMovies;
+    public void set_as_wathced(List<Movie> watchedMovies, Movie movie) {
+        watchedMovies.add(movie);
     }
 }

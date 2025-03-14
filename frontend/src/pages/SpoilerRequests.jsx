@@ -9,7 +9,7 @@ const SpoilerRequests = () => {
             movieTitle: "Inception",
             postId: 1,
             postContent: "In the end, the totem keeps spinning which means...",
-            reportedBy: "User123",
+            reportedBy: "Yiğit Bıçkıcı",
             timestamp: "2 hours ago",
             status: "pending",
             poster_path: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg"
@@ -20,7 +20,7 @@ const SpoilerRequests = () => {
             movieTitle: "The Dark Knight",
             postId: 2,
             postContent: "When Harvey Dent becomes Two-Face...",
-            reportedBy: "User456",
+            reportedBy: "Emircan Çapkan",
             timestamp: "5 hours ago",
             status: "pending",
             poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
