@@ -40,6 +40,18 @@ public class User {
     )
     private List<Movie> watchedMovies;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_watchlist",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns =   @JoinColumn(name = "movie_id")
+    )
+    private List<Movie> watchedList;
+
+    //JOIN
+    //private List<User> following;
+    //private List<User> followers;
+
     // Getters and Setters
     public Long getId() {
         return id;
