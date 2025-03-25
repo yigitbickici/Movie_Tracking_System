@@ -1,6 +1,7 @@
 package com.Movie_Management_System.spring.entities;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,8 +13,8 @@ public class User {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
-    private Role role;
+    @Column(nullable = false)
+    private Role role = Role.CUSTOMER;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -30,27 +31,51 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<Movie> favoriteMovies;
+    private List<Movie> favoriteMovies = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
             name = "user_watched_movies",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns =   @JoinColumn(name = "movie_id")
+            inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<Movie> watchedMovies;
+    private List<Movie> watchedMovies = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
             name = "user_watchlist",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns =   @JoinColumn(name = "movie_id")
+            inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<Movie> watchedList;
+    private List<Movie> watchedList = new ArrayList<>();
 
-    //JOIN
-    //private List<User> following;
-    //private List<User> followers;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Posts> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "requestedByUser")
+    private List<SpoilerRequest> requestedSpoilers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resolvedByUser")
+    private List<SpoilerRequest> resolvedSpoilers = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<User> followers = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_following",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    private List<User> following = new ArrayList<>();
 
     // Getters and Setters
     public Long getId() {
@@ -59,6 +84,14 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getUsername() {
@@ -89,15 +122,106 @@ public class User {
         return favoriteMovies;
     }
 
-    public void add_to_favorite(List<Movie> favoriteMovies,  Movie movie) {
-        favoriteMovies.add(movie);
+    public void setFavoriteMovies(List<Movie> favoriteMovies) {
+        this.favoriteMovies = favoriteMovies;
     }
 
     public List<Movie> getWatchedMovies() {
         return watchedMovies;
     }
 
-    public void set_as_wathced(List<Movie> watchedMovies, Movie movie) {
+    public void setWatchedMovies(List<Movie> watchedMovies) {
+        this.watchedMovies = watchedMovies;
+    }
+
+    public List<Movie> getWatchedList() {
+        return watchedList;
+    }
+
+    public void setWatchedList(List<Movie> watchedList) {
+        this.watchedList = watchedList;
+    }
+
+    public List<Posts> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Posts> posts) {
+        this.posts = posts;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<SpoilerRequest> getRequestedSpoilers() {
+        return requestedSpoilers;
+    }
+
+    public void setRequestedSpoilers(List<SpoilerRequest> requestedSpoilers) {
+        this.requestedSpoilers = requestedSpoilers;
+    }
+
+    public List<SpoilerRequest> getResolvedSpoilers() {
+        return resolvedSpoilers;
+    }
+
+    public void setResolvedSpoilers(List<SpoilerRequest> resolvedSpoilers) {
+        this.resolvedSpoilers = resolvedSpoilers;
+    }
+
+    public List<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<User> followers) {
+        this.followers = followers;
+    }
+
+    public List<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<User> following) {
+        this.following = following;
+    }
+
+    // Helper methods
+    public void addToFavorite(Movie movie) {
+        favoriteMovies.add(movie);
+    }
+
+    public void removeFromFavorite(Movie movie) {
+        favoriteMovies.remove(movie);
+    }
+
+    public void addToWatched(Movie movie) {
         watchedMovies.add(movie);
+    }
+
+    public void removeFromWatched(Movie movie) {
+        watchedMovies.remove(movie);
+    }
+
+    public void addToWatchlist(Movie movie) {
+        watchedList.add(movie);
+    }
+
+    public void removeFromWatchlist(Movie movie) {
+        watchedList.remove(movie);
+    }
+
+    public void followUser(User user) {
+        following.add(user);
+        user.getFollowers().add(this);
+    }
+
+    public void unfollowUser(User user) {
+        following.remove(user);
+        user.getFollowers().remove(this);
     }
 }
