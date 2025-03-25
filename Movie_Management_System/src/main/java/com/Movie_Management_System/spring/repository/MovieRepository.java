@@ -11,7 +11,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     List<Movie> findByTitle(String title);
 
-    List<Movie> findByDirector(String director);
+    List<Movie> findByTitleContaining(String title);
 
     List<Movie> findByReleaseYear(int releaseYear);
 

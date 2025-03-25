@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Auth.css';
 
 const Login = () => {
@@ -8,6 +9,8 @@ const Login = () => {
         email: '',
         password: ''
     });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -16,28 +19,35 @@ const Login = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setLoading(true);
         
-        if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
-            localStorage.setItem('isAdmin', 'true');
-            localStorage.setItem('userType', 'admin');
-            localStorage.setItem('userName', 'Admin');
-            navigate('/admin');
-        }
-        else if (formData.email === 'user@example.com' && formData.password === 'user123') {
-            localStorage.setItem('isAdmin', 'false');
-            localStorage.setItem('userType', 'user');
-            localStorage.setItem('userName', 'User1');
-            navigate('/');
-        } 
-        else if (formData.email === 'editor@example.com' && formData.password === 'editor123') {
-            localStorage.setItem('isAdmin', 'false');
-            localStorage.setItem('userType', 'editor');
-            localStorage.setItem('userName', 'Editor');
-            navigate('/');
-        }else {
-            alert('Invalid email or password!');
+        try {
+            const response = await axios.post('http://localhost:8080/api/auth/login', formData);
+            
+            if (response.data.success) {
+                // Kullanıcı bilgilerini local storage'a kaydet
+                localStorage.setItem('userId', response.data.userId);
+                localStorage.setItem('userName', response.data.username);
+                localStorage.setItem('userType', response.data.role.toLowerCase());
+                localStorage.setItem('isAdmin', response.data.role === 'ADMIN' ? 'true' : 'false');
+                
+                // Kullanıcı rolüne göre yönlendirme
+                if (response.data.role === 'ADMIN') {
+                    navigate('/admin');
+                } else {
+                    navigate('/');
+                }
+            } else {
+                setError(response.data.message);
+            }
+        } catch (error) {
+            setError(error.response?.data?.message || 'Login failed. Please try again.');
+            console.error('Login error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -49,6 +59,9 @@ const Login = () => {
             <div className="auth-box">
                 <h2>Welcome</h2>
                 <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Login and Start Now!</p>
+                
+                {error && <div className="error-message">{error}</div>}
+                
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="input-container">
                         <input
@@ -75,30 +88,33 @@ const Login = () => {
                     <div className="forgot-password">
                         <Link to="#">Forgot your password?</Link>
                     </div>
-                    <button type="submit" className="auth-button">
-                        Login
+                    <button type="submit" className="auth-button" disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
                 <p className="auth-link">
                     Do not have any account? <Link to="/register">Register Free</Link>
                 </p>
                 
-                {/*
+                {/* Test hesapları bölümü geliştirme aşamasında yararlı olabilir */}
                 <div className="login-info">
-                    <p style={{ textAlign: 'center', fontWeight: 'bold' }}>Test Hesapları</p>
+                    <p style={{ textAlign: 'center', fontWeight: 'bold' }}>Test Accounts</p>
                     <div className="test-account">
-                        <p><strong>Admin Hesabı:</strong></p>
+                        <p><strong>Admin Account:</strong></p>
                         <p>Email: admin@example.com</p>
-                        <p>Şifre: admin123</p>
+                        <p>Password: admin123</p>
                     </div>
                     <div className="test-account">
-                        <p><strong>Normal Kullanıcı:</strong></p>
+                        <p><strong>Normal User:</strong></p>
                         <p>Email: user@example.com</p>
-                        <p>Şifre: user123</p>
+                        <p>Password: user123</p>
+                    </div>
+                    <div className="test-account">
+                        <p><strong>Editor Account:</strong></p>
+                        <p>Email: editor@example.com</p>
+                        <p>Password: editor123</p>
                     </div>
                 </div>
-                */}
-
             </div>
         </div>
     );

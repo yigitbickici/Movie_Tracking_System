@@ -3,27 +3,38 @@ package com.Movie_Management_System.spring.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "username"),
+           @UniqueConstraint(columnNames = "email")
+       })
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 20)
+    private String username;
+
+    @NotBlank
+    @Size(max = 50)
+    @Email
+    private String email;
+
+    @NotBlank
+    @Size(max = 120)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.CUSTOMER;
-
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, unique = true)
-    private String email;
 
     @ManyToMany
     @JoinTable(
@@ -77,6 +88,15 @@ public class User {
     )
     private List<User> following = new ArrayList<>();
 
+    public User() {
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -84,14 +104,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public String getUsername() {
@@ -102,6 +114,14 @@ public class User {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -110,12 +130,12 @@ public class User {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
+    public Role getRole() {
+        return role;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public List<Movie> getFavoriteMovies() {

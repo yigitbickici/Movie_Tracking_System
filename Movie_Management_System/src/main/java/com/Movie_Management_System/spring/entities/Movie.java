@@ -9,6 +9,7 @@ import java.util.List;
 public class Movie {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // it is TMDB ID
 
     @Column
@@ -25,6 +26,15 @@ public class Movie {
 
     @Column
     private Double voteAverage;
+
+    @Column
+    private int releaseYear;
+
+    @Column
+    private String genre;
+
+    @Column
+    private String director;
 
     @OneToMany(mappedBy = "movie")
     private List<Posts> posts;
@@ -99,5 +109,29 @@ public class Movie {
 
     public void setDiscussion(Discussion discussion) {
         this.discussion = discussion;
+    }
+
+    public int getReleaseYear() {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(int releaseYear) {
+        this.releaseYear = releaseYear;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
     }
 }
