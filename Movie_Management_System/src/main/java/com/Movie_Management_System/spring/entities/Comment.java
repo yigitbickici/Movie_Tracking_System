@@ -11,18 +11,21 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 1000)
-    private String content;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Posts post;
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
+
+    @Column(nullable = false, length = 1000)
+    private String content;
 
     @Column(nullable = false)
+    private double rating;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column
@@ -34,8 +37,13 @@ public class Comment {
     @Column
     private Integer likeCount = 0;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Posts post;
+
     // Constructors
     public Comment() {
+        this.createdAt = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -47,14 +55,6 @@ public class Comment {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public User getUser() {
         return user;
     }
@@ -63,12 +63,28 @@ public class Comment {
         this.user = user;
     }
 
-    public Posts getPost() {
-        return post;
+    public Movie getMovie() {
+        return movie;
     }
 
-    public void setPost(Posts post) {
-        this.post = post;
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -101,6 +117,14 @@ public class Comment {
 
     public void setLikeCount(Integer likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public Posts getPost() {
+        return post;
+    }
+
+    public void setPost(Posts post) {
+        this.post = post;
     }
 
     // Pre-persist hook to set createdAt

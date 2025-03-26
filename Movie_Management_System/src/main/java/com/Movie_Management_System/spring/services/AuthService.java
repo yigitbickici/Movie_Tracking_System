@@ -23,10 +23,10 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
-        Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
         
         if (userOptional.isEmpty()) {
-            return new LoginResponse(false, "User not found with this email");
+            return new LoginResponse(false, "User not found with this username");
         }
         
         User user = userOptional.get();

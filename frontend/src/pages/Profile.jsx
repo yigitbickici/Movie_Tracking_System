@@ -1,26 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit, FaUsers, FaUserFriends } from 'react-icons/fa';
 import MovieDetail from '../components/MovieDetail';
+import axios from 'axios';
 
 const Profile = () => {
-    const [userProfile, setUserProfile] = useState({
-        username: "USER1",
-        avatar: "U1",
-        stats: {
-            following: 10,
-            followers: 10,
-            comments: 2,
-            movieTime: {
-                months: 0,
-                days: 5,
-                hours: 6
-            },
-            moviesWatched: 20,
-        }
-    });
-
+    const { username } = useParams();
+    const [userProfile, setUserProfile] = useState(null);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [userMovies, setUserMovies] = useState({
         favorites: [],
@@ -37,197 +24,71 @@ const Profile = () => {
         isOpen: false,
         comment: null
     });
-
-    const [followers, setFollowers] = useState([
-        {
-            id: 1,
-            username: "MovieLover",
-            movieCount: 150,
-            isFollowing: true,
-        },
-        {
-            id: 2,
-            username: "CinemaFan",
-            movieCount: 89,
-            isFollowing: false,
-        }
-    ]);
-
-    const [following, setFollowing] = useState([
-        {
-            id: 3,
-            username: "FilmBuff",
-            movieCount: 234,
-        },
-        {
-            id: 4,
-            username: "MovieCritic",
-            movieCount: 567,
-        }
-    ]);
-
     const [followersModal, setFollowersModal] = useState(false);
     const [followingModal, setFollowingModal] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchUserMovies();
-        fetchUserComments();
-    }, []);
+        fetchUserProfile();
+    }, [username]);
 
-    const fetchUserMovies = async () => {
-        setUserMovies({
-            favorites: [
+    const fetchUserProfile = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `http://localhost:8080/api/profile/${username || 'me'}`,
                 {
-                    id: 238,
-                    title: "The Godfather",
-                    poster_path: "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
-                    release_date: "1972-03-14"
-                },
-                {
-                    id: 155,
-                    title: "The Dark Knight",
-                    poster_path: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-                    release_date: "2008-07-18"
-                },
-                {
-                    id: 550,
-                    title: "Fight Club",
-                    poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-                    release_date: "1999-10-15"
-                },
-                {
-                    id: 278,
-                    title: "The Shawshank Redemption",
-                    poster_path: "/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
-                    release_date: "1994-09-23"
-                },
-                {
-                    id: 13,
-                    title: "Forrest Gump",
-                    poster_path: "/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
-                    release_date: "1994-07-06"
-                },
-                {
-                    id: 497,
-                    title: "The Green Mile",
-                    poster_path: "/velWPhVMQeQKcxggNEU8YmIo52R.jpg",
-                    release_date: "1999-12-10"
-                },
-                {
-                    id: 429,
-                    title: "The Good, the Bad and the Ugly",
-                    poster_path: "/bX2xnavhMYjWDoZp1VM6VnU1xwe.jpg",
-                    release_date: "1966-12-23"
-                },
-                {
-                    id: 389,
-                    title: "12 Angry Men",
-                    poster_path: "/ppd84D2i9W8jXmsyInGyihiSyqz.jpg",
-                    release_date: "1957-04-10"
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            ],
-            watched: [
-                {
-                    id: 27205,
-                    title: "Inception",
-                    poster_path: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-                    release_date: "2010-07-16"
-                },
-                {
-                    id: 157336,
-                    title: "Interstellar",
-                    poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-                    release_date: "2014-11-07"
-                },
-                {
-                    id: 680,
-                    title: "Pulp Fiction",
-                    poster_path: "/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-                    release_date: "1994-09-10"
-                },
-                {
-                    id: 603,
-                    title: "The Matrix",
-                    poster_path: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-                    release_date: "1999-03-30"
-                },
-                {
-                    id: 769,
-                    title: "Goodfellas",
-                    poster_path: "/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
-                    release_date: "1990-09-12"
-                },
-                {
-                    id: 122,
-                    title: "The Lord of the Rings: The Return of the King",
-                    poster_path: "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
-                    release_date: "2003-12-17"
-                },
-                {
-                    id: 240,
-                    title: "The Godfather Part II",
-                    poster_path: "/hek3koDUyRQk7FIhPXsa6mT2Zc3.jpg",
-                    release_date: "1974-12-20"
-                },
-                {
-                    id: 424,
-                    title: "Schindler's List",
-                    poster_path: "/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
-                    release_date: "1993-12-15"
-                },
-                {
-                    id: 129,
-                    title: "Spirited Away",
-                    poster_path: "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
-                    release_date: "2001-07-20"
-                },
-                {
-                    id: 372058,
-                    title: "Your Name.",
-                    poster_path: "/q719jXXEzOoYaps6babgKnONONX.jpg",
-                    release_date: "2016-08-26"
-                }
-            ],
-            watchlist: [
-                {
-                    id: 11,
-                    title: "Star Wars",
-                    poster_path: "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
-                    release_date: "1977-05-25"
-                },
-
-            ]
-        });
+            );
+            setUserProfile(response.data);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            setError('Failed to load profile data');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const fetchUserComments = async () => {
+    const handleFollow = async (userId) => {
         try {
-            // Mock data - gerçek API'den gelecek
-            const mockComments = [
+            const token = localStorage.getItem('token');
+            await axios.post(
+                `http://localhost:8080/api/profile/follow/${userId}`,
+                {},
                 {
-                    id: 1,
-                    movieId: 27205,
-                    movieTitle: "Inception",
-                    moviePoster: "/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-                    comment: "Great movie! One of Christopher Nolan's best.",
-                    rating: 4.5,
-                    date: "2024-03-15"
-                },
-                {
-                    id: 2,
-                    movieId: 155,
-                    movieTitle: "The Dark Knight",
-                    moviePoster: "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-                    comment: "Heath Ledger's performance as the Joker is unforgettable.",
-                    rating: 5,
-                    date: "2024-03-10"
-                },
-            ];
-            setUserComments(mockComments);
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            fetchUserProfile(); // Profili yenile
         } catch (error) {
-            console.error('Error fetching user comments:', error);
+            console.error('Error following user:', error);
+        }
+    };
+
+    const handleUnfollow = async (userId) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post(
+                `http://localhost:8080/api/profile/unfollow/${userId}`,
+                {},
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            fetchUserProfile(); // Profili yenile
+        } catch (error) {
+            console.error('Error unfollowing user:', error);
         }
     };
 
@@ -304,26 +165,6 @@ const Profile = () => {
         } catch (error) {
             console.error('Error updating comment:', error);
         }
-    };
-
-    const handleFollow = (userId) => {
-        setFollowers(followers.map(follower => 
-            follower.id === userId 
-                ? {...follower, isFollowing: !follower.isFollowing}
-                : follower
-        ));
-    };
-
-    const handleUnfollow = (userId) => {
-        setFollowing(following.filter(user => user.id !== userId));
-        // Takipçi sayısını güncelle
-        setUserProfile(prev => ({
-            ...prev,
-            stats: {
-                ...prev.stats,
-                following: prev.stats.following - 1
-            }
-        }));
     };
 
     const MoviePreview = ({ movie }) => (
@@ -414,21 +255,21 @@ const Profile = () => {
         );
     };
 
-    const DeleteConfirmationModal = () => (
-        <div className={`delete-modal-overlay ${deleteModal.isOpen ? 'active' : ''}`}>
+    const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => (
+        <div className={`delete-modal-overlay ${isOpen ? 'active' : ''}`}>
             <div className="delete-modal-content">
                 <h3>Delete Comment</h3>
                 <p>Are you sure you want to delete this comment?</p>
                 <div className="delete-modal-buttons">
                     <button 
                         className="delete-modal-button cancel"
-                        onClick={() => setDeleteModal({ isOpen: false, commentId: null })}
+                        onClick={onClose}
                     >
                         Cancel
                     </button>
                     <button 
                         className="delete-modal-button confirm"
-                        onClick={() => handleDeleteComment(deleteModal.commentId)}
+                        onClick={onConfirm}
                     >
                         Delete
                     </button>
@@ -437,20 +278,20 @@ const Profile = () => {
         </div>
     );
 
-    const EditCommentModal = () => {
-        const [editedComment, setEditedComment] = useState(editModal.comment?.comment || '');
-        const [editedRating, setEditedRating] = useState(editModal.comment?.rating || 5);
+    const EditCommentModal = ({ isOpen, comment, onClose, onSave }) => {
+        const [editedComment, setEditedComment] = useState(comment?.comment || '');
+        const [editedRating, setEditedRating] = useState(comment?.rating || 5);
         const [hoveredRating, setHoveredRating] = useState(0);
 
         useEffect(() => {
-            if (editModal.comment) {
-                setEditedComment(editModal.comment.comment);
-                setEditedRating(editModal.comment.rating);
+            if (comment) {
+                setEditedComment(comment.comment);
+                setEditedRating(comment.rating);
             }
-        }, [editModal.comment]);
+        }, [comment]);
 
         return (
-            <div className={`edit-modal-overlay ${editModal.isOpen ? 'active' : ''}`}>
+            <div className={`edit-modal-overlay ${isOpen ? 'active' : ''}`}>
                 <div className="edit-modal-content">
                     <h3>Edit Comment</h3>
                     <div className="edit-modal-form">
@@ -494,13 +335,13 @@ const Profile = () => {
                     <div className="edit-modal-buttons">
                         <button 
                             className="edit-modal-button cancel"
-                            onClick={() => setEditModal({ isOpen: false, comment: null })}
+                            onClick={onClose}
                         >
                             Cancel
                         </button>
                         <button 
                             className="edit-modal-button confirm"
-                            onClick={() => handleEditComment(editModal.comment.id, editedComment, editedRating)}
+                            onClick={() => onSave(comment.id, editedComment, editedRating)}
                         >
                             Save
                         </button>
@@ -510,7 +351,7 @@ const Profile = () => {
         );
     };
 
-    const CommentCard = ({ comment }) => (
+    const CommentCard = ({ comment, onEdit, onDelete }) => (
         <div className="comment-card">
             <div className="comment-movie-info" onClick={() => handleMovieClick({ id: comment.movieId })}>
                 <img 
@@ -534,7 +375,7 @@ const Profile = () => {
                         className="edit-comment-button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            setEditModal({ isOpen: true, comment });
+                            onEdit(comment);
                         }}
                     >
                         <FaEdit />
@@ -543,7 +384,7 @@ const Profile = () => {
                         className="delete-comment-button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            setDeleteModal({ isOpen: true, commentId: comment.id });
+                            onDelete(comment.id);
                         }}
                     >
                         <FaTrash />
@@ -553,7 +394,7 @@ const Profile = () => {
         </div>
     );
 
-    const UserCard = ({ user, type }) => (
+    const UserCard = ({ user, type, onFollow, onUnfollow }) => (
         <div 
             className="user-card"
             onClick={() => navigate(`/user/${user.username}`)}
@@ -569,7 +410,7 @@ const Profile = () => {
                 className={`follow-button ${type === 'following' || user.isFollowing ? 'following' : ''}`}
                 onClick={(e) => {
                     e.stopPropagation();
-                    type === 'following' ? handleUnfollow(user.id) : handleFollow(user.id);
+                    type === 'following' ? onUnfollow(user.id) : onFollow(user.id);
                 }}
             >
                 {type === 'following' || user.isFollowing ? 'Following' : 'Follow'}
@@ -577,7 +418,7 @@ const Profile = () => {
         </div>
     );
 
-    const ConnectionModal = ({ title, users, isOpen, onClose, icon: Icon, type }) => {
+    const ConnectionModal = ({ title, users, isOpen, onClose, icon: Icon, type, onFollow, onUnfollow }) => {
         const [isActive, setIsActive] = useState(false);
 
         useEffect(() => {
@@ -611,6 +452,8 @@ const Profile = () => {
                                 key={user.id} 
                                 user={user} 
                                 type={type}
+                                onFollow={onFollow}
+                                onUnfollow={onUnfollow}
                             />
                         ))}
                     </div>
@@ -619,6 +462,18 @@ const Profile = () => {
         );
     };
 
+    if (loading) {
+        return <div className="loading">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="error">{error}</div>;
+    }
+
+    if (!userProfile) {
+        return <div className="error">Profile not found</div>;
+    }
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -626,9 +481,11 @@ const Profile = () => {
                     <span>{userProfile.avatar}</span>
                 </div>
                 <h1 className="profile-username">{userProfile.username}</h1>
-                <Link to="/profile/edit" className="edit-button">
-                    EDIT
-                </Link>
+                {!username && (
+                    <Link to="/profile/edit" className="edit-button">
+                        EDIT
+                    </Link>
+                )}
                 <div className="profile-stats">
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.following}</div>
@@ -691,11 +548,13 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="user-list">
-                            {followers.map(user => (
+                            {userProfile.followers.map(user => (
                                 <UserCard 
                                     key={user.id} 
                                     user={user} 
                                     type="followers"
+                                    onFollow={handleFollow}
+                                    onUnfollow={handleUnfollow}
                                 />
                             ))}
                         </div>
@@ -718,11 +577,13 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="user-list">
-                            {following.map(user => (
+                            {userProfile.following.map(user => (
                                 <UserCard 
                                     key={user.id} 
                                     user={user} 
                                     type="following"
+                                    onFollow={handleFollow}
+                                    onUnfollow={handleUnfollow}
                                 />
                             ))}
                         </div>
@@ -730,49 +591,52 @@ const Profile = () => {
 
                     <ConnectionModal 
                         title="Followers"
-                        users={followers}
+                        users={userProfile.followers}
                         isOpen={followersModal}
                         onClose={() => setFollowersModal(false)}
                         icon={FaUsers}
                         type="followers"
+                        onFollow={handleFollow}
+                        onUnfollow={handleUnfollow}
                     />
 
                     <ConnectionModal 
                         title="Following"
-                        users={following}
+                        users={userProfile.following}
                         isOpen={followingModal}
                         onClose={() => setFollowingModal(false)}
                         icon={FaUserFriends}
                         type="following"
+                        onFollow={handleFollow}
+                        onUnfollow={handleUnfollow}
                     />
                 </div>
 
                 <MovieSection 
                     title="Favorites"
-                    movies={userMovies.favorites}
+                    movies={userProfile.favorites}
                     icon={FaHeart}
                 />
 
                 <MovieSection 
                     title="Watched Movies"
-                    movies={userMovies.watched}
+                    movies={userProfile.watched}
                     icon={FaEye}
                 />
 
                 <MovieSection 
                     title="Watchlist"
-                    movies={userMovies.watchlist}
+                    movies={userProfile.watchlist}
                     icon={FaList}
                 />
 
-                {/* Yorumlar bölümü */}
                 <div className="comments-section">
                     <div className="section-header">
                         <h2>
                             <FaComment className="section-icon" />
                             Comments
                         </h2>
-                        {userComments.length > 3 && (
+                        {userProfile.comments.length > 3 && (
                             <button 
                                 className="see-all-button" 
                                 onClick={() => setShowAllComments(!showAllComments)}
@@ -784,10 +648,15 @@ const Profile = () => {
                     </div>
                     
                     <div className="comments-container">
-                        {userComments.length > 0 ? (
+                        {userProfile.comments.length > 0 ? (
                             <div className="comments-grid">
-                                {(showAllComments ? userComments : userComments.slice(0, 3)).map(comment => (
-                                    <CommentCard key={comment.id} comment={comment} />
+                                {(showAllComments ? userProfile.comments : userProfile.comments.slice(0, 3)).map(comment => (
+                                    <CommentCard 
+                                        key={comment.id} 
+                                        comment={comment}
+                                        onEdit={(editedComment) => setEditModal({ isOpen: true, comment: editedComment })}
+                                        onDelete={(commentId) => setDeleteModal({ isOpen: true, commentId })}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -806,8 +675,17 @@ const Profile = () => {
                     isInList={true}
                 />
             )}
-            <DeleteConfirmationModal />
-            <EditCommentModal />
+            <DeleteConfirmationModal 
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ isOpen: false, commentId: null })}
+                onConfirm={() => handleDeleteComment(deleteModal.commentId)}
+            />
+            <EditCommentModal 
+                isOpen={editModal.isOpen}
+                comment={editModal.comment}
+                onClose={() => setEditModal({ isOpen: false, comment: null })}
+                onSave={handleEditComment}
+            />
         </div>
     );
 };

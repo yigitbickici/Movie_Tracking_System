@@ -1,16 +1,16 @@
 package com.Movie_Management_System.spring.dto;
 
 public class LoginRequest {
-    private String email;
+    private String username;
     private String password;
 
     // Getters and Setters
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
