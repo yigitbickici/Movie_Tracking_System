@@ -30,7 +30,7 @@ const Login = () => {
             if (response.data.success) {
                 // Kullanıcı bilgilerini local storage'a kaydet
                 localStorage.setItem('userId', response.data.userId);
-                localStorage.setItem('userName', response.data.username);
+                localStorage.setItem('userMail', response.data.email);
                 localStorage.setItem('userType', response.data.role.toLowerCase());
                 localStorage.setItem('isAdmin', response.data.role === 'ADMIN' ? 'true' : 'false');
                 

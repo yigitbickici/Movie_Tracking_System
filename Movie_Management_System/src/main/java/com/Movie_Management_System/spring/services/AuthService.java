@@ -1,4 +1,4 @@
-package com.Movie_Management_System.spring.service;
+package com.Movie_Management_System.spring.services;
 
 import com.Movie_Management_System.spring.dto.LoginRequest;
 import com.Movie_Management_System.spring.dto.LoginResponse;

@@ -1,17 +1,24 @@
 package com.Movie_Management_System.spring.payload.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
     private Long id;
     private String username;
     private String email;
+    private String role;
 
-    public JwtResponse(String accessToken, Long id, String username, String email) {
+    public JwtResponse(String accessToken, Long id, String username, String email, String role) {
         this.token = accessToken;
         this.id = id;
         this.username = username;
         this.email = email;
+        this.role = role;
     }
 
     public String getAccessToken() {
@@ -52,5 +59,13 @@ public class JwtResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 } 
