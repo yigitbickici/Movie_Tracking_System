@@ -344,56 +344,29 @@
 
 .favorite-button {
     background: none;
-    border: 2px solid #ff4081;
-    color: #ff4081;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    border: none;
+    color: #666;
     font-size: 24px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 5px;
     transition: all 0.3s ease;
-    padding: 0;
-    line-height: 1;
-    position: relative;
-}
-
-.favorite-button.active {
-    background-color: #ff4081;
-    color: white;
-}
-
-.favorite-button::after {
-    content: 'Add to Favorites';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    white-space: nowrap;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s;
-    margin-bottom: 5px;
-}
-
-.favorite-button:hover::after {
-    visibility: visible;
-    opacity: 1;
-}
-
-.favorite-button.active::after {
-    content: 'Remove from Favorites';
+    margin-left: 10px;
 }
 
 .favorite-button:hover {
     transform: scale(1.1);
+    color: #ff4d4d;
+}
+
+.favorite-button.active {
+    color: #ff4d4d;
+    animation: heartBeat 0.3s ease-in-out;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
 .see-posts-button {

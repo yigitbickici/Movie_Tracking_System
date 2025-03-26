@@ -135,4 +135,53 @@ public class MovieController {
         List<Movie> watchedMovies = movieService.getWatchedMovies(user.getId());
         return ResponseEntity.ok(watchedMovies);
     }
+
+    @PostMapping("/{movieId}/favorites")
+    public ResponseEntity<?> addToFavorites(@PathVariable Long movieId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            
+            movieService.addToFavorites(user.getId(), movieId);
+            return ResponseEntity.ok(Map.of("message", "Film favorilere eklendi"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{movieId}/favorites")
+    public ResponseEntity<?> removeFromFavorites(@PathVariable Long movieId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        movieService.removeFromFavorites(user.getId(), movieId);
+        return ResponseEntity.ok(Map.of("message", "Film favorilerden çıkarıldı"));
+    }
+
+    @GetMapping("/{movieId}/favorites/check")
+    public ResponseEntity<?> checkFavoriteStatus(@PathVariable Long movieId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("No User Found"));
+        
+        boolean isFavorite = movieService.isFavorite(user.getId(), movieId);
+        return ResponseEntity.ok(Map.of("isFavorite", isFavorite));
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<?> getFavoriteMovies() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        List<Movie> favoriteMovies = movieService.getFavoriteMovies(user.getId());
+        return ResponseEntity.ok(favoriteMovies);
+    }
 } 

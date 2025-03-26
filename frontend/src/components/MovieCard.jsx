@@ -1,7 +1,7 @@
 import React from "react";
 import './MovieCard.css';
 
-const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, isGridView }) => {
+const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, isFavorite, onFavoriteToggle, isGridView }) => {
     // Liste görünümü için
     if (!isGridView) {
         return (
@@ -32,6 +32,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                             e.stopPropagation();
                             onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                         }}
+                        title={isWatched ? "İzlendi" : "İzlenmedi"}
                     >
                         ✓
                     </button>
@@ -60,6 +61,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                         e.stopPropagation();
                         onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                     }}
+                    title={isWatched ? "İzlendi" : "İzlenmedi"}
                 >
                     ✓
                 </button>

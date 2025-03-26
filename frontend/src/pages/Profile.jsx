@@ -178,6 +178,26 @@ const Profile = () => {
         }
     };
 
+    const handleFavoriteToggle = async (movieId, isFavorite) => {
+        try {
+            if (isFavorite) {
+                await axios.post(`/api/movies/${movieId}/favorites`);
+                setUserProfile(prevProfile => ({
+                    ...prevProfile,
+                    favorites: [...prevProfile.favorites, prevProfile.watchlist.find(m => m.tmdbId === movieId)]
+                }));
+            } else {
+                await axios.delete(`/api/movies/${movieId}/favorites`);
+                setUserProfile(prevProfile => ({
+                    ...prevProfile,
+                    favorites: prevProfile.favorites.filter(m => m.tmdbId !== movieId)
+                }));
+            }
+        } catch (error) {
+            console.error("Favori durumu güncellenirken hata oluştu:", error);
+        }
+    };
+
     const MovieSection = ({ title, movies, icon: Icon }) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -222,6 +242,8 @@ const Profile = () => {
                             isWatchlist={title === "Watchlist"}
                             isWatched={userProfile.watched.some(w => w.tmdbId === movie.tmdbId)}
                             onWatchedToggle={handleWatchedToggle}
+                            isFavorite={userProfile.favorites.some(f => f.tmdbId === movie.tmdbId)}
+                            onFavoriteToggle={handleFavoriteToggle}
                         />
                     ))}
                 </div>
@@ -233,8 +255,8 @@ const Profile = () => {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                 />
-            </div>
-        );
+        </div>
+    );
     };
 
     const MovieModal = ({ movies, title, isOpen, onClose, icon: Icon }) => {

@@ -30,6 +30,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
         if (movie?.tmdbId) {
             checkWatchlistStatus();
             checkWatchedStatus();
+            checkFavoriteStatus();
         }
     }, [movie]);
 
@@ -53,6 +54,15 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             setIsWatched(response.data.isWatched);
         } catch (error) {
             console.error("İzlenme durumu kontrol edilirken hata oluştu:", error);
+        }
+    };
+
+    const checkFavoriteStatus = async () => {
+        try {
+            const response = await axios.get(`/api/movies/${movie.tmdbId}/favorites/check`);
+            setIsFavorite(response.data.isFavorite);
+        } catch (error) {
+            console.error("Favori durumu kontrol edilirken hata oluştu:", error);
         }
     };
 
@@ -155,6 +165,28 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
         window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
     };
 
+    const handleFavoriteToggle = async () => {
+        if (!movie?.tmdbId) {
+            console.error("tmdbId bulunamadı:", movie);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            if (isFavorite) {
+                await axios.delete(`/api/movies/${movie.tmdbId}/favorites`);
+                setIsFavorite(false);
+            } else {
+                await axios.post(`/api/movies/${movie.tmdbId}/favorites`);
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error("Favori durumu güncellenirken hata oluştu:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="movie-detail-overlay">
             <div className="movie-detail-content">
@@ -184,6 +216,13 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                             <span>{(movie.release_date || movie.releaseDate)?.split("-")[0]}</span>
                             <span>⭐ {movie.vote_average || movie.voteAverage}</span>
                             {movie.runtime && <span>⏱️ {formatRuntime(movie.runtime)}</span>}
+                            <button 
+                                className={`favorite-button ${isFavorite ? 'active' : ''}`}
+                                onClick={handleFavoriteToggle}
+                                disabled={isLoading}
+                            >
+                                ❤️
+                            </button>
                         </div>
                         <p className="overview">{movie.overview}</p>
                         
@@ -320,7 +359,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                     <div className="interaction-buttons">
                                         <button 
                                             className={`favorite-button ${isFavorite ? 'active' : ''}`}
-                                            onClick={() => setIsFavorite(!isFavorite)}
+                                            onClick={handleFavoriteToggle}
                                         >
                                             ♥
                                         </button>

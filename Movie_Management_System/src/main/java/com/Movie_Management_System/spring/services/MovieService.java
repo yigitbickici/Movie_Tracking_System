@@ -138,4 +138,46 @@ public class MovieService {
 
         return new ArrayList<>(user.getWatchedMovies());
     }
+
+    public void addToFavorites(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        Movie movie = movieRepository.findByTmdbId(movieId)
+            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+
+        if (!user.getFavoriteMovies().contains(movie)) {
+            user.addToFavoriteMovies(movie);
+            userRepository.save(user);
+        }
+    }
+
+    public void removeFromFavorites(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        Movie movie = movieRepository.findByTmdbId(movieId)
+            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+
+        if (user.getFavoriteMovies().contains(movie)) {
+            user.removeFromFavoriteMovies(movie);
+            userRepository.save(user);
+            movieRepository.save(movie);
+        }
+    }
+
+    public boolean isFavorite(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        return user.getFavoriteMovies().stream()
+            .anyMatch(movie -> movie.getTmdbId().equals(movieId));
+    }
+
+    public List<Movie> getFavoriteMovies(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        return new ArrayList<>(user.getFavoriteMovies());
+    }
 }

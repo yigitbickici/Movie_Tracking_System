@@ -44,7 +44,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<Movie> favoriteMovies = new ArrayList<>();
+    private Set<Movie> favoriteMovies = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -138,11 +138,11 @@ public class User {
         this.role = role;
     }
 
-    public List<Movie> getFavoriteMovies() {
+    public Set<Movie> getFavoriteMovies() {
         return favoriteMovies;
     }
 
-    public void setFavoriteMovies(List<Movie> favoriteMovies) {
+    public void setFavoriteMovies(Set<Movie> favoriteMovies) {
         this.favoriteMovies = favoriteMovies;
     }
 
@@ -211,11 +211,11 @@ public class User {
     }
 
     // Helper methods
-    public void addToFavorite(Movie movie) {
+    public void addToFavoriteMovies(Movie movie) {
         favoriteMovies.add(movie);
     }
 
-    public void removeFromFavorite(Movie movie) {
+    public void removeFromFavoriteMovies(Movie movie) {
         favoriteMovies.remove(movie);
     }
 
