@@ -96,26 +96,6 @@ const Login = () => {
                 <p className="auth-link">
                     Do not have any account? <Link to="/register">Register Free</Link>
                 </p>
-                
-                {/* Test hesapları bölümü geliştirme aşamasında yararlı olabilir */}
-                <div className="login-info">
-                    <p style={{ textAlign: 'center', fontWeight: 'bold' }}>Test Accounts</p>
-                    <div className="test-account">
-                        <p><strong>Admin Account:</strong></p>
-                        <p>Email: admin@example.com</p>
-                        <p>Password: admin123</p>
-                    </div>
-                    <div className="test-account">
-                        <p><strong>Normal User:</strong></p>
-                        <p>Email: user@example.com</p>
-                        <p>Password: user123</p>
-                    </div>
-                    <div className="test-account">
-                        <p><strong>Editor Account:</strong></p>
-                        <p>Email: editor@example.com</p>
-                        <p>Password: editor123</p>
-                    </div>
-                </div>
             </div>
         </div>
     );
