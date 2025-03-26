@@ -106,6 +106,9 @@ public class MovieService {
 
         if (user.getWatchedMovies().contains(movie)) {
             user.removeFromWatchedMovies(movie);
+            if (user.getFavoriteMovies().contains(movie)) {
+                user.removeFromFavoriteMovies(movie);
+            }
             userRepository.save(user);
             movieRepository.save(movie);
         }

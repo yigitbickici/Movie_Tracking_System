@@ -137,9 +137,13 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             if (isWatched) {
                 await axios.delete(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(false);
+                // Sayfayı yenile
+                window.location.reload();
             } else {
                 await axios.post(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(true);
+                // Sayfayı yenile
+                window.location.reload();
             }
         } catch (error) {
             console.error("İzlenme durumu güncellenirken hata oluştu:", error);
@@ -176,9 +180,13 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             if (isFavorite) {
                 await axios.delete(`/api/movies/${movie.tmdbId}/favorites`);
                 setIsFavorite(false);
+                // Sayfayı yenile
+                window.location.reload();
             } else {
                 await axios.post(`/api/movies/${movie.tmdbId}/favorites`);
                 setIsFavorite(true);
+                // Sayfayı yenile
+                window.location.reload();
             }
         } catch (error) {
             console.error("Favori durumu güncellenirken hata oluştu:", error);
