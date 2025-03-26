@@ -78,11 +78,18 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
-            System.out.println("Login attempt for user: " + loginRequest.getUsername());
+            System.out.println("Login attempt for user: " + loginRequest.getEmail());
             
+            // Önce kullanıcının var olup olmadığını kontrol et
+            if (!userService.existsByEmail(loginRequest.getEmail())) {
+                return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Error: User not found with email: " + loginRequest.getEmail()));
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
+                    loginRequest.getEmail(),
                     loginRequest.getPassword()
                 )
             );
@@ -103,7 +110,13 @@ public class AuthController {
             System.err.println("Authentication failed: " + e.getMessage());
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponse("Error: Invalid username or password"));
+                .body(new MessageResponse("Error: Invalid password for email: " + loginRequest.getEmail()));
+        } catch (Exception e) {
+            System.err.println("Unexpected error during login: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error: An unexpected error occurred during login"));
         }
     }
 } 

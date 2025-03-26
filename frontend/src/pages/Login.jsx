@@ -27,21 +27,22 @@ const Login = () => {
         try {
             const response = await axios.post('http://localhost:8080/api/auth/login', formData);
             
-            if (response.data.success) {
-                // Kullanıcı bilgilerini local storage'a kaydet
-                localStorage.setItem('userId', response.data.userId);
+            if (response.data) {
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('userId', response.data.id);
                 localStorage.setItem('userMail', response.data.email);
                 localStorage.setItem('userType', response.data.role.toLowerCase());
                 localStorage.setItem('isAdmin', response.data.role === 'ADMIN' ? 'true' : 'false');
-                
-                // Kullanıcı rolüne göre yönlendirme
+
                 if (response.data.role === 'ADMIN') {
                     navigate('/admin');
+                } else if (response.data.role === 'EDITOR') {
+                    navigate('/editor');
                 } else {
                     navigate('/');
                 }
             } else {
-                setError(response.data.message);
+                setError('Login failed. Please try again.');
             }
         } catch (error) {
             setError(error.response?.data?.message || 'Login failed. Please try again.');
