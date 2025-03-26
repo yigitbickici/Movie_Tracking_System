@@ -43,6 +43,7 @@ public class MovieController {
                     newMovie.setReleaseDate((String) movieData.get("releaseDate"));
                     newMovie.setOverview((String) movieData.get("overview"));
                     newMovie.setVoteAverage(((Number) movieData.get("voteAverage")).doubleValue());
+                    newMovie.setRuntime(((Number) movieData.get("runtime")).intValue());
                     return movieService.saveMovie(newMovie);
                 });
 
@@ -183,5 +184,33 @@ public class MovieController {
         
         List<Movie> favoriteMovies = movieService.getFavoriteMovies(user.getId());
         return ResponseEntity.ok(favoriteMovies);
+    }
+
+    @GetMapping("/stats/movietime")
+    public ResponseEntity<?> getMovieTimeStats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        Map<String, Integer> stats = movieService.calculateMovieTimeStats(user.getId());
+        return ResponseEntity.ok(stats);
+    }
+
+    @PutMapping("/{movieId}/runtime")
+    public ResponseEntity<?> updateMovieRuntime(
+            @PathVariable Long movieId,
+            @RequestBody Map<String, Object> movieData) {
+        try {
+            Movie movie = movieService.getMovieByTmdbId(movieId)
+                .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            
+            movie.setRuntime(((Number) movieData.get("runtime")).intValue());
+            movieService.saveMovie(movie);
+            
+            return ResponseEntity.ok(Map.of("message", "Film süresi güncellendi"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 } 

@@ -31,6 +31,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             checkWatchlistStatus();
             checkWatchedStatus();
             checkFavoriteStatus();
+            updateMovieRuntime();
         }
     }, [movie]);
 
@@ -63,6 +64,18 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             setIsFavorite(response.data.isFavorite);
         } catch (error) {
             console.error("Favori durumu kontrol edilirken hata oluştu:", error);
+        }
+    };
+
+    const updateMovieRuntime = async () => {
+        try {
+            if (!movie?.tmdbId || !movie.runtime) return;
+            
+            await axios.put(`/api/movies/${movie.tmdbId}/runtime`, {
+                runtime: movie.runtime
+            });
+        } catch (error) {
+            console.error("Film süresi güncellenirken hata oluştu:", error);
         }
     };
 
@@ -107,7 +120,8 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                 posterPath: movie.poster_path || movie.posterPath,
                 releaseDate: movie.release_date || movie.releaseDate,
                 overview: movie.overview,
-                voteAverage: movie.vote_average || movie.voteAverage
+                voteAverage: movie.vote_average || movie.voteAverage,
+                runtime: movie.runtime || 0
             };
 
             console.log("Sending movie data:", movieData); // Debug için

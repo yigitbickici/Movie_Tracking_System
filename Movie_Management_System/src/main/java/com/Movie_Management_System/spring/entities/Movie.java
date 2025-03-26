@@ -39,6 +39,9 @@ public class Movie {
     @Column
     private String director;
 
+    @Column(name = "runtime")
+    private Integer runtime;
+
     @OneToMany(mappedBy = "movie")
     private List<Posts> posts;
 
@@ -144,5 +147,13 @@ public class Movie {
 
     public void setDirector(String director) {
         this.director = director;
+    }
+
+    public Integer getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(Integer runtime) {
+        this.runtime = runtime;
     }
 }
