@@ -51,10 +51,10 @@ public class MovieService {
 
     public void addToWatchlist(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (!user.getWatchlist().contains(movie)) {
             user.addToWatchlist(movie);
@@ -64,10 +64,10 @@ public class MovieService {
 
     public void removeFromWatchlist(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (user.getWatchlist().contains(movie)) {
             user.removeFromWatchlist(movie);
@@ -78,7 +78,7 @@ public class MovieService {
 
     public boolean isInWatchlist(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         return user.getWatchlist().stream()
             .anyMatch(movie -> movie.getTmdbId().equals(movieId));
@@ -86,10 +86,10 @@ public class MovieService {
 
     public void addToWatched(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (!user.getWatchedMovies().contains(movie)) {
             user.addToWatchedMovies(movie);
@@ -99,10 +99,10 @@ public class MovieService {
 
     public void removeFromWatched(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (user.getWatchedMovies().contains(movie)) {
             user.removeFromWatchedMovies(movie);
@@ -116,7 +116,7 @@ public class MovieService {
 
     public boolean isWatched(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         return user.getWatchedMovies().stream()
             .anyMatch(movie -> movie.getTmdbId().equals(movieId));
@@ -124,7 +124,7 @@ public class MovieService {
 
     public List<Movie> getWatchlist(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         // İzlenen filmleri al
         Set<Movie> watchedMovies = user.getWatchedMovies();
@@ -137,17 +137,17 @@ public class MovieService {
 
     public List<Movie> getWatchedMovies(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         return new ArrayList<>(user.getWatchedMovies());
     }
 
     public void addToFavorites(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (!user.getFavoriteMovies().contains(movie)) {
             user.addToFavoriteMovies(movie);
@@ -157,10 +157,10 @@ public class MovieService {
 
     public void removeFromFavorites(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
         if (user.getFavoriteMovies().contains(movie)) {
             user.removeFromFavoriteMovies(movie);
@@ -171,7 +171,7 @@ public class MovieService {
 
     public boolean isFavorite(Long userId, Long movieId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException(" User could not be found"));
 
         return user.getFavoriteMovies().stream()
             .anyMatch(movie -> movie.getTmdbId().equals(movieId));
@@ -179,7 +179,7 @@ public class MovieService {
 
     public List<Movie> getFavoriteMovies(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         return new ArrayList<>(user.getFavoriteMovies());
     }
