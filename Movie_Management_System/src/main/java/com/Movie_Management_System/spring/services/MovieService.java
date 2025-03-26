@@ -34,7 +34,9 @@ public class MovieService {
         return movieRepository.findByTitleContaining(title);
     }
 
-
+    public Optional<Movie> getMovieByTmdbId(Long tmdbId) {
+        return movieRepository.findByTmdbId(tmdbId);
+    }
 
     public Movie saveMovie(Movie movie) {
         return movieRepository.save(movie);
@@ -49,16 +51,11 @@ public class MovieService {
             .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
-            .orElseGet(() -> {
-                Movie newMovie = new Movie();
-                newMovie.setTmdbId(movieId);
-                return movieRepository.save(newMovie);
-            });
+            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
 
         if (!user.getWatchlist().contains(movie)) {
             user.addToWatchlist(movie);
             userRepository.save(user);
-            movieRepository.save(movie);
         }
     }
 

@@ -23,6 +23,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const [showSocialPage, setShowSocialPage] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isInWatchlist, setIsInWatchlist] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isWatched, setIsWatched] = useState(false);
 
     useEffect(() => {
@@ -33,16 +34,15 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
 
     const checkWatchlistStatus = async () => {
         try {
-            if (!movie?.tmdbId) {
-                console.error('Film ID bulunamadı');
-                return;
-            }
+            if (!movie?.tmdbId) return;
+            setIsLoading(true);
             const response = await axios.get(`/api/movies/${movie.tmdbId}/watchlist/check`);
-            console.log('Watchlist durumu:', response.data.inWatchlist);
             setIsInWatchlist(response.data.inWatchlist);
         } catch (error) {
             console.error('Watchlist durumu kontrol edilirken hata:', error);
             setIsInWatchlist(false);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -76,25 +76,33 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const handleAddToWatchlist = async () => {
         try {
             if (!movie?.tmdbId) {
-                console.error('Film ID bulunamadı');
+                console.error("tmdbId bulunamadı:", movie);
                 return;
             }
 
+            console.log("Movie data:", movie); // Debug için
+
             const movieData = {
-                tmdbId: movie.tmdbId,
-                title: movie.title,
+                title: movie.title || movie.original_title,
                 posterPath: movie.poster_path || movie.posterPath,
                 releaseDate: movie.release_date || movie.releaseDate,
                 overview: movie.overview,
                 voteAverage: movie.vote_average || movie.voteAverage
             };
 
-            console.log('Watchlist\'e ekleniyor:', movieData);
-            await axios.post(`/api/movies/${movie.tmdbId}/watchlist`, movieData);
+            console.log("Sending movie data:", movieData); // Debug için
+            console.log("tmdbId:", movie.tmdbId); // Debug için
+
+            const response = await axios.post(`/api/movies/${movie.tmdbId}/watchlist`, movieData);
+            console.log("Response:", response.data); // Debug için
+
             setIsInWatchlist(true);
-            onWatchlistUpdate?.(movie.tmdbId, true);
+            if (onWatchlistUpdate) {
+                onWatchlistUpdate(movie.tmdbId, true);
+            }
         } catch (error) {
             console.error('Watchlist\'e eklenirken hata:', error);
+            console.error('Error details:', error.response?.data); // Debug için
         }
     };
 
@@ -105,15 +113,11 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
 
     const handleRemoveFromWatchlist = async () => {
         try {
-            if (!movie?.tmdbId) {
-                console.error('Film ID bulunamadı');
-                return;
-            }
-
-            console.log('Watchlist\'ten çıkarılıyor:', movie.tmdbId);
+            if (!movie?.tmdbId) return;
             await axios.delete(`/api/movies/${movie.tmdbId}/watchlist`);
             setIsInWatchlist(false);
             onWatchlistUpdate?.(movie.tmdbId, false);
+            window.location.reload(); // Sayfayı yenile
         } catch (error) {
             console.error('Watchlist\'ten çıkarılırken hata:', error);
         }

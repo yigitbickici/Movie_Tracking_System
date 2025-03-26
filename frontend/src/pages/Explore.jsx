@@ -56,6 +56,7 @@ const Explore = () => {
         setSelectedMovie({
             ...movie,
             ...detailedMovie,
+            tmdbId: movie.id,
             overview: detailedMovie.overview,
             vote_average: detailedMovie.vote_average,
             original_title: detailedMovie.original_title,
@@ -74,6 +75,14 @@ const Explore = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     setCurrentPage(1);
+  };
+
+  const handleWatchlistUpdate = (movieId, isAdded) => {
+    if (isAdded) {
+        setMovies(prev => prev.map(movie => 
+            movie.id === movieId ? { ...movie, isInWatchlist: true } : movie
+        ));
+    }
   };
 
   return (
@@ -125,6 +134,7 @@ const Explore = () => {
             movie={selectedMovie} 
             onClose={() => setSelectedMovie(null)}
             isInList={false}
+            onWatchlistUpdate={handleWatchlistUpdate}
           />
         )}
 

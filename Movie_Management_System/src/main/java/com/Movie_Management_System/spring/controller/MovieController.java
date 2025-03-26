@@ -27,25 +27,30 @@ public class MovieController {
     public ResponseEntity<?> addToWatchlist(
             @PathVariable Long movieId,
             @RequestBody Map<String, Object> movieData) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
-        
-        Movie movie = movieService.getMovieById(movieId)
-            .orElseGet(() -> {
-                Movie newMovie = new Movie();
-                newMovie.setTmdbId(movieId);
-                newMovie.setPosterPath((String) movieData.get("poster_path"));
-                newMovie.setTitle((String) movieData.get("title"));
-                newMovie.setReleaseDate((String) movieData.get("release_date"));
-                newMovie.setOverview((String) movieData.get("overview"));
-                newMovie.setVoteAverage(((Number) movieData.get("vote_average")).doubleValue());
-                return movieService.saveMovie(newMovie);
-            });
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            
+            Movie movie = movieService.getMovieByTmdbId(movieId)
+                .orElseGet(() -> {
+                    Movie newMovie = new Movie();
+                    newMovie.setTmdbId(movieId);
+                    newMovie.setTitle((String) movieData.get("title"));
+                    newMovie.setPosterPath((String) movieData.get("posterPath"));
+                    newMovie.setReleaseDate((String) movieData.get("releaseDate"));
+                    newMovie.setOverview((String) movieData.get("overview"));
+                    newMovie.setVoteAverage(((Number) movieData.get("voteAverage")).doubleValue());
+                    return movieService.saveMovie(newMovie);
+                });
 
-        movieService.addToWatchlist(user.getId(), movieId);
-        return ResponseEntity.ok(Map.of("message", "Film watchlist'e eklendi"));
+            movieService.addToWatchlist(user.getId(), movieId);
+            return ResponseEntity.ok(Map.of("message", "Film watchlist'e eklendi"));
+        } catch (Exception e) {
+            e.printStackTrace(); // Debug için
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{movieId}/watchlist")
@@ -64,7 +69,7 @@ public class MovieController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new RuntimeException("No User Found"));
         
         boolean inWatchlist = movieService.isInWatchlist(user.getId(), movieId);
         return ResponseEntity.ok(Map.of("inWatchlist", inWatchlist));

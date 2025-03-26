@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 import MovieDetail from '../components/MovieDetail';
 import './Watchlist.css';
@@ -6,13 +7,12 @@ import './Watchlist.css';
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
 const Watchlist = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('watchlist');
     const [isGridView, setIsGridView] = useState(true);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [watchedMovies, setWatchedMovies] = useState(new Set());
-
-    // Örnek veri - Backend entegrasyonunda burası API'dan gelecek
-    const watchlistMovies = [
+    const [watchlistMovies, setWatchlistMovies] = useState([
         {
             id: 238,
             title: "The Godfather",
@@ -103,7 +103,7 @@ const Watchlist = () => {
             vote_average: 8.6,
             isWatched: false
         }
-    ];
+    ]);
 
     const watchedMoviesData = [
         {
@@ -186,6 +186,12 @@ const Watchlist = () => {
         setIsGridView(!isGridView);
     };
 
+    const handleWatchlistUpdate = (movieId, isAdded) => {
+        if (!isAdded) {
+            navigate('/profile');
+        }
+    };
+
     return (
         <div className="watchlist-container">
             <div className="watchlist-header">
@@ -227,6 +233,7 @@ const Watchlist = () => {
                     movie={selectedMovie}
                     onClose={() => setSelectedMovie(null)}
                     isInList={true}
+                    onWatchlistUpdate={handleWatchlistUpdate}
                 />
             )}
         </div>

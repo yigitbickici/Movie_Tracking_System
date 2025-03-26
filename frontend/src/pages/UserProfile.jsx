@@ -280,6 +280,15 @@ const UserProfile = () => {
         .catch(error => console.error("Error fetching movie details:", error));
     };
 
+    const handleWatchlistUpdate = (movieId, isAdded) => {
+        setUserMovies(prev => ({
+            ...prev,
+            watchlist: isAdded 
+                ? [...prev.watchlist, { id: movieId }]
+                : prev.watchlist.filter(movie => movie.id !== movieId)
+        }));
+    };
+
     const MoviePreview = ({ movie }) => (
         <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
             <img 
@@ -533,6 +542,7 @@ const UserProfile = () => {
                     movie={selectedMovie} 
                     onClose={() => setSelectedMovie(null)}
                     isInList={true}
+                    onWatchlistUpdate={handleWatchlistUpdate}
                 />
             )}
         </div>
