@@ -18,10 +18,37 @@ const Register = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Şimdilik sadece yönlendirme yapıyoruz
-        navigate('/login');
+        
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password,
+                    role: "CUSTOMER" // Varsayılan rol
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Registration failed:', errorData);
+                // Hata mesajını kullanıcıya göster
+                return;
+            }
+
+            const data = await response.json();
+            console.log('Registration successful:', data);
+            // Başarılı kayıt sonrası login sayfasına yönlendir
+            navigate('/login');
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
     };
 
     return (
