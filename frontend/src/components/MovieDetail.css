@@ -408,6 +408,18 @@
     transition: all 0.3s ease;
 }
 
+.see-posts-button:hover {
+    background: #1976D2;
+    transform: scale(1.05);
+}
+
+.watched-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
 /* Responsive düzenlemeler */
 @media screen and (max-width: 1024px) {
     .movie-detail-content {

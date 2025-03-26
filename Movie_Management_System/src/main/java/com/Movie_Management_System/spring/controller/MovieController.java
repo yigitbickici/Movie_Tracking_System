@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -73,5 +74,65 @@ public class MovieController {
         
         boolean inWatchlist = movieService.isInWatchlist(user.getId(), movieId);
         return ResponseEntity.ok(Map.of("inWatchlist", inWatchlist));
+    }
+
+    @PostMapping("/{movieId}/watched")
+    public ResponseEntity<?> addToWatched(@PathVariable Long movieId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            
+            movieService.addToWatched(user.getId(), movieId);
+            return ResponseEntity.ok(Map.of("message", "Film izlendi olarak işaretlendi"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{movieId}/watched")
+    public ResponseEntity<?> removeFromWatched(@PathVariable Long movieId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        movieService.removeFromWatched(user.getId(), movieId);
+        return ResponseEntity.ok(Map.of("message", "Film izlendi listesinden çıkarıldı"));
+    }
+
+    @GetMapping("/{movieId}/watched/check")
+    public ResponseEntity<?> checkWatchedStatus(@PathVariable Long movieId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("No User Found"));
+        
+        boolean isWatched = movieService.isWatched(user.getId(), movieId);
+        return ResponseEntity.ok(Map.of("isWatched", isWatched));
+    }
+
+    @GetMapping("/watchlist")
+    public ResponseEntity<?> getWatchlist() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        List<Movie> watchlist = movieService.getWatchlist(user.getId());
+        return ResponseEntity.ok(watchlist);
+    }
+
+    @GetMapping("/watched")
+    public ResponseEntity<?> getWatchedMovies() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        List<Movie> watchedMovies = movieService.getWatchedMovies(user.getId());
+        return ResponseEntity.ok(watchedMovies);
     }
 } 

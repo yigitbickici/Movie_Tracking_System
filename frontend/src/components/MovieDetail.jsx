@@ -23,12 +23,13 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const [showSocialPage, setShowSocialPage] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isInWatchlist, setIsInWatchlist] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [isWatched, setIsWatched] = useState(false);
 
     useEffect(() => {
         if (movie?.tmdbId) {
             checkWatchlistStatus();
+            checkWatchedStatus();
         }
     }, [movie]);
 
@@ -43,6 +44,15 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             setIsInWatchlist(false);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const checkWatchedStatus = async () => {
+        try {
+            const response = await axios.get(`/api/movies/${movie.tmdbId}/watched/check`);
+            setIsWatched(response.data.isWatched);
+        } catch (error) {
+            console.error("İzlenme durumu kontrol edilirken hata oluştu:", error);
         }
     };
 
@@ -106,9 +116,26 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
         }
     };
 
-    const handleMarkAsWatched = () => {
-        setIsWatched(!isWatched);
-        console.log("Movie watched status changed:", movie.title);
+    const handleWatchedToggle = async () => {
+        if (!movie?.tmdbId) {
+            console.error("tmdbId bulunamadı:", movie);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            if (isWatched) {
+                await axios.delete(`/api/movies/${movie.tmdbId}/watched`);
+                setIsWatched(false);
+            } else {
+                await axios.post(`/api/movies/${movie.tmdbId}/watched`);
+                setIsWatched(true);
+            }
+        } catch (error) {
+            console.error("İzlenme durumu güncellenirken hata oluştu:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleRemoveFromWatchlist = async () => {
@@ -142,7 +169,8 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                         {isInWatchlist && (
                             <button 
                                 className={`watched-button ${isWatched ? 'active' : ''}`}
-                                onClick={handleMarkAsWatched}
+                                onClick={handleWatchedToggle}
+                                disabled={isLoading}
                                 title="Watched"
                             >
                                 ✓
@@ -272,12 +300,46 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
 
                         {/* Watch status section */}
                         {isInWatchlist ? (
-                            <button 
-                                className="detail-remove-button" 
-                                onClick={handleRemoveFromWatchlist}
-                            >
-                                - REMOVE FROM WATCHLIST
-                            </button>
+                            isWatched ? (
+                                <div className="user-interaction">
+                                    <div className="rating-section">
+                                        <h4>Rate this movie</h4>
+                                        <div className="star-rating">
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    className={`star-button ${star <= selectedRating ? 'active' : ''}`}
+                                                    onClick={() => handleRatingChange(star)}
+                                                >
+                                                    ★
+                                                </button>
+                                            ))}
+                                            <span className="rating-number">{selectedRating}/10</span>
+                                        </div>
+                                    </div>
+                                    <div className="interaction-buttons">
+                                        <button 
+                                            className={`favorite-button ${isFavorite ? 'active' : ''}`}
+                                            onClick={() => setIsFavorite(!isFavorite)}
+                                        >
+                                            ♥
+                                        </button>
+                                        <button 
+                                            className="see-posts-button"
+                                            onClick={handleSeePostsClick}
+                                        >
+                                            SEE DISCUSSIONS
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button 
+                                    className="detail-remove-button" 
+                                    onClick={handleRemoveFromWatchlist}
+                                >
+                                    - REMOVE FROM WATCHLIST
+                                </button>
+                            )
                         ) : (
                             <button 
                                 className="detail-add-button" 

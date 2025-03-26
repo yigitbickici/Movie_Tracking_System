@@ -30,7 +30,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                         className={`watched-indicator ${isWatched ? 'active' : ''}`}
                         onClick={(e) => {
                             e.stopPropagation();
-                            onWatchedToggle(e);
+                            onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                         }}
                     >
                         ✓
@@ -58,7 +58,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                     className={`watched-indicator ${isWatched ? 'active' : ''}`}
                     onClick={(e) => {
                         e.stopPropagation();
-                        onWatchedToggle(e);
+                        onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                     }}
                 >
                     ✓

@@ -52,7 +52,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private List<Movie> watchedMovies = new ArrayList<>();
+    private Set<Movie> watchedMovies = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_watchlist",
@@ -146,11 +146,11 @@ public class User {
         this.favoriteMovies = favoriteMovies;
     }
 
-    public List<Movie> getWatchedMovies() {
+    public Set<Movie> getWatchedMovies() {
         return watchedMovies;
     }
 
-    public void setWatchedMovies(List<Movie> watchedMovies) {
+    public void setWatchedMovies(Set<Movie> watchedMovies) {
         this.watchedMovies = watchedMovies;
     }
 
@@ -219,12 +219,12 @@ public class User {
         favoriteMovies.remove(movie);
     }
 
-    public void addToWatched(Movie movie) {
-        watchedMovies.add(movie);
+    public void addToWatchedMovies(Movie movie) {
+        this.watchedMovies.add(movie);
     }
 
-    public void removeFromWatched(Movie movie) {
-        watchedMovies.remove(movie);
+    public void removeFromWatchedMovies(Movie movie) {
+        this.watchedMovies.remove(movie);
     }
 
     public void addToWatchlist(Movie movie) {

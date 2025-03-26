@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Set;
 
 @Service
 public class MovieService {
@@ -79,5 +82,60 @@ public class MovieService {
 
         return user.getWatchlist().stream()
             .anyMatch(movie -> movie.getTmdbId().equals(movieId));
+    }
+
+    public void addToWatched(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        Movie movie = movieRepository.findByTmdbId(movieId)
+            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+
+        if (!user.getWatchedMovies().contains(movie)) {
+            user.addToWatchedMovies(movie);
+            userRepository.save(user);
+        }
+    }
+
+    public void removeFromWatched(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        Movie movie = movieRepository.findByTmdbId(movieId)
+            .orElseThrow(() -> new RuntimeException("Film bulunamadı"));
+
+        if (user.getWatchedMovies().contains(movie)) {
+            user.removeFromWatchedMovies(movie);
+            userRepository.save(user);
+            movieRepository.save(movie);
+        }
+    }
+
+    public boolean isWatched(Long userId, Long movieId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        return user.getWatchedMovies().stream()
+            .anyMatch(movie -> movie.getTmdbId().equals(movieId));
+    }
+
+    public List<Movie> getWatchlist(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        // İzlenen filmleri al
+        Set<Movie> watchedMovies = user.getWatchedMovies();
+        
+        // Watchlist'ten izlenen filmleri filtrele
+        return user.getWatchlist().stream()
+            .filter(movie -> !watchedMovies.contains(movie))
+            .collect(Collectors.toList());
+    }
+
+    public List<Movie> getWatchedMovies(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        return new ArrayList<>(user.getWatchedMovies());
     }
 }

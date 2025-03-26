@@ -144,8 +144,47 @@ const Profile = () => {
         }
     };
 
+    const handleWatchlistUpdate = (movieId, isInWatchlist) => {
+        setUserProfile(prevProfile => ({
+            ...prevProfile,
+            watchlist: isInWatchlist 
+                ? [...prevProfile.watchlist]
+                : prevProfile.watchlist.filter(m => m.tmdbId !== movieId),
+            watched: isInWatchlist 
+                ? prevProfile.watched.filter(m => m.tmdbId !== movieId)
+                : prevProfile.watched
+        }));
+    };
+
+    const handleWatchedToggle = async (movieId, isWatched) => {
+        try {
+            if (isWatched) {
+                await axios.post(`/api/movies/${movieId}/watched`);
+                setUserProfile(prevProfile => ({
+                    ...prevProfile,
+                    watched: [...prevProfile.watched, prevProfile.watchlist.find(m => m.tmdbId === movieId)],
+                    watchlist: prevProfile.watchlist.filter(m => m.tmdbId !== movieId)
+                }));
+            } else {
+                await axios.delete(`/api/movies/${movieId}/watched`);
+                setUserProfile(prevProfile => ({
+                    ...prevProfile,
+                    watched: prevProfile.watched.filter(m => m.tmdbId !== movieId),
+                    watchlist: [...prevProfile.watchlist, prevProfile.watched.find(m => m.tmdbId === movieId)]
+                }));
+            }
+        } catch (error) {
+            console.error("İzlenme durumu güncellenirken hata oluştu:", error);
+        }
+    };
+
     const MovieSection = ({ title, movies, icon: Icon }) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
+
+        // İzlenen filmleri watchlist'ten filtrele
+        const filteredMovies = title === "Watchlist" 
+            ? movies.filter(movie => !userProfile.watched.some(w => w.tmdbId === movie.tmdbId))
+            : movies;
 
         const formatMovie = (movie) => ({
             ...movie,
@@ -174,18 +213,21 @@ const Profile = () => {
                 </div>
                 
                 <div className="movies-grid">
-                    {movies.slice(0, 5).map(movie => (
+                    {filteredMovies.slice(0, 5).map(movie => (
                         <MovieCard
                             key={movie.id}
                             movie={formatMovie(movie)}
                             onClick={() => handleMovieClick(movie)}
                             isGridView={true}
+                            isWatchlist={title === "Watchlist"}
+                            isWatched={userProfile.watched.some(w => w.tmdbId === movie.tmdbId)}
+                            onWatchedToggle={handleWatchedToggle}
                         />
                     ))}
                 </div>
 
                 <MovieModal 
-                    movies={movies}
+                    movies={filteredMovies}
                     title={title}
                     icon={Icon}
                     isOpen={isModalOpen}
@@ -665,14 +707,7 @@ const Profile = () => {
                     movie={selectedMovie} 
                     onClose={() => setSelectedMovie(null)}
                     isInList={true}
-                    onWatchlistUpdate={(movieId, isInWatchlist) => {
-                        setUserProfile(prevProfile => ({
-                            ...prevProfile,
-                            watchlist: isInWatchlist 
-                                ? [...prevProfile.watchlist]
-                                : prevProfile.watchlist.filter(m => m.tmdbId !== movieId)
-                        }));
-                    }}
+                    onWatchlistUpdate={handleWatchlistUpdate}
                 />
             )}
             <DeleteConfirmationModal 
