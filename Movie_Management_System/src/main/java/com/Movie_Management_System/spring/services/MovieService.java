@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class MovieService {
@@ -182,5 +184,34 @@ public class MovieService {
             .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         return new ArrayList<>(user.getFavoriteMovies());
+    }
+
+    public Map<String, Integer> calculateMovieTimeStats(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        Set<Movie> watchedMovies = user.getWatchedMovies();
+        int totalMinutes = 0;
+
+        // İzlenen tüm filmlerin sürelerini topla
+        for (Movie movie : watchedMovies) {
+            if (movie.getRuntime() != null) {
+                totalMinutes += movie.getRuntime();
+            }
+        }
+
+        // Toplam dakikayı ay, gün ve saat olarak hesapla
+        int months = totalMinutes / (30 * 24 * 60); // Aylık ortalama 30 gün
+        int remainingMinutes = totalMinutes % (30 * 24 * 60);
+        int days = remainingMinutes / (24 * 60);
+        remainingMinutes = remainingMinutes % (24 * 60);
+        int hours = remainingMinutes / 60;
+
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("months", months);
+        stats.put("days", days);
+        stats.put("hours", hours);
+
+        return stats;
     }
 }

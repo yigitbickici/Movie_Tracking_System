@@ -29,11 +29,17 @@ const Profile = () => {
     const [followingModal, setFollowingModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [movieTimeStats, setMovieTimeStats] = useState({
+        months: 0,
+        days: 0,
+        hours: 0
+    });
 
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserProfile();
+        fetchMovieTimeStats();
     }, [username]);
 
     const fetchUserProfile = async () => {
@@ -46,6 +52,15 @@ const Profile = () => {
             setError('Failed to load profile data');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchMovieTimeStats = async () => {
+        try {
+            const response = await axios.get('/api/movies/stats/movietime');
+            setMovieTimeStats(response.data);
+        } catch (error) {
+            console.error('Error fetching movie time stats:', error);
         }
     };
 
@@ -566,15 +581,15 @@ const Profile = () => {
                             <h4>Movie time</h4>
                             <div className="time-stats">
                                 <div className="time-stat">
-                                    <span>{userProfile.stats.movieTime.months}</span>
+                                    <span>{movieTimeStats.months}</span>
                                     <label>MONTHS</label>
                                 </div>
                                 <div className="time-stat">
-                                    <span>{userProfile.stats.movieTime.days}</span>
+                                    <span>{movieTimeStats.days}</span>
                                     <label>DAYS</label>
                                 </div>
                                 <div className="time-stat">
-                                    <span>{userProfile.stats.movieTime.hours}</span>
+                                    <span>{movieTimeStats.hours}</span>
                                     <label>HOURS</label>
                                 </div>
                             </div>
