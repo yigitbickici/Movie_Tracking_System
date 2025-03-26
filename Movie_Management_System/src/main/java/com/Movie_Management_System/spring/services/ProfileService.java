@@ -84,6 +84,7 @@ public class ProfileService {
                 .map(movie -> {
                     ProfileResponse.MovieDTO dto = new ProfileResponse.MovieDTO();
                     dto.setId(movie.getId());
+                    dto.setTmdbId(movie.getTmdbId());
                     dto.setTitle(movie.getTitle());
                     dto.setPosterPath(movie.getPosterPath());
                     dto.setReleaseDate(movie.getReleaseDate());
@@ -97,6 +98,7 @@ public class ProfileService {
                 .map(movie -> {
                     ProfileResponse.MovieDTO dto = new ProfileResponse.MovieDTO();
                     dto.setId(movie.getId());
+                    dto.setTmdbId(movie.getTmdbId());
                     dto.setTitle(movie.getTitle());
                     dto.setPosterPath(movie.getPosterPath());
                     dto.setReleaseDate(movie.getReleaseDate());
@@ -105,11 +107,12 @@ public class ProfileService {
                 .collect(Collectors.toList()) : 
             new ArrayList<>());
 
-        response.setWatchlist(user.getWatchedList() != null ? 
-            user.getWatchedList().stream()
+        response.setWatchlist(user.getWatchlist() != null ? 
+            user.getWatchlist().stream()
                 .map(movie -> {
                     ProfileResponse.MovieDTO dto = new ProfileResponse.MovieDTO();
                     dto.setId(movie.getId());
+                    dto.setTmdbId(movie.getTmdbId());
                     dto.setTitle(movie.getTitle());
                     dto.setPosterPath(movie.getPosterPath());
                     dto.setReleaseDate(movie.getReleaseDate());

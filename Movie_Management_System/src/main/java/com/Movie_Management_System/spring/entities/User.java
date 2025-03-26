@@ -3,6 +3,8 @@ package com.Movie_Management_System.spring.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -52,13 +54,11 @@ public class User {
     )
     private List<Movie> watchedMovies = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_watchlist",
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_watchlist",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "movie_id")
-    )
-    private List<Movie> watchedList = new ArrayList<>();
+            inverseJoinColumns = @JoinColumn(name = "movie_id"))
+    private Set<Movie> watchlist = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Posts> posts = new ArrayList<>();
@@ -154,12 +154,12 @@ public class User {
         this.watchedMovies = watchedMovies;
     }
 
-    public List<Movie> getWatchedList() {
-        return watchedList;
+    public Set<Movie> getWatchlist() {
+        return watchlist;
     }
 
-    public void setWatchedList(List<Movie> watchedList) {
-        this.watchedList = watchedList;
+    public void setWatchlist(Set<Movie> watchlist) {
+        this.watchlist = watchlist;
     }
 
     public List<Posts> getPosts() {
@@ -228,11 +228,11 @@ public class User {
     }
 
     public void addToWatchlist(Movie movie) {
-        watchedList.add(movie);
+        watchlist.add(movie);
     }
 
     public void removeFromWatchlist(Movie movie) {
-        watchedList.remove(movie);
+        watchlist.remove(movie);
     }
 
     public void followUser(User user) {

@@ -12,6 +12,9 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // it is TMDB ID
 
+    @Column(unique = true)
+    private Long tmdbId;
+
     @Column
     private String title;
 
@@ -53,6 +56,14 @@ public class Movie {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getTmdbId() {
+        return tmdbId;
+    }
+
+    public void setTmdbId(Long tmdbId) {
+        this.tmdbId = tmdbId;
     }
 
     public String getTitle() {

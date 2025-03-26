@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../services/axiosConfig';
 import './MovieDetail.css';
 import MovieSocialPage from './MovieSocialPage';
 
@@ -15,7 +16,7 @@ const PLATFORM_URLS = {
     11: "https://mubi.com/tr/tr/", // MUBI
 };
 
-const MovieDetail = ({ movie, onClose }) => {
+const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const navigate = useNavigate();
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedRating, setSelectedRating] = useState(0);
@@ -23,6 +24,27 @@ const MovieDetail = ({ movie, onClose }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isInWatchlist, setIsInWatchlist] = useState(false);
     const [isWatched, setIsWatched] = useState(false);
+
+    useEffect(() => {
+        if (movie?.tmdbId) {
+            checkWatchlistStatus();
+        }
+    }, [movie]);
+
+    const checkWatchlistStatus = async () => {
+        try {
+            if (!movie?.tmdbId) {
+                console.error('Film ID bulunamadı');
+                return;
+            }
+            const response = await axios.get(`/api/movies/${movie.tmdbId}/watchlist/check`);
+            console.log('Watchlist durumu:', response.data.inWatchlist);
+            setIsInWatchlist(response.data.inWatchlist);
+        } catch (error) {
+            console.error('Watchlist durumu kontrol edilirken hata:', error);
+            setIsInWatchlist(false);
+        }
+    };
 
     if (!movie) return null;
 
@@ -48,12 +70,32 @@ const MovieDetail = ({ movie, onClose }) => {
     };
 
     const handleSeePostsClick = () => {
-        navigate(`/movies/${movie.id}/social`);
+        navigate(`/movies/${movie.tmdbId}/social`);
     };
 
-    const handleAddToWatchlist = () => {
-        setIsInWatchlist(true);
-        console.log("Added to watchlist:", movie.title);
+    const handleAddToWatchlist = async () => {
+        try {
+            if (!movie?.tmdbId) {
+                console.error('Film ID bulunamadı');
+                return;
+            }
+
+            const movieData = {
+                tmdbId: movie.tmdbId,
+                title: movie.title,
+                posterPath: movie.poster_path || movie.posterPath,
+                releaseDate: movie.release_date || movie.releaseDate,
+                overview: movie.overview,
+                voteAverage: movie.vote_average || movie.voteAverage
+            };
+
+            console.log('Watchlist\'e ekleniyor:', movieData);
+            await axios.post(`/api/movies/${movie.tmdbId}/watchlist`, movieData);
+            setIsInWatchlist(true);
+            onWatchlistUpdate?.(movie.tmdbId, true);
+        } catch (error) {
+            console.error('Watchlist\'e eklenirken hata:', error);
+        }
     };
 
     const handleMarkAsWatched = () => {
@@ -61,10 +103,20 @@ const MovieDetail = ({ movie, onClose }) => {
         console.log("Movie watched status changed:", movie.title);
     };
 
-    const handleRemoveFromList = () => {
-        setIsInWatchlist(false);
-        setIsWatched(false);
-        console.log("Removed from list:", movie.title);
+    const handleRemoveFromWatchlist = async () => {
+        try {
+            if (!movie?.tmdbId) {
+                console.error('Film ID bulunamadı');
+                return;
+            }
+
+            console.log('Watchlist\'ten çıkarılıyor:', movie.tmdbId);
+            await axios.delete(`/api/movies/${movie.tmdbId}/watchlist`);
+            setIsInWatchlist(false);
+            onWatchlistUpdate?.(movie.tmdbId, false);
+        } catch (error) {
+            console.error('Watchlist\'ten çıkarılırken hata:', error);
+        }
     };
 
     const handleActorClick = (actorName) => {
@@ -79,7 +131,7 @@ const MovieDetail = ({ movie, onClose }) => {
                 <div className="movie-detail-header">
                     <div className="poster-container">
                         <img 
-                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path || movie.posterPath}`} 
                             alt={movie.title} 
                             className="detail-poster"
                         />
@@ -97,8 +149,8 @@ const MovieDetail = ({ movie, onClose }) => {
                         <h1>{movie.title}</h1>
                         <p className="original-title">{movie.original_title}</p>
                         <div className="movie-meta">
-                            <span>{movie.release_date.split("-")[0]}</span>
-                            <span>⭐ {movie.vote_average}</span>
+                            <span>{(movie.release_date || movie.releaseDate)?.split("-")[0]}</span>
+                            <span>⭐ {movie.vote_average || movie.voteAverage}</span>
                             {movie.runtime && <span>⏱️ {formatRuntime(movie.runtime)}</span>}
                         </div>
                         <p className="overview">{movie.overview}</p>
@@ -213,66 +265,22 @@ const MovieDetail = ({ movie, onClose }) => {
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Watch status section */}
-                        {!isInWatchlist ? (
+                        {isInWatchlist ? (
+                            <button 
+                                className="detail-remove-button" 
+                                onClick={handleRemoveFromWatchlist}
+                            >
+                                - REMOVE FROM WATCHLIST
+                            </button>
+                        ) : (
                             <button 
                                 className="detail-add-button" 
                                 onClick={handleAddToWatchlist}
                             >
                                 + ADD TO WATCHLIST
                             </button>
-                        ) : !isWatched ? (
-                            <button 
-                                className="detail-remove-button" 
-                                onClick={handleRemoveFromList}
-                            >
-                                - REMOVE FROM LIST
-                            </button>
-                        ) : (
-                            <div className="user-interaction">
-                                <div className="rating-section">
-                                    <h4>Rate</h4>
-                                    <div className="star-rating">
-                                        {[...Array(10)].map((_, index) => {
-                                            const ratingValue = index + 1;
-                                            return (
-                                                <button
-                                                    type="button"
-                                                    key={ratingValue}
-                                                    className={`star-button ${
-                                                        ratingValue <= (hoveredRating || selectedRating) 
-                                                            ? 'active' 
-                                                            : ''
-                                                    }`}
-                                                    onClick={() => handleRatingChange(ratingValue)}
-                                                    onMouseEnter={() => setHoveredRating(ratingValue)}
-                                                    onMouseLeave={() => setHoveredRating(0)}
-                                                >
-                                                    ★
-                                                </button>
-                                            );
-                                        })}
-                                        {selectedRating > 0 && (
-                                            <span className="rating-number">{selectedRating}/10</span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="interaction-buttons">
-                                    <button 
-                                        className={`favorite-button ${isFavorite ? 'active' : ''}`}
-                                        onClick={() => setIsFavorite(!isFavorite)}
-                                    >
-                                        ♥
-                                    </button>
-                                    <button 
-                                        className="see-posts-button"
-                                        onClick={handleSeePostsClick}
-                                    >
-                                        Join Discussion
-                                    </button>
-                                </div>
-                            </div>
                         )}
                     </div>
                 </div>
@@ -288,4 +296,4 @@ const MovieDetail = ({ movie, onClose }) => {
     );
 };
 
-export default MovieDetail; 
+export default MovieDetail;

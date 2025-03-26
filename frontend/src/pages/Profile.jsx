@@ -3,7 +3,8 @@ import './Profile.css';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit, FaUsers, FaUserFriends } from 'react-icons/fa';
 import MovieDetail from '../components/MovieDetail';
-import axios from 'axios';
+import MovieCard from '../components/MovieCard';
+import axios from '../services/axiosConfig';
 
 const Profile = () => {
     const { username } = useParams();
@@ -38,15 +39,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
-            const response = await axios.get(
-                `http://localhost:8080/api/profile/${username || 'me'}`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await axios.get(`/api/profile/${username || 'me'}`);
             setUserProfile(response.data);
         } catch (error) {
             console.error('Error fetching profile:', error);
@@ -58,17 +51,8 @@ const Profile = () => {
 
     const handleFollow = async (userId) => {
         try {
-            const token = localStorage.getItem('token');
-            await axios.post(
-                `http://localhost:8080/api/profile/follow/${userId}`,
-                {},
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            fetchUserProfile(); // Profili yenile
+            await axios.post(`/api/profile/follow/${userId}`);
+            fetchUserProfile();
         } catch (error) {
             console.error('Error following user:', error);
         }
@@ -76,17 +60,8 @@ const Profile = () => {
 
     const handleUnfollow = async (userId) => {
         try {
-            const token = localStorage.getItem('token');
-            await axios.post(
-                `http://localhost:8080/api/profile/unfollow/${userId}`,
-                {},
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            fetchUserProfile(); // Profili yenile
+            await axios.post(`/api/profile/unfollow/${userId}`);
+            fetchUserProfile();
         } catch (error) {
             console.error('Error unfollowing user:', error);
         }
@@ -94,23 +69,25 @@ const Profile = () => {
 
     const handleMovieClick = (movie) => {
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=84e605aa45ef84282ba934b9b2648dc5`)
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/watch/providers?api_key=84e605aa45ef84282ba934b9b2648dc5`),
+            axios.get(`/api/movies/${movie.tmdbId}/watchlist/check`)
         ])
-        .then(([detailsRes, creditsRes, providersRes]) => 
-            Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
+        .then(([detailsRes, creditsRes, providersRes, watchlistRes]) => 
+            Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json(), watchlistRes.data])
         )
-        .then(([detailedMovie, credits, providers]) => {
+        .then(([detailedMovie, credits, providers, watchlistStatus]) => {
             setSelectedMovie({
-                ...movie,
                 ...detailedMovie,
-                overview: detailedMovie.overview,
-                vote_average: detailedMovie.vote_average,
-                original_title: detailedMovie.original_title,
-                runtime: detailedMovie.runtime,
-                cast: credits.cast.slice(0, 5),
-                providers: providers.results.TR || {}
+                id: movie.tmdbId,
+                tmdbId: movie.tmdbId,
+                poster_path: detailedMovie.poster_path || movie.posterPath,
+                release_date: detailedMovie.release_date || movie.releaseDate,
+                vote_average: detailedMovie.vote_average || movie.voteAverage,
+                cast: credits.cast?.slice(0, 5),
+                providers: providers.results?.TR || {},
+                isInWatchlist: watchlistStatus.inWatchlist
             });
         })
         .catch(error => console.error("Error fetching movie details:", error));
@@ -167,21 +144,68 @@ const Profile = () => {
         }
     };
 
-    const MoviePreview = ({ movie }) => (
-        <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
-            <img 
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
-                alt={movie.title}
-            />
-            <div className="movie-preview-info">
-                <h4>{movie.title}</h4>
-                <p>{movie.release_date?.split('-')[0]}</p>
+    const MovieSection = ({ title, movies, icon: Icon }) => {
+        const [isModalOpen, setIsModalOpen] = useState(false);
+
+        const formatMovie = (movie) => ({
+            ...movie,
+            poster_path: movie.posterPath,
+            release_date: movie.releaseDate,
+            vote_average: movie.voteAverage,
+            overview: movie.overview,
+            id: movie.tmdbId
+        });
+
+        return (
+            <div className="movies-section">
+                <div className="section-header">
+                    <h2>
+                        <Icon className="section-icon" />
+                        {title}
+                    </h2>
+                    <div className="section-buttons">
+                        <button 
+                            className="see-all-button modal-button" 
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            See all <FaChevronRight />
+                        </button>
+                    </div>
+                </div>
+                
+                <div className="movies-grid">
+                    {movies.slice(0, 5).map(movie => (
+                        <MovieCard
+                            key={movie.id}
+                            movie={formatMovie(movie)}
+                            onClick={() => handleMovieClick(movie)}
+                            isGridView={true}
+                        />
+                    ))}
+                </div>
+
+                <MovieModal 
+                    movies={movies}
+                    title={title}
+                    icon={Icon}
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                />
             </div>
-        </div>
-    );
+        );
+    };
 
     const MovieModal = ({ movies, title, isOpen, onClose, icon: Icon }) => {
         const [isActive, setIsActive] = useState(false);
+
+        const formatMovie = (movie) => ({
+            ...movie,
+            poster_path: movie.posterPath,
+            release_date: movie.releaseDate,
+            vote_average: movie.voteAverage,
+            overview: movie.overview,
+            id: movie.tmdbId
+        });
 
         useEffect(() => {
             if (isOpen) {
@@ -210,47 +234,15 @@ const Profile = () => {
                     </div>
                     <div className="modal-movies-grid">
                         {movies.map(movie => (
-                            <MoviePreview key={movie.id} movie={movie} />
+                            <MovieCard
+                                key={movie.id}
+                                movie={formatMovie(movie)}
+                                onClick={() => handleMovieClick(movie)}
+                                isGridView={true}
+                            />
                         ))}
                     </div>
                 </div>
-            </div>
-        );
-    };
-
-    const MovieSection = ({ title, movies, icon: Icon }) => {
-        const [isModalOpen, setIsModalOpen] = useState(false);
-
-        return (
-            <div className="movies-section">
-                <div className="section-header">
-                    <h2>
-                        <Icon className="section-icon" />
-                        {title}
-                    </h2>
-                    <div className="section-buttons">
-                        <button 
-                            className="see-all-button modal-button" 
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            See all <FaChevronRight />
-                        </button>
-                    </div>
-                </div>
-                
-                <div className="movies-grid">
-                    {movies.slice(0, 5).map(movie => (
-                        <MoviePreview key={movie.id} movie={movie} />
-                    ))}
-                </div>
-
-                <MovieModal 
-                    movies={movies}
-                    title={title}
-                    icon={Icon}
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                />
             </div>
         );
     };
@@ -673,6 +665,14 @@ const Profile = () => {
                     movie={selectedMovie} 
                     onClose={() => setSelectedMovie(null)}
                     isInList={true}
+                    onWatchlistUpdate={(movieId, isInWatchlist) => {
+                        setUserProfile(prevProfile => ({
+                            ...prevProfile,
+                            watchlist: isInWatchlist 
+                                ? [...prevProfile.watchlist]
+                                : prevProfile.watchlist.filter(m => m.tmdbId !== movieId)
+                        }));
+                    }}
                 />
             )}
             <DeleteConfirmationModal 
