@@ -3,6 +3,8 @@ package com.Movie_Management_System.spring.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "discussions")
@@ -11,10 +13,12 @@ public class Discussion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "discussion")
     private List<Posts> posts = new ArrayList<>();
 

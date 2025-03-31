@@ -3,6 +3,8 @@ package com.Movie_Management_System.spring.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "movies")
@@ -45,7 +47,8 @@ public class Movie {
     @OneToMany(mappedBy = "movie")
     private List<Posts> posts;
 
-    @OneToOne(mappedBy = "movie")
+    @JsonManagedReference
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL)
     private Discussion discussion;
 
     // Constructors

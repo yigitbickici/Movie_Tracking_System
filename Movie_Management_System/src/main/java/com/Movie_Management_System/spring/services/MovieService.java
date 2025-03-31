@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
 
 @Service
 public class MovieService {
@@ -141,7 +142,18 @@ public class MovieService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User could not be found"));
 
-        return new ArrayList<>(user.getWatchedMovies());
+        Set<Movie> watchedMoviesSet = user.getWatchedMovies();
+        System.out.println("User ID: " + userId);
+        System.out.println("Watched movies set: " + (watchedMoviesSet != null ? watchedMoviesSet.size() : "null"));
+        
+        if (watchedMoviesSet == null) {
+            System.out.println("Watched movies set is null, returning empty list");
+            return new ArrayList<>();
+        }
+        
+        List<Movie> result = new ArrayList<>(watchedMoviesSet);
+        System.out.println("Returning watched movies list with size: " + result.size());
+        return result;
     }
 
     public void addToFavorites(Long userId, Long movieId) {

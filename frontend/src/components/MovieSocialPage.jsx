@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './MovieSocialPage.css';
+import axios from '../services/axiosConfig';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
@@ -12,74 +13,75 @@ const MovieSocialPage = () => {
     const [newPost, setNewPost] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [posts, setPosts] = useState([
-        // İlk örnek post
-        {
-            id: 1,
-            user: {
-                name: 'USER1',
-                avatar: 'https://eu.ui-avatars.com/api/?name=User1',
-                isFollowing: false
-            },
-            content: 'Movie was wonderful.Especially last scene...',
-            likes: 15,
-            isSpoiler: false,
-            comments: [
-                {
-                    id: 1,
-                    user: {
-                        name: 'USER2',
-                        avatar: 'https://eu.ui-avatars.com/api/?name=User2',
-                        isFollowing: false
-                    },
-                    content: 'Agreed!',
-                    likes: 3,
-                    isSpoiler: false
-                }
-            ],
-            timestamp: '2 hour ago'
-        },
-        {
-            id: 2,
-            user: {
-                name: 'USER3',
-                avatar: 'https://eu.ui-avatars.com/api/?name=User3',
-                isFollowing: false
-            },
-            content: 'Masterpiece 😄',
-            media: '/very-nice-nice.gif',  // Local gif'i kullanıyoruz
-            likes: 8,
-            comments: [
-                {
-                    id: 1,
-                    user: {
-                        name: 'USER4',
-                        avatar: 'https://eu.ui-avatars.com/api/?name=User4',
-                        isFollowing: false
-                    },
-                    content: '👏',
-                    likes: 2
-                }
-            ],
-            timestamp: '45 min ago'
-        }
-    ]);
+    const [posts, setPosts] = useState([]);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
 
     useEffect(() => {
         setLoading(true);
-        fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-TR`)
-            .then(response => response.json())
-            .then(data => {
-                setMovie(data);
-                setLoading(false);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            setLoading(false);
+            return;
+        }
+
+        Promise.all([
+            fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-TR`),
+            axios.get(`/api/discussions/movie/${movieId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                setLoading(false);
-            });
-    }, [movieId]);
+        ])
+        .then(([movieRes, discussionRes]) => 
+            Promise.all([movieRes.json(), discussionRes.data])
+        )
+        .then(([movieData, discussionData]) => {
+            setMovie(movieData);
+            if (discussionData && discussionData.posts) {
+                setPosts(discussionData.posts.map(post => ({
+                    ...post,
+                    user: {
+                        name: post.user.username,
+                        avatar: post.user.avatar || post.user.username.substring(0, 2).toUpperCase(),
+                        isFollowing: false
+                    },
+                    timestamp: new Date(post.createdAt).toLocaleString(),
+                    comments: post.comments.map(comment => ({
+                        ...comment,
+                        user: {
+                            name: comment.user.username,
+                            avatar: comment.user.avatar || comment.user.username.substring(0, 2).toUpperCase(),
+                            isFollowing: false
+                        }
+                    }))
+                })));
+            }
+            setLoading(false);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (error.response?.status === 401) {
+                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            } else {
+                setModalMessage('Film bilgileri yüklenirken bir hata oluştu');
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            }
+            setLoading(false);
+        });
+    }, [movieId, navigate]);
 
     const handleMediaSelect = (e) => {
         const file = e.target.files[0];
@@ -93,98 +95,292 @@ const MovieSocialPage = () => {
         }
     };
 
-    const handlePostSubmit = (e) => {
+    const handlePostSubmit = async (e) => {
         e.preventDefault();
         if (!newPost.trim() && !selectedMedia) return;
 
-        const newPostObj = {
-            id: posts.length + 1,
-            user: {
-                name: 'USER1',
-                avatar: 'https://eu.ui-avatars.com/api/?name=User1'
-            },
-            content: newPost,
-            media: mediaPreview,
-            likes: 0,
-            comments: [],
-            timestamp: 'Now'
-        };
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            return;
+        }
 
-        setPosts([newPostObj, ...posts]);
-        setNewPost('');
-        setSelectedMedia(null);
-        setMediaPreview(null);
-    };
-
-    const handleLike = (postId) => {
-        setPosts(posts.map(post => 
-            post.id === postId ? {...post, likes: post.likes + 1} : post
-        ));
-    };
-
-    const handleCommentSubmit = (postId, comment) => {
-        setPosts(posts.map(post => {
-            if (post.id === postId) {
-                const newComment = {
-                    id: post.comments.length + 1,
-                    user: {
-                        name: 'USER1',
-                        avatar: 'https://eu.ui-avatars.com/api/?name=User1'
-                    },
-                    content: comment,
-                    likes: 0
-                };
-                return {
-                    ...post,
-                    comments: [...post.comments, newComment]
-                };
-            }
-            return post;
-        }));
-    };
-
-    const handleFollow = (postId, userId) => {
-        setPosts(posts.map(post => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    user: {
-                        ...post.user,
-                        isFollowing: !post.user.isFollowing
-                    }
-                };
-            }
-            return post;
-        }));
-    };
-
-    const handleSpoilerReport = (postId, commentId = null) => {
-        setPosts(posts.map(post => {
-            if (postId === post.id) {
-                if (commentId === null) {
-                    // Post için spoiler işaretleme
-                    const newSpoilerState = !post.isSpoiler;
-                    setModalMessage(newSpoilerState ? 'Content marked as spoiler' : 'Spoiler removed');
-                    setShowModal(true);
-                    setTimeout(() => setShowModal(false), 2000);
-                    return { ...post, isSpoiler: newSpoilerState };
-                } else {
-                    // Yorum için spoiler işaretleme
-                    const updatedComments = post.comments.map(comment => {
-                        if (comment.id === commentId) {
-                            const newSpoilerState = !comment.isSpoiler;
-                            setModalMessage(newSpoilerState ? 'Comment marked as spoiler' : 'Spoiler removed from comment');
-                            setShowModal(true);
-                            setTimeout(() => setShowModal(false), 2000);
-                            return { ...comment, isSpoiler: newSpoilerState };
-                        }
-                        return comment;
-                    });
-                    return { ...post, comments: updatedComments };
+        try {
+            // Token kontrolü
+            const tokenCheckResponse = await axios.get('/api/auth/check-token', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
+            });
+
+            if (!tokenCheckResponse.data.valid) {
+                throw new Error('Token geçersiz');
             }
-            return post;
-        }));
+
+            // Önce filmin varlığını kontrol et
+            const movieResponse = await axios.get(`/api/movies/${movieId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!movieResponse.data) {
+                throw new Error('Film bulunamadı');
+            }
+
+            // Discussion'ı kontrol et veya oluştur
+            let discussionId;
+            try {
+                const discussionResponse = await axios.get(`/api/discussions/movie/${movieId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                discussionId = discussionResponse.data.id;
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    throw new Error('Oturum süreniz dolmuş');
+                }
+                // Discussion yoksa oluştur
+                const createDiscussionResponse = await axios.post(`/api/discussions/movie/${movieId}`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                discussionId = createDiscussionResponse.data.id;
+            }
+
+            // Post oluştur
+            const formData = new FormData();
+            formData.append('content', newPost);
+            formData.append('discussionId', discussionId);
+            if (selectedMedia) {
+                formData.append('media', selectedMedia);
+            }
+
+            console.log('Post gönderiliyor:', {
+                movieId: movieId,
+                discussionId: discussionId,
+                content: newPost
+            });
+
+            const response = await axios.post(`/api/posts/movie/${movieId}`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
+                validateStatus: function (status) {
+                    return status < 500; // 500'den küçük tüm durumları kabul et
+                }
+            });
+
+            if (response.status === 401) {
+                throw new Error('Oturum süreniz dolmuş');
+            }
+
+            if (response.status !== 200 && response.status !== 201) {
+                throw new Error(response.data.message || 'Post oluşturulurken bir hata oluştu');
+            }
+            
+            console.log('Post yanıtı:', response.data);
+            const newPostData = response.data;
+            
+            setPosts([{
+                ...newPostData,
+                user: {
+                    name: newPostData.user.username,
+                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase(),
+                    isFollowing: false
+                },
+                timestamp: new Date(newPostData.createdAt).toLocaleString(),
+                comments: []
+            }, ...posts]);
+            
+            setNewPost('');
+            setSelectedMedia(null);
+            setMediaPreview(null);
+            setModalMessage('Post başarıyla paylaşıldı');
+            setShowModal(true);
+            setTimeout(() => setShowModal(false), 2000);
+        } catch (error) {
+            console.error('Post oluşturma hatası:', error);
+            console.error('Hata detayları:', error.response?.data);
+
+            if (error.message === 'Token geçersiz' || error.message === 'Oturum süreniz dolmuş' || error.response?.status === 401) {
+                localStorage.removeItem('token'); // Token'ı temizle
+                setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            } else {
+                const errorMessage = error.response?.data?.message || error.message;
+                console.error('Detaylı hata:', errorMessage);
+                setModalMessage(`Post paylaşılırken bir hata oluştu: ${errorMessage}`);
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            }
+        }
+    };
+
+    const handleLike = async (postId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            return;
+        }
+
+        try {
+            await axios.post(`/api/posts/${postId}/like`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setPosts(posts.map(post => 
+                post.id === postId ? {...post, likeNum: post.likeNum + 1} : post
+            ));
+        } catch (error) {
+            console.error('Error liking post:', error);
+            if (error.response?.status === 401) {
+                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            }
+        }
+    };
+
+    const handleCommentSubmit = async (postId, comment) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            return;
+        }
+
+        try {
+            const response = await axios.post(`/api/posts/${postId}/comments`, { content: comment }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const newComment = response.data;
+            
+            setPosts(posts.map(post => {
+                if (post.id === postId) {
+                    return {
+                        ...post,
+                        comments: [...post.comments, {
+                            ...newComment,
+                            user: {
+                                name: newComment.user.username,
+                                avatar: newComment.user.avatar || newComment.user.username.substring(0, 2).toUpperCase(),
+                                isFollowing: false
+                            }
+                        }],
+                        commentNum: post.commentNum + 1
+                    };
+                }
+                return post;
+            }));
+        } catch (error) {
+            console.error('Error creating comment:', error);
+            if (error.response?.status === 401) {
+                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            }
+        }
+    };
+
+    const handleFollow = async (postId, userId) => {
+        try {
+            await axios.post(`/api/profile/follow/${userId}`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            setPosts(posts.map(post => {
+                if (post.id === postId) {
+                    return {
+                        ...post,
+                        user: {
+                            ...post.user,
+                            isFollowing: !post.user.isFollowing
+                        }
+                    };
+                }
+                return post;
+            }));
+        } catch (error) {
+            console.error('Error following user:', error);
+        }
+    };
+
+    const handleSpoilerReport = async (postId, commentId = null) => {
+        try {
+            if (commentId === null) {
+                await axios.post(`/api/spoiler-requests/post/${postId}`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setPosts(posts.map(post => {
+                    if (postId === post.id) {
+                        const newSpoilerState = !post.isSpoiler;
+                        setModalMessage(newSpoilerState ? 'İçerik spoiler olarak işaretlendi' : 'Spoiler işareti kaldırıldı');
+                        setShowModal(true);
+                        setTimeout(() => setShowModal(false), 2000);
+                        return { ...post, isSpoiler: newSpoilerState };
+                    }
+                    return post;
+                }));
+            } else {
+                await axios.post(`/api/spoiler-requests/comment/${commentId}`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setPosts(posts.map(post => {
+                    if (postId === post.id) {
+                        const updatedComments = post.comments.map(comment => {
+                            if (comment.id === commentId) {
+                                const newSpoilerState = !comment.isSpoiler;
+                                setModalMessage(newSpoilerState ? 'Yorum spoiler olarak işaretlendi' : 'Spoiler işareti kaldırıldı');
+                                setShowModal(true);
+                                setTimeout(() => setShowModal(false), 2000);
+                                return { ...comment, isSpoiler: newSpoilerState };
+                            }
+                            return comment;
+                        });
+                        return { ...post, comments: updatedComments };
+                    }
+                    return post;
+                }));
+            }
+        } catch (error) {
+            console.error('Error reporting spoiler:', error);
+        }
     };
 
     if (loading) {

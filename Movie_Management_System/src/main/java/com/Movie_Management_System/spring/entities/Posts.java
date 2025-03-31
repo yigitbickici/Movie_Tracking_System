@@ -5,6 +5,8 @@ import org.hibernate.annotations.Comments;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name ="posts")
@@ -22,6 +24,7 @@ public class Posts {
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "discussion_id")
     private Discussion discussion;
@@ -44,6 +47,7 @@ public class Posts {
     @Column
     private Boolean isSpoiler = false;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 

@@ -66,6 +66,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/public/**").permitAll()
+                    .requestMatchers("/api/posts/**").authenticated()
+                    .requestMatchers("/api/discussions/**").authenticated()
+                    .requestMatchers("/api/movies/**").authenticated()
+                    .requestMatchers("/api/profile/**").authenticated()
+                    .requestMatchers("/api/spoiler-requests/**").authenticated()
                     .anyRequest().authenticated()
             );
         

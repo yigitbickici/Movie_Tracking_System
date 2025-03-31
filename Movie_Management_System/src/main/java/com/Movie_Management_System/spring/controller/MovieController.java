@@ -134,6 +134,8 @@ public class MovieController {
             .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
         
         List<Movie> watchedMovies = movieService.getWatchedMovies(user.getId());
+        System.out.println("Watched movies for user " + username + ": " + watchedMovies.size());
+        System.out.println("Watched movies content: " + watchedMovies);
         return ResponseEntity.ok(watchedMovies);
     }
 

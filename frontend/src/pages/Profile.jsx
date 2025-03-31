@@ -261,7 +261,7 @@ const Profile = () => {
                             onFavoriteToggle={handleFavoriteToggle}
                         />
                     ))}
-                </div>
+            </div>
 
                 <MovieModal 
                     movies={filteredMovies}

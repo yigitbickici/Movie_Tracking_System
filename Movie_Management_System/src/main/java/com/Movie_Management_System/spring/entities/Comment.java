@@ -2,6 +2,8 @@ package com.Movie_Management_System.spring.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "comments")
@@ -37,6 +39,7 @@ public class Comment {
     @Column
     private Integer likeCount = 0;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Posts post;
