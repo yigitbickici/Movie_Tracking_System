@@ -19,6 +19,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -117,6 +119,19 @@ public class AuthController {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error: An unexpected error occurred during login"));
+        }
+    }
+
+    @GetMapping("/check-token")
+    public ResponseEntity<?> checkToken() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+                return ResponseEntity.ok(Map.of("valid", true));
+            }
+            return ResponseEntity.ok(Map.of("valid", false));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("valid", false));
         }
     }
 } 

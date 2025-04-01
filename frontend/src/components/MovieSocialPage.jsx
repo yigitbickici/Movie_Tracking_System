@@ -33,19 +33,19 @@ const MovieSocialPage = () => {
 
         Promise.all([
             fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-TR`),
-            axios.get(`/api/discussions/movie/${movieId}`, {
+            axios.get(`/api/posts/movie/${movieId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
         ])
-        .then(([movieRes, discussionRes]) => 
-            Promise.all([movieRes.json(), discussionRes.data])
+        .then(([movieRes, postsRes]) => 
+            Promise.all([movieRes.json(), postsRes.data])
         )
-        .then(([movieData, discussionData]) => {
+        .then(([movieData, postsData]) => {
             setMovie(movieData);
-            if (discussionData && discussionData.posts) {
-                setPosts(discussionData.posts.map(post => ({
+            if (postsData) {
+                setPosts(postsData.map(post => ({
                     ...post,
                     user: {
                         name: post.user.username,
@@ -62,6 +62,8 @@ const MovieSocialPage = () => {
                         }
                     }))
                 })));
+            } else {
+                setPosts([]); // Boş liste olarak ayarla
             }
             setLoading(false);
         })
@@ -73,6 +75,13 @@ const MovieSocialPage = () => {
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
+                }, 2000);
+            } else if (error.response?.status === 404) {
+                setModalMessage('Film bulunamadı');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate(-1);
                 }, 2000);
             } else {
                 setModalMessage('Film bilgileri yüklenirken bir hata oluştu');
@@ -111,73 +120,29 @@ const MovieSocialPage = () => {
         }
 
         try {
-            // Token kontrolü
-            const tokenCheckResponse = await axios.get('/api/auth/check-token', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!tokenCheckResponse.data.valid) {
-                throw new Error('Token geçersiz');
-            }
-
-            // Önce filmin varlığını kontrol et
-            const movieResponse = await axios.get(`/api/movies/${movieId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!movieResponse.data) {
-                throw new Error('Film bulunamadı');
-            }
-
-            // Discussion'ı kontrol et veya oluştur
-            let discussionId;
-            try {
-                const discussionResponse = await axios.get(`/api/discussions/movie/${movieId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                discussionId = discussionResponse.data.id;
-            } catch (error) {
-                if (error.response?.status === 401) {
-                    throw new Error('Oturum süreniz dolmuş');
-                }
-                // Discussion yoksa oluştur
-                const createDiscussionResponse = await axios.post(`/api/discussions/movie/${movieId}`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                discussionId = createDiscussionResponse.data.id;
-            }
+            // Token'ı kontrol et
+            console.log('Token:', token.substring(0, 20) + '...');
 
             // Post oluştur
-            const formData = new FormData();
-            formData.append('content', newPost);
-            formData.append('discussionId', discussionId);
-            if (selectedMedia) {
-                formData.append('media', selectedMedia);
-            }
-
             console.log('Post gönderiliyor:', {
-                movieId: movieId,
-                discussionId: discussionId,
+                movieId: parseInt(movieId),
                 content: newPost
             });
 
-            const response = await axios.post(`/api/posts/movie/${movieId}`, formData, {
+            const response = await axios.post('/api/posts/create', {
+                movieId: parseInt(movieId),
+                content: newPost
+            }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/json'
                 },
-                validateStatus: function (status) {
-                    return status < 500; // 500'den küçük tüm durumları kabul et
-                }
+                withCredentials: true
             });
+
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            console.log('Response data:', response.data);
 
             if (response.status === 401) {
                 throw new Error('Oturum süreniz dolmuş');
@@ -187,7 +152,6 @@ const MovieSocialPage = () => {
                 throw new Error(response.data.message || 'Post oluşturulurken bir hata oluştu');
             }
             
-            console.log('Post yanıtı:', response.data);
             const newPostData = response.data;
             
             setPosts([{
@@ -210,8 +174,10 @@ const MovieSocialPage = () => {
         } catch (error) {
             console.error('Post oluşturma hatası:', error);
             console.error('Hata detayları:', error.response?.data);
+            console.error('Hata status:', error.response?.status);
+            console.error('Hata headers:', error.response?.headers);
 
-            if (error.message === 'Token geçersiz' || error.message === 'Oturum süreniz dolmuş' || error.response?.status === 401) {
+            if (error.response?.status === 401) {
                 localStorage.removeItem('token'); // Token'ı temizle
                 setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
                 setShowModal(true);

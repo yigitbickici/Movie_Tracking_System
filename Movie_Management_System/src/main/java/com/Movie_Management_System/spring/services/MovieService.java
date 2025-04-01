@@ -6,6 +6,8 @@ import com.Movie_Management_System.spring.repository.MovieRepository;
 import com.Movie_Management_System.spring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,6 +19,8 @@ import java.util.Collections;
 
 @Service
 public class MovieService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
 
     private final MovieRepository movieRepository;
 
@@ -32,8 +36,14 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    public Optional<Movie> getMovieById(Long id) {
-        return movieRepository.findById(id);
+    public Movie getMovieById(Long id) {
+        logger.info("Fetching movie with ID: {}", id);
+        Optional<Movie> movie = movieRepository.findById(id);
+        if (movie.isPresent()) {
+            return movie.get();
+        }
+        logger.error("Movie not found with ID: {}", id);
+        throw new RuntimeException("Movie not found");
     }
 
     public List<Movie> getMoviesByTitle(String title) {
@@ -41,10 +51,12 @@ public class MovieService {
     }
 
     public Optional<Movie> getMovieByTmdbId(Long tmdbId) {
+        logger.info("Fetching movie with TMDB ID: {}", tmdbId);
         return movieRepository.findByTmdbId(tmdbId);
     }
 
     public Movie saveMovie(Movie movie) {
+        logger.info("Saving movie: {}", movie.getId());
         return movieRepository.save(movie);
     }
 
@@ -94,7 +106,7 @@ public class MovieService {
         Movie movie = movieRepository.findByTmdbId(movieId)
             .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
-        if (!user.getWatchedMovies().contains(movie)) {
+        if (!user.getWatchedMovies().stream().anyMatch(m -> m.getTmdbId().equals(movieId))) {
             user.addToWatchedMovies(movie);
             userRepository.save(user);
         }
@@ -107,13 +119,12 @@ public class MovieService {
         Movie movie = movieRepository.findByTmdbId(movieId)
             .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
-        if (user.getWatchedMovies().contains(movie)) {
+        if (user.getWatchedMovies().stream().anyMatch(m -> m.getTmdbId().equals(movieId))) {
             user.removeFromWatchedMovies(movie);
-            if (user.getFavoriteMovies().contains(movie)) {
+            if (user.getFavoriteMovies().stream().anyMatch(m -> m.getTmdbId().equals(movieId))) {
                 user.removeFromFavoriteMovies(movie);
             }
             userRepository.save(user);
-            movieRepository.save(movie);
         }
     }
 

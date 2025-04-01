@@ -30,13 +30,13 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [movieTimeStats, setMovieTimeStats] = useState({
-        months: 0,
-        days: 0,
-        hours: 0
+            months: 0,
+            days: 0,
+            hours: 0
     });
 
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         fetchUserProfile();
         fetchMovieTimeStats();
@@ -548,7 +548,7 @@ const Profile = () => {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                <div className="profile-avatar">
+                    <div className="profile-avatar">
                     <span>{userProfile.avatar}</span>
                 </div>
                 <h1 className="profile-username">{userProfile.username}</h1>
@@ -576,26 +576,26 @@ const Profile = () => {
             <div className="profile-content">
                 <div className="stats-section">
                     <h2>Stats</h2>
-                    <div className="stats-grid">
-                        <div className="stat-card">
-                            <h4>Movie time</h4>
-                            <div className="time-stats">
-                                <div className="time-stat">
+                <div className="stats-grid">
+                    <div className="stat-card">
+                        <h4>Movie time</h4>
+                        <div className="time-stats">
+                            <div className="time-stat">
                                     <span>{movieTimeStats.months}</span>
-                                    <label>MONTHS</label>
-                                </div>
-                                <div className="time-stat">
+                                <label>MONTHS</label>
+                            </div>
+                            <div className="time-stat">
                                     <span>{movieTimeStats.days}</span>
-                                    <label>DAYS</label>
-                                </div>
-                                <div className="time-stat">
+                                <label>DAYS</label>
+                            </div>
+                            <div className="time-stat">
                                     <span>{movieTimeStats.hours}</span>
-                                    <label>HOURS</label>
+                                <label>HOURS</label>
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card">
-                            <h4>Movies watched</h4>
+                    <div className="stat-card">
+                        <h4>Movies watched</h4>
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                     </div>
@@ -644,7 +644,7 @@ const Profile = () => {
                                     onClick={() => setFollowingModal(true)}
                                 >
                                     See all <FaChevronRight />
-                                </button>
+                    </button>
                             </div>
                         </div>
                         <div className="user-list">
@@ -714,7 +714,7 @@ const Profile = () => {
                             >
                                 {showAllComments ? 'Show Less' : 'See All'} 
                                 <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
-                            </button>
+                    </button>
                         )}
                     </div>
                     

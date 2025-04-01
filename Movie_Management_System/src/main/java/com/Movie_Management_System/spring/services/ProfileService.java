@@ -97,7 +97,7 @@ public class ProfileService {
             user.getWatchedMovies().stream()
                 .map(movie -> {
                     ProfileResponse.MovieDTO dto = new ProfileResponse.MovieDTO();
-                    dto.setId(movie.getId());
+                    dto.setId(movie.getTmdbId());
                     dto.setTmdbId(movie.getTmdbId());
                     dto.setTitle(movie.getTitle());
                     dto.setPosterPath(movie.getPosterPath());
@@ -111,7 +111,7 @@ public class ProfileService {
             user.getWatchlist().stream()
                 .map(movie -> {
                     ProfileResponse.MovieDTO dto = new ProfileResponse.MovieDTO();
-                    dto.setId(movie.getId());
+                    dto.setId(movie.getTmdbId());
                     dto.setTmdbId(movie.getTmdbId());
                     dto.setTitle(movie.getTitle());
                     dto.setPosterPath(movie.getPosterPath());

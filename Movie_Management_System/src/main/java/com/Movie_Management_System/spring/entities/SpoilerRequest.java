@@ -2,6 +2,7 @@ package com.Movie_Management_System.spring.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "spoiler_requests")
@@ -15,13 +16,10 @@ public class SpoilerRequest {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Posts post;
-
-    @ManyToOne
-    @JoinColumn(name = "discussion_id")
-    private Discussion discussion;
 
     @ManyToOne
     @JoinColumn(name = "comment_id")
@@ -30,7 +28,7 @@ public class SpoilerRequest {
     @Column(nullable = false)
     private String status; // PENDING, APPROVED, REJECTED
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column
@@ -176,14 +174,6 @@ public class SpoilerRequest {
 
     public void setPost(Posts post) {
         this.post = post;
-    }
-
-    public Discussion getDiscussion() {
-        return discussion;
-    }
-
-    public void setDiscussion(Discussion discussion) {
-        this.discussion = discussion;
     }
 
     public Comment getComment() {

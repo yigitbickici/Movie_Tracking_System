@@ -4,6 +4,7 @@ import com.Movie_Management_System.spring.entities.Comment;
 import com.Movie_Management_System.spring.entities.Posts;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository

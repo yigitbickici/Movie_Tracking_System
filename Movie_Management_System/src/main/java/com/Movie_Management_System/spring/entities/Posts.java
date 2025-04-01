@@ -24,11 +24,6 @@ public class Posts {
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "discussion_id")
-    private Discussion discussion;
-
     @Column(nullable = false, length = 2000)
     private String content;
 
@@ -81,14 +76,6 @@ public class Posts {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
-    }
-
-    public Discussion getDiscussion() {
-        return discussion;
-    }
-
-    public void setDiscussion(Discussion discussion) {
-        this.discussion = discussion;
     }
 
     public String getContent() {

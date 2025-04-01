@@ -47,10 +47,10 @@ public class MovieController {
                     return movieService.saveMovie(newMovie);
                 });
 
-            movieService.addToWatchlist(user.getId(), movieId);
+            movieService.addToWatchlist(user.getId(), movie.getTmdbId());
             return ResponseEntity.ok(Map.of("message", "Film watchlist'e eklendi"));
         } catch (Exception e) {
-            e.printStackTrace(); // Debug için
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -78,14 +78,32 @@ public class MovieController {
     }
 
     @PostMapping("/{movieId}/watched")
-    public ResponseEntity<?> addToWatched(@PathVariable Long movieId) {
+    public ResponseEntity<?> addToWatched(
+            @PathVariable Long movieId,
+            @RequestBody(required = false) Map<String, Object> movieData) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
             
-            movieService.addToWatched(user.getId(), movieId);
+            Movie movie = movieService.getMovieByTmdbId(movieId)
+                .orElseGet(() -> {
+                    if (movieData == null) {
+                        throw new RuntimeException("Movie data is required for new movies");
+                    }
+                    Movie newMovie = new Movie();
+                    newMovie.setTmdbId(movieId);
+                    newMovie.setTitle((String) movieData.get("title"));
+                    newMovie.setPosterPath((String) movieData.get("posterPath"));
+                    newMovie.setReleaseDate((String) movieData.get("releaseDate"));
+                    newMovie.setOverview((String) movieData.get("overview"));
+                    newMovie.setVoteAverage(((Number) movieData.get("voteAverage")).doubleValue());
+                    newMovie.setRuntime(((Number) movieData.get("runtime")).intValue());
+                    return movieService.saveMovie(newMovie);
+                });
+
+            movieService.addToWatched(user.getId(), movie.getTmdbId());
             return ResponseEntity.ok(Map.of("message", "Film izlendi olarak işaretlendi"));
         } catch (Exception e) {
             e.printStackTrace();
