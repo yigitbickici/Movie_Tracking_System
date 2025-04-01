@@ -38,8 +38,28 @@ public class PostService {
     private UserService userService;
 
     public List<Posts> getPostsByMovie(Movie movie) {
-        logger.info("Fetching posts for movie: {}", movie.getId());
-        return postsRepository.findByMovieOrderByCreatedAtDesc(movie);
+        logger.info("Fetching posts for movie: {} (ID: {})", movie.getTitle(), movie.getId());
+        
+        try {
+            List<Posts> posts = postsRepository.findByMovieOrderByCreatedAtDesc(movie);
+            logger.info("Found {} posts for movie", posts.size());
+            
+            // Initialize lazy-loaded collections
+            posts.forEach(post -> {
+                logger.debug("Loading data for post ID: {}", post.getId());
+                post.getUser().getUsername(); // Initialize user
+                post.getComments().size(); // Initialize comments
+                post.getComments().forEach(comment -> {
+                    comment.getUser().getUsername(); // Initialize comment users
+                });
+            });
+            
+            return posts;
+        } catch (Exception e) {
+            logger.error("Error fetching posts for movie: {}", e.getMessage());
+            logger.error("Stack trace:", e);
+            throw new RuntimeException("Error fetching posts: " + e.getMessage());
+        }
     }
 
     public Posts createPost(String content, Long userId, Movie movie) {

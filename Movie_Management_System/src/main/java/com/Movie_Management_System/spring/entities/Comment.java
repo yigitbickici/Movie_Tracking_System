@@ -13,13 +13,15 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonManagedReference("user-comments")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
-    private Movie movie;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "post_id", nullable = false)
+    @JsonBackReference("post-comments")
+    private Posts post;
 
     @Column(nullable = false, length = 1000)
     private String content;
@@ -38,11 +40,6 @@ public class Comment {
 
     @Column
     private Integer likeCount = 0;
-
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Posts post;
 
     // Constructors
     public Comment() {
@@ -66,12 +63,12 @@ public class Comment {
         this.user = user;
     }
 
-    public Movie getMovie() {
-        return movie;
+    public Posts getPost() {
+        return post;
     }
 
-    public void setMovie(Movie movie) {
-        this.movie = movie;
+    public void setPost(Posts post) {
+        this.post = post;
     }
 
     public String getContent() {
@@ -120,14 +117,6 @@ public class Comment {
 
     public void setLikeCount(Integer likeCount) {
         this.likeCount = likeCount;
-    }
-
-    public Posts getPost() {
-        return post;
-    }
-
-    public void setPost(Posts post) {
-        this.post = post;
     }
 
     // Pre-persist hook to set createdAt

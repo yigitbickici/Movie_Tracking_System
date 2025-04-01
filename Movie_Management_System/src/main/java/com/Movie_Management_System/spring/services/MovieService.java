@@ -100,15 +100,32 @@ public class MovieService {
     }
 
     public void addToWatched(Long userId, Long movieId) {
+        logger.info("Adding movie with TMDB ID {} to watched list for user ID {}", movieId, userId);
+        
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Movie movie = movieRepository.findByTmdbId(movieId)
             .orElseThrow(() -> new RuntimeException("Movie could not be found"));
 
-        if (!user.getWatchedMovies().stream().anyMatch(m -> m.getTmdbId().equals(movieId))) {
+        // Check if movie is already in watched list
+        boolean isAlreadyWatched = user.getWatchedMovies().stream()
+            .anyMatch(m -> m.getTmdbId().equals(movieId));
+
+        if (!isAlreadyWatched) {
+            logger.info("Movie not in watched list, adding now");
             user.addToWatchedMovies(movie);
+            
+            // Remove from watchlist if present
+            if (user.getWatchlist().contains(movie)) {
+                logger.info("Removing movie from watchlist as it's now watched");
+                user.removeFromWatchlist(movie);
+            }
+            
             userRepository.save(user);
+            logger.info("Successfully added movie to watched list");
+        } else {
+            logger.info("Movie is already in watched list");
         }
     }
 
@@ -150,20 +167,28 @@ public class MovieService {
     }
 
     public List<Movie> getWatchedMovies(Long userId) {
+        logger.info("Getting watched movies for user ID: {}", userId);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User could not be found"));
 
         Set<Movie> watchedMoviesSet = user.getWatchedMovies();
-        System.out.println("User ID: " + userId);
-        System.out.println("Watched movies set: " + (watchedMoviesSet != null ? watchedMoviesSet.size() : "null"));
-        
-        if (watchedMoviesSet == null) {
-            System.out.println("Watched movies set is null, returning empty list");
+        logger.info("Found {} watched movies for user ID: {}", 
+            watchedMoviesSet != null ? watchedMoviesSet.size() : 0);
+
+        if (watchedMoviesSet == null || watchedMoviesSet.isEmpty()) {
+            logger.info("No watched movies found for user ID: {}", userId);
             return new ArrayList<>();
         }
-        
+
         List<Movie> result = new ArrayList<>(watchedMoviesSet);
-        System.out.println("Returning watched movies list with size: " + result.size());
+        logger.info("Returning {} watched movies for user ID: {}", result.size(), userId);
+        
+        // Log some details about the movies for debugging
+        result.forEach(movie -> {
+            logger.info("Watched movie - ID: {}, TMDB ID: {}, Title: {}", 
+                movie.getId(), movie.getTmdbId(), movie.getTitle());
+        });
+        
         return result;
     }
 

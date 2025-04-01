@@ -38,17 +38,28 @@ public class PostController {
     public ResponseEntity<List<Posts>> getPostsByMovie(@PathVariable Long tmdbId) {
         logger.info("Fetching posts for movie with TMDB ID: {}", tmdbId);
         try {
+            // First check if movie exists
             Movie movie = movieService.getMovieByTmdbId(tmdbId)
                     .orElseThrow(() -> new RuntimeException("Movie not found with TMDB ID: " + tmdbId));
+            logger.info("Found movie: {} (ID: {})", movie.getTitle(), movie.getId());
             
+            // Get posts for the movie
             List<Posts> posts = postService.getPostsByMovie(movie);
             logger.info("Found {} posts for movie with TMDB ID: {}", posts.size(), tmdbId);
             
-            // Boş liste olsa bile 200 OK dön
+            // Log each post for debugging
+            posts.forEach(post -> {
+                logger.info("Post ID: {}, User: {}, Content: {}, Comments: {}", 
+                    post.getId(), 
+                    post.getUser().getUsername(),
+                    post.getContent().substring(0, Math.min(50, post.getContent().length())),
+                    post.getComments().size());
+            });
+
             return ResponseEntity.ok(posts);
         } catch (RuntimeException e) {
             logger.error("Error fetching posts for movie with TMDB ID {}: {}", tmdbId, e.getMessage());
-            // Film bulunamadığında 404, diğer hatalarda 500 dön
+            logger.error("Stack trace:", e);
             if (e.getMessage().contains("Movie not found")) {
                 return ResponseEntity.notFound().build();
             }

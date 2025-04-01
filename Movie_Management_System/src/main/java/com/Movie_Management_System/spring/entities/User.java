@@ -8,6 +8,8 @@ import java.util.HashSet;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "users",
@@ -32,6 +34,7 @@ public class User {
 
     @NotBlank
     @Size(max = 120)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -44,6 +47,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
+    @JsonIgnore
     private Set<Movie> favoriteMovies = new HashSet<>();
 
     @ManyToMany
@@ -52,18 +56,22 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
+    @JsonIgnore
     private Set<Movie> watchedMovies = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_watchlist",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id"))
+    @JsonIgnore
     private Set<Movie> watchlist = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference("user-posts")
     private List<Posts> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference("user-comments")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "requestedByUser")
@@ -211,28 +219,43 @@ public class User {
     }
 
     // Helper methods
-    public void addToFavoriteMovies(Movie movie) {
-        favoriteMovies.add(movie);
-    }
-
-    public void removeFromFavoriteMovies(Movie movie) {
-        favoriteMovies.remove(movie);
-    }
-
     public void addToWatchedMovies(Movie movie) {
-        this.watchedMovies.add(movie);
+        if (watchedMovies == null) {
+            watchedMovies = new HashSet<>();
+        }
+        watchedMovies.add(movie);
     }
 
     public void removeFromWatchedMovies(Movie movie) {
-        this.watchedMovies.remove(movie);
+        if (watchedMovies != null) {
+            watchedMovies.remove(movie);
+        }
     }
 
     public void addToWatchlist(Movie movie) {
+        if (watchlist == null) {
+            watchlist = new HashSet<>();
+        }
         watchlist.add(movie);
     }
 
     public void removeFromWatchlist(Movie movie) {
-        watchlist.remove(movie);
+        if (watchlist != null) {
+            watchlist.remove(movie);
+        }
+    }
+
+    public void addToFavoriteMovies(Movie movie) {
+        if (favoriteMovies == null) {
+            favoriteMovies = new HashSet<>();
+        }
+        favoriteMovies.add(movie);
+    }
+
+    public void removeFromFavoriteMovies(Movie movie) {
+        if (favoriteMovies != null) {
+            favoriteMovies.remove(movie);
+        }
     }
 
     public void followUser(User user) {

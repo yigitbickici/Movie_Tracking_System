@@ -126,9 +126,9 @@ public class ProfileService {
                 .map(comment -> {
                     ProfileResponse.CommentDTO dto = new ProfileResponse.CommentDTO();
                     dto.setId(comment.getId());
-                    dto.setMovieId(comment.getMovie().getId());
-                    dto.setMovieTitle(comment.getMovie().getTitle());
-                    dto.setMoviePoster(comment.getMovie().getPosterPath());
+                    dto.setMovieId(comment.getPost().getMovie().getId());
+                    dto.setMovieTitle(comment.getPost().getMovie().getTitle());
+                    dto.setMoviePoster(comment.getPost().getMovie().getPosterPath());
                     dto.setComment(comment.getContent());
                     dto.setRating(comment.getRating());
                     dto.setDate(comment.getCreatedAt().toString());

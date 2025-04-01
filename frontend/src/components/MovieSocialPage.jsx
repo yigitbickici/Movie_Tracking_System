@@ -44,27 +44,23 @@ const MovieSocialPage = () => {
         )
         .then(([movieData, postsData]) => {
             setMovie(movieData);
-            if (postsData) {
-                setPosts(postsData.map(post => ({
-                    ...post,
+            setPosts(postsData ? postsData.map(post => ({
+                ...post,
+                user: {
+                    name: post.user.username,
+                    avatar: post.user.avatar || post.user.username.substring(0, 2).toUpperCase(),
+                    isFollowing: false
+                },
+                timestamp: new Date(post.createdAt).toLocaleString(),
+                comments: post.comments.map(comment => ({
+                    ...comment,
                     user: {
-                        name: post.user.username,
-                        avatar: post.user.avatar || post.user.username.substring(0, 2).toUpperCase(),
+                        name: comment.user.username,
+                        avatar: comment.user.avatar || comment.user.username.substring(0, 2).toUpperCase(),
                         isFollowing: false
-                    },
-                    timestamp: new Date(post.createdAt).toLocaleString(),
-                    comments: post.comments.map(comment => ({
-                        ...comment,
-                        user: {
-                            name: comment.user.username,
-                            avatar: comment.user.avatar || comment.user.username.substring(0, 2).toUpperCase(),
-                            isFollowing: false
-                        }
-                    }))
-                })));
-            } else {
-                setPosts([]); // Boş liste olarak ayarla
-            }
+                    }
+                }))
+            })) : []);
             setLoading(false);
         })
         .catch(error => {
@@ -77,14 +73,13 @@ const MovieSocialPage = () => {
                     navigate('/login');
                 }, 2000);
             } else if (error.response?.status === 404) {
-                setModalMessage('Film bulunamadı');
+                setModalMessage('Bu film için henüz tartışma bulunmuyor. İlk tartışmayı siz başlatabilirsiniz!');
                 setShowModal(true);
-                setTimeout(() => {
-                    setShowModal(false);
-                    navigate(-1);
-                }, 2000);
+                setTimeout(() => setShowModal(false), 3000);
+                setPosts([]);
+                setLoading(false);
             } else {
-                setModalMessage('Film bilgileri yüklenirken bir hata oluştu');
+                setModalMessage('Tartışmalar yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }

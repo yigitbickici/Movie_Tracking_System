@@ -45,6 +45,7 @@ public class Movie {
     private Integer runtime;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonManagedReference("movie-posts")
     private List<Posts> posts = new ArrayList<>();
 
     // Constructors
