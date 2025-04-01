@@ -151,13 +151,23 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             if (isWatched) {
                 await axios.delete(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(false);
-                // Sayfayı yenile
-                window.location.reload();
+                // Film izlenmedi olarak işaretlendiğinde watchlist'e ekle
+                const movieData = {
+                    title: movie.title || movie.original_title,
+                    posterPath: movie.poster_path || movie.posterPath,
+                    releaseDate: movie.release_date || movie.releaseDate,
+                    overview: movie.overview,
+                    voteAverage: movie.vote_average || movie.voteAverage,
+                    runtime: movie.runtime || 0
+                };
+                await axios.post(`/api/movies/${movie.tmdbId}/watchlist`, movieData);
+                setIsInWatchlist(true);
             } else {
                 await axios.post(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(true);
-                // Sayfayı yenile
-                window.location.reload();
+                // Film izlendi olarak işaretlendiğinde watchlist'ten çıkar
+                await axios.delete(`/api/movies/${movie.tmdbId}/watchlist`);
+                setIsInWatchlist(false);
             }
         } catch (error) {
             console.error("İzlenme durumu güncellenirken hata oluştu:", error);
@@ -220,16 +230,14 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                             alt={movie.title} 
                             className="detail-poster"
                         />
-                        {isInWatchlist && (
-                            <button 
-                                className={`watched-button ${isWatched ? 'active' : ''}`}
-                                onClick={handleWatchedToggle}
-                                disabled={isLoading}
-                                title="Watched"
-                            >
-                                ✓
-                            </button>
-                        )}
+                        <button 
+                            className={`watched-button ${isWatched ? 'active' : ''}`}
+                            onClick={handleWatchedToggle}
+                            disabled={isLoading}
+                            title={isWatched ? "Mark as unwatched" : "Mark as watched"}
+                        >
+                            ✓
+                        </button>
                     </div>
                     <div className="movie-detail-info">
                         <h1>{movie.title}</h1>
@@ -360,47 +368,45 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                         )}
 
                         {/* Watch status section */}
-                        {isInWatchlist ? (
-                            isWatched ? (
-                                <div className="user-interaction">
-                                    <div className="rating-section">
-                                        <h4>Rate this movie</h4>
-                                        <div className="star-rating">
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    className={`star-button ${star <= selectedRating ? 'active' : ''}`}
-                                                    onClick={() => handleRatingChange(star)}
-                                                >
-                                                    ★
-                                                </button>
-                                            ))}
-                                            <span className="rating-number">{selectedRating}/10</span>
-                                        </div>
-                                    </div>
-                                    <div className="interaction-buttons">
-                                        <button 
-                                            className={`favorite-button ${isFavorite ? 'active' : ''}`}
-                                            onClick={handleFavoriteToggle}
-                                        >
-                                            ♥
-                                        </button>
-                                        <button 
-                                            className="see-posts-button"
-                                            onClick={handleSeePostsClick}
-                                        >
-                                            SEE DISCUSSIONS
-                                        </button>
+                        {isWatched ? (
+                            <div className="user-interaction">
+                                <div className="rating-section">
+                                    <h4>Rate this movie</h4>
+                                    <div className="star-rating">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                            <button
+                                                key={star}
+                                                className={`star-button ${star <= selectedRating ? 'active' : ''}`}
+                                                onClick={() => handleRatingChange(star)}
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
+                                        <span className="rating-number">{selectedRating}/10</span>
                                     </div>
                                 </div>
-                            ) : (
-                                <button 
-                                    className="detail-remove-button" 
-                                    onClick={handleRemoveFromWatchlist}
-                                >
-                                    - REMOVE FROM WATCHLIST
-                                </button>
-                            )
+                                <div className="interaction-buttons">
+                                    <button 
+                                        className={`favorite-button ${isFavorite ? 'active' : ''}`}
+                                        onClick={handleFavoriteToggle}
+                                    >
+                                        ♥
+                                    </button>
+                                    <button 
+                                        className="see-posts-button"
+                                        onClick={handleSeePostsClick}
+                                    >
+                                        SEE DISCUSSIONS
+                                    </button>
+                                </div>
+                            </div>
+                        ) : isInWatchlist ? (
+                            <button 
+                                className="detail-remove-button" 
+                                onClick={handleRemoveFromWatchlist}
+                            >
+                                - REMOVE FROM WATCHLIST
+                            </button>
                         ) : (
                             <button 
                                 className="detail-add-button" 
