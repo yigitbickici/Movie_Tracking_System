@@ -14,9 +14,13 @@ instance.interceptors.request.use(
         const token = localStorage.getItem('token');
         if (token) {
             console.log('Adding token to request:', token.substring(0, 20) + '...');
+            console.log('Request URL:', config.url);
+            console.log('Request Method:', config.method);
             config.headers.Authorization = `Bearer ${token}`;
         } else {
             console.log('No token found in localStorage');
+            console.log('Request URL:', config.url);
+            console.log('Request Method:', config.method);
         }
         return config;
     },
@@ -34,15 +38,21 @@ instance.interceptors.response.use(
     (error) => {
         console.error('Response interceptor error:', error);
         console.error('Error response:', error.response);
+        console.error('Error status:', error.response?.status);
+        console.error('Error data:', error.response?.data);
         
         if (error.response && error.response.status === 401) {
             console.log('Unauthorized error, clearing user data');
-            localStorage.removeItem('token');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userMail');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('isAdmin');
-            window.location.href = '/login';
+            // Clear all user data
+            localStorage.clear();
+            
+            // Only redirect if we're not already on the login page
+            if (!window.location.pathname.includes('/login')) {
+                // Use setTimeout to ensure the redirect happens after the current execution context
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 0);
+            }
         }
         return Promise.reject(error);
     }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from '../services/axiosConfig';
 import './Auth.css';
 
 const Register = () => {
@@ -10,6 +11,10 @@ const Register = () => {
         password: '',
         confirmPassword: ''
     });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const handleChange = (e) => {
         setFormData({
@@ -20,34 +25,35 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setError('');
+        setLoading(true);
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password,
-                    role: "CUSTOMER" // Varsayılan rol
-                })
+            const response = await axios.post('/api/auth/register', {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Registration failed:', errorData);
-                // Hata mesajını kullanıcıya göster
-                return;
+            if (response.data) {
+                setModalMessage('Registration successful! Please login.');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
             }
-
-            const data = await response.json();
-            console.log('Registration successful:', data);
-            // Başarılı kayıt sonrası login sayfasına yönlendir
-            navigate('/login');
         } catch (error) {
-            console.error('Error during registration:', error);
+            setError(error.response?.data?.message || 'Registration failed. Please try again.');
+            console.error('Registration error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -57,7 +63,15 @@ const Register = () => {
                 ← Back to Main page
             </Link>
             <div className="auth-box">
-                <h2>Create Account</h2>
+                <h2>Register</h2>
+                {error && <div className="error">{error}</div>}
+                {showModal && (
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{modalMessage}</p>
+                        </div>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="input-container">
                         <input
@@ -103,8 +117,8 @@ const Register = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="auth-button">
-                        Create
+                    <button type="submit" disabled={loading} className="auth-button">
+                        {loading ? 'Loading...' : 'Register'}
                     </button>
                 </form>
                 <p className="auth-link">
