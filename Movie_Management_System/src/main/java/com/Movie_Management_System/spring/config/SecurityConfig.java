@@ -82,8 +82,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/discussions/movies/{movieId}/posts").authenticated()
-                .requestMatchers("/api/discussions/**").authenticated()
+                .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
