@@ -31,16 +31,25 @@ const MovieSocialPage = () => {
             return;
         }
 
+        const cleanMovieId = movieId.split('/')[0];
+
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-TR`),
-            axios.get(`/api/posts/movie/${movieId}`)
+            fetch(`https://api.themoviedb.org/3/movie/${cleanMovieId}?api_key=${API_KEY}&language=en-TR`),
+            axios.get(`/api/posts/movie/${cleanMovieId}`)
         ])
         .then(([movieRes, postsRes]) => 
             Promise.all([movieRes.json(), postsRes.data])
         )
         .then(([movieData, postsData]) => {
+            console.log('Posts data from API:', postsData);
             setMovie(movieData);
-            setPosts(postsData);
+            setPosts(postsData.map(post => ({
+                ...post,
+                user: {
+                    ...post.user,
+                    name: post.user.username
+                }
+            })));
             setLoading(false);
         })
         .catch(error => {
@@ -90,22 +99,23 @@ const MovieSocialPage = () => {
         }
 
         try {
+            const cleanMovieId = movieId.split('/')[0];
+            
             const response = await axios.post('/api/posts/create', {
-                movieId: parseInt(movieId),
+                movieId: parseInt(cleanMovieId),
                 content: newPost
             });
             
             const newPostData = response.data;
+            console.log('New post data from API:', newPostData);
             
             setPosts([{
                 ...newPostData,
                 user: {
+                    ...newPostData.user,
                     name: newPostData.user.username,
-                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase(),
-                    isFollowing: false
-                },
-                timestamp: new Date(newPostData.createdAt).toLocaleString(),
-                comments: []
+                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
+                }
             }, ...posts]);
             
             setNewPost('');
@@ -421,16 +431,20 @@ const MovieSocialPage = () => {
                     {posts.map(post => (
                         <div key={post.id} className="post">
                             <div className="post-header">
-                                <img src={post.user.avatar} alt={post.user.name} className="user-avatar" />
+                                <img 
+                                    src={post.user.avatar || `https://ui-avatars.com/api/?name=${post.user.username}&background=random`} 
+                                    alt={post.user.username} 
+                                    className="user-avatar" 
+                                />
                                 <div className="post-info">
-                                    <span className="username">{post.user.name}</span>
+                                    <span className="username">{post.user.username}</span>
                                     <button 
                                         className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
-                                        onClick={() => handleFollow(post.id, post.user.name)}
+                                        onClick={() => handleFollow(post.id, post.user.id)}
                                     >
                                         {post.user.isFollowing ? '✓ Following' : '+ Follow'}
                                     </button>
-                                    <span className="timestamp">{post.timestamp}</span>
+                                    <span className="timestamp">{new Date(post.createdAt).toLocaleString()}</span>
                                 </div>
                             </div>
                             <div className="post-content">
@@ -447,9 +461,9 @@ const MovieSocialPage = () => {
                             </div>
                             <div className="post-actions">
                                 <button onClick={() => handleLike(post.id)}>
-                                    ❤️ {post.likes}
+                                    ❤️ {post.likeNum}
                                 </button>
-                                <button>💬 {post.comments.length}</button>
+                                <button>💬 {post.commentNum}</button>
                                 <button 
                                     onClick={() => handleReportSpoiler(post.id)} 
                                     className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
@@ -460,9 +474,13 @@ const MovieSocialPage = () => {
                             <div className="comments-section">
                                 {post.comments.map(comment => (
                                     <div key={comment.id} className="comment">
-                                        <img src={comment.user.avatar} alt={comment.user.name} className="user-avatar-small" />
+                                        <img 
+                                            src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}&background=random`} 
+                                            alt={comment.user.username} 
+                                            className="user-avatar-small" 
+                                        />
                                         <div className="comment-content">
-                                            <span className="username">{comment.user.name}</span>
+                                            <span className="username">{comment.user.username}</span>
                                             {comment.isSpoiler ? (
                                                 <div className="spoiler-warning">
                                                     ⚠️ Bu yorum spoiler içerebilir

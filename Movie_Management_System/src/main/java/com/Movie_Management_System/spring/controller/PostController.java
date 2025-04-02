@@ -8,6 +8,7 @@ import com.Movie_Management_System.spring.services.PostService;
 import com.Movie_Management_System.spring.services.MovieService;
 import com.Movie_Management_System.spring.services.UserService;
 import com.Movie_Management_System.spring.payload.request.PostRequest;
+import com.Movie_Management_System.spring.payload.request.CommentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -136,7 +137,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<Comment> createComment(@PathVariable Long postId, @RequestBody Comment comment) {
+    public ResponseEntity<Comment> createComment(@PathVariable Long postId, @RequestBody CommentRequest request) {
         logger.info("Creating comment for post ID: {}", postId);
         
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -152,12 +153,16 @@ public class PostController {
             return ResponseEntity.status(401).build();
         }
 
-        if (comment.getContent() == null || comment.getContent().trim().isEmpty()) {
+        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
             logger.error("Comment content is empty");
             return ResponseEntity.status(400).build();
         }
 
+        Comment comment = new Comment();
+        comment.setContent(request.getContent());
         comment.setUser(user);
+        comment.setRating(0.0);
+        
         Comment createdComment = postService.createComment(postId, comment);
         
         logger.info("Comment created successfully with ID: {}", createdComment.getId());

@@ -5,9 +5,7 @@ import org.hibernate.annotations.Comments;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name ="posts")
@@ -19,12 +17,12 @@ public class Posts {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonManagedReference("user-posts")
+    @JsonIgnoreProperties({"posts", "comments", "password", "email", "roles"})
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "movie_id", nullable = false)
-    @JsonBackReference("movie-posts")
+    @JsonIgnoreProperties("posts")
     private Movie movie;
 
     @Column(nullable = false, length = 2000)
@@ -46,11 +44,11 @@ public class Posts {
     private Boolean isSpoiler = false;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference("post-comments")
+    @JsonIgnoreProperties("post")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonIgnoreProperties("post")
     private List<SpoilerRequest> spoilerRequests = new ArrayList<>();
 
     // Constructors

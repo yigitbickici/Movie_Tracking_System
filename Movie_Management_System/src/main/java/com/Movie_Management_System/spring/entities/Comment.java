@@ -2,8 +2,7 @@ package com.Movie_Management_System.spring.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "comments")
@@ -15,21 +14,20 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonManagedReference("user-comments")
+    @JsonIgnoreProperties({"posts", "comments", "password", "email", "roles"})
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
-    @JsonBackReference("post-comments")
+    @JsonIgnoreProperties("comments")
     private Posts post;
 
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @Column(nullable = false)
     private double rating;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column

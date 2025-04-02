@@ -102,6 +102,10 @@ public class PostService {
         
         comment.setPost(post);
         comment.setCreatedAt(LocalDateTime.now());
+        comment.setRating(0.0);
+        comment.setIsSpoiler(false);
+        comment.setLikeCount(0);
+        
         Comment savedComment = commentRepository.save(comment);
         
         post.setCommentNum(post.getCommentNum() + 1);

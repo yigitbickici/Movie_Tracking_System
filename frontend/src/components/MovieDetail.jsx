@@ -151,23 +151,9 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             if (isWatched) {
                 await axios.delete(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(false);
-                // Film izlenmedi olarak işaretlendiğinde watchlist'e ekle
-                const movieData = {
-                    title: movie.title || movie.original_title,
-                    posterPath: movie.poster_path || movie.posterPath,
-                    releaseDate: movie.release_date || movie.releaseDate,
-                    overview: movie.overview,
-                    voteAverage: movie.vote_average || movie.voteAverage,
-                    runtime: movie.runtime || 0
-                };
-                await axios.post(`/api/movies/${movie.tmdbId}/watchlist`, movieData);
-                setIsInWatchlist(true);
             } else {
                 await axios.post(`/api/movies/${movie.tmdbId}/watched`);
                 setIsWatched(true);
-                // Film izlendi olarak işaretlendiğinde watchlist'ten çıkar
-                await axios.delete(`/api/movies/${movie.tmdbId}/watchlist`);
-                setIsInWatchlist(false);
             }
         } catch (error) {
             console.error("İzlenme durumu güncellenirken hata oluştu:", error);
@@ -230,14 +216,16 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                             alt={movie.title} 
                             className="detail-poster"
                         />
-                        <button 
-                            className={`watched-button ${isWatched ? 'active' : ''}`}
-                            onClick={handleWatchedToggle}
-                            disabled={isLoading}
-                            title={isWatched ? "Mark as unwatched" : "Mark as watched"}
-                        >
-                            ✓
-                        </button>
+                        {isInWatchlist && (
+                            <button
+                                className={`watched-button ${isWatched ? 'active' : ''}`}
+                                onClick={handleWatchedToggle}
+                                disabled={isLoading}
+                                title={isWatched ? "Mark as unwatched" : "Mark as watched"}
+                            >
+                                ✓
+                            </button>
+                        )}
                     </div>
                     <div className="movie-detail-info">
                         <h1>{movie.title}</h1>
@@ -400,20 +388,22 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                     </button>
                                 </div>
                             </div>
-                        ) : isInWatchlist ? (
-                            <button 
-                                className="detail-remove-button" 
-                                onClick={handleRemoveFromWatchlist}
-                            >
-                                - REMOVE FROM WATCHLIST
-                            </button>
                         ) : (
-                            <button 
-                                className="detail-add-button" 
-                                onClick={handleAddToWatchlist}
-                            >
-                                + ADD TO WATCHLIST
-                            </button>
+                            isInWatchlist ? (
+                                <button 
+                                    className="detail-remove-button" 
+                                    onClick={handleRemoveFromWatchlist}
+                                >
+                                    - REMOVE FROM WATCHLIST
+                                </button>
+                            ) : (
+                                <button 
+                                    className="detail-add-button" 
+                                    onClick={handleAddToWatchlist}
+                                >
+                                    + ADD TO WATCHLIST
+                                </button>
+                            )
                         )}
                     </div>
                 </div>
