@@ -7,6 +7,8 @@ import com.Movie_Management_System.spring.exceptions.ResourceNotFoundException;
 import com.Movie_Management_System.spring.services.CommentService;
 import com.Movie_Management_System.spring.services.PostService;
 import com.Movie_Management_System.spring.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PostController {
+    private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
     @Autowired
     private PostService postService;
@@ -34,37 +38,47 @@ public class PostController {
     @Transactional
     public ResponseEntity<Comment> createComment(
             @PathVariable Long postId,
-            @RequestBody Map<String, String> commentRequest) {
+            @RequestBody Comment commentRequest) {
         try {
-            String content = commentRequest.get("content");
-            if (content == null || content.trim().isEmpty()) {
+            logger.info("Creating comment for post ID: {}", postId);
+            logger.debug("Comment request: {}", commentRequest);
+
+            if (commentRequest.getContent() == null || commentRequest.getContent().trim().isEmpty()) {
+                logger.warn("Empty comment content received");
                 return ResponseEntity.badRequest().build();
             }
 
             Posts post = postService.getPostById(postId)
                     .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
+            logger.debug("Found post: {}", post);
 
             User currentUser = userService.getCurrentUser();
             if (currentUser == null) {
+                logger.error("No authenticated user found");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+            logger.debug("Current user: {}", currentUser.getUsername());
 
             Comment comment = new Comment();
-            comment.setContent(content);
+            comment.setContent(commentRequest.getContent());
             comment.setUser(currentUser);
             comment.setPost(post);
-            comment.setSpoiler(false);
+            comment.setSpoiler(commentRequest.isSpoiler());
 
             Comment savedComment = commentService.saveComment(comment);
+            logger.info("Comment saved successfully with ID: {}", savedComment.getId());
             
             // Update post comment count
             post.setCommentNum(post.getCommentNum() + 1);
             postService.savePost(post);
+            logger.debug("Updated post comment count to: {}", post.getCommentNum());
 
             return ResponseEntity.ok(savedComment);
         } catch (ResourceNotFoundException e) {
+            logger.error("Resource not found: {}", e.getMessage());
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            logger.error("Error creating comment: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

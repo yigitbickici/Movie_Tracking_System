@@ -42,16 +42,23 @@ instance.interceptors.response.use(
         console.error('Error data:', error.response?.data);
         
         if (error.response && error.response.status === 401) {
-            console.log('Unauthorized error, clearing user data');
-            // Clear all user data
-            localStorage.clear();
+            console.log('Unauthorized error, checking if token exists');
+            const token = localStorage.getItem('token');
             
-            // Only redirect if we're not already on the login page
-            if (!window.location.pathname.includes('/login')) {
-                // Use setTimeout to ensure the redirect happens after the current execution context
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 0);
+            // Only clear data and redirect if we have a token (meaning it's invalid)
+            if (token) {
+                console.log('Token exists but is invalid, clearing user data');
+                localStorage.clear();
+                
+                // Only redirect if we're not already on the login page
+                if (!window.location.pathname.includes('/login')) {
+                    console.log('Redirecting to login page...');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 0);
+                }
+            } else {
+                console.log('No token found, user is not logged in');
             }
         }
         return Promise.reject(error);

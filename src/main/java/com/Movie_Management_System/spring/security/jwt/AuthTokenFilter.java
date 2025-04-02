@@ -40,6 +40,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
 
             logger.info("Processing request for path: {}", requestURI);
+            logger.debug("Request headers: {}", getRequestHeaders(request));
             
             if (jwt != null) {
                 logger.info("JWT token found, validating...");
@@ -57,19 +58,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 } else {
                     logger.error("Invalid JWT token");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("{\"error\":\"Invalid token\"}");
                     return;
                 }
             } else {
                 logger.warn("No JWT token found in request");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\":\"No token provided\"}");
                 return;
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\":\"Authentication failed\"}");
             return;
         }
 
@@ -84,5 +82,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    private String getRequestHeaders(HttpServletRequest request) {
+        StringBuilder headers = new StringBuilder();
+        java.util.Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            headers.append(headerName).append(": ").append(request.getHeader(headerName)).append(", ");
+        }
+        return headers.toString();
     }
 } 
