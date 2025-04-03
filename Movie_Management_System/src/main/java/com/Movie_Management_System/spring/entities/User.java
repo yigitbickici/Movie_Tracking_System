@@ -38,6 +38,12 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.CUSTOMER;
 
+    @Column(name = "is_banned")
+    private boolean isBanned;
+
+    @Column(name = "ban_reason")
+    private String banReason;
+
     @ManyToMany
     @JoinTable(
             name = "user_favorite_movies",
@@ -136,6 +142,22 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean getIsBanned() {
+        return isBanned;
+    }
+
+    public void setIsBanned(boolean isBanned) {
+        this.isBanned = isBanned;
+    }
+
+    public String getBanReason() {
+        return banReason;
+    }
+
+    public void setBanReason(String banReason) {
+        this.banReason = banReason;
     }
 
     public Set<Movie> getFavoriteMovies() {

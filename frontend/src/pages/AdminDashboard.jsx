@@ -5,15 +5,36 @@ import { FaStar, FaTrash, FaChevronRight, FaUsers } from 'react-icons/fa';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const [users, setUsers] = useState([]);
+    const [banModal, setBanModal] = useState({ isOpen: false, userId: null, isBanned: false });
+    const [selectedReason, setSelectedReason] = useState('');
+    const [customReason, setCustomReason] = useState('');
+    const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);  // 🔥 eksikse ekle
+    const [isMoviesModalOpen, setIsMoviesModalOpen] = useState(false); // 🔥 eksikse ekle
+    const token = localStorage.getItem("token");
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/admin/all-users", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error("Kullanıcılar alınamadı");
+            const data = await response.json();
+            console.log("Gelen kullanıcı verisi:", data);
+            setUsers(data);
+        } catch (error) {
+            console.error("Kullanıcıları çekerken hata:", error);
+        }
+    };
 
     useEffect(() => {
-        const isAdmin = localStorage.getItem('isAdmin'); // örnek kontrol
-        
-        if (!isAdmin) {
-            navigate('/login');
-            alert('You do not have acces to this page!');
-        }
-    }, [navigate]);
+        fetchUsers();
+    }, []);
+
+
+
 
     const stats = {
         totalUsers: 1250,
@@ -93,53 +114,6 @@ const AdminDashboard = () => {
         // Daha fazla yorum eklenebilir
     ]);
 
-    // Users state'ini güncelleyelim
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            username: "Emircan Çapkan",
-            movieCount: 150,
-            commentCount: 45,
-            joinDate: "2024-01-15",
-            isBanned: false,
-            banReason: null
-        },
-        {
-            id: 2,
-            username: "Yiğit Bıçkıcı",
-            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=CinemaFan",
-            movieCount: 89,
-            commentCount: 23,
-            joinDate: "2024-02-20"
-        },
-        {
-            id: 3,
-            username: "Elif Gülüm",
-            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=FilmBuff",
-            movieCount: 234,
-            commentCount: 78,
-            joinDate: "2023-12-10"
-        },
-        {
-            id: 4,
-            username: "Muhammed Emir Gündoğdu",
-            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=FilmBuff",
-            movieCount: 234,
-            commentCount: 25,
-            joinDate: "2025-03-08"
-        }
-    ]);
-
-    const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
-    const [isMoviesModalOpen, setIsMoviesModalOpen] = useState(false);
-
-    // Ban modalı için state
-    const [banModal, setBanModal] = useState({
-        isOpen: false,
-        userId: null,
-        isBanned: false
-    });
-
     // Ban sebepleri
     const banReasons = [
         "Unsuitable content sharing",
@@ -150,27 +124,63 @@ const AdminDashboard = () => {
     ];
 
     // Ban işlemi için fonksiyon
-    const handleBanUser = (userId, reason) => {
-        setUsers(prevUsers =>
-            prevUsers.map(user =>
-                user.id === userId
-                    ? { ...user, isBanned: true, banReason: reason }
-                    : user
-            )
-        );
-        setBanModal({ isOpen: false, userId: null, isBanned: false });
+    const handleBanUser = async (userId, reason) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8080/api/admin/ban/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ reason })
+            });
+    
+            if (response.ok) {
+                // Modalı kapat
+                setBanModal({ isOpen: false, userId: null, isBanned: false });
+                // Kullanıcı listesini güncelle
+                await fetchUsers(); // 👈 EKLENDİ
+            } else {
+                const errorData = await response.json();
+                alert("Ban işlemi başarısız: " + errorData.message);
+            }
+        } catch (error) {
+            console.error("Ban hatası:", error);
+        }
     };
+    
+    
+      
+    
 
     // Unban işlemi için fonksiyon
-    const handleUnbanUser = (userId) => {
-        setUsers(prevUsers =>
-            prevUsers.map(user =>
-                user.id === userId
-                    ? { ...user, isBanned: false, banReason: null }
-                    : user
-            )
-        );
+    const handleUnbanUser = async (userId) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8080/api/admin/unban/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (response.ok) {
+                // Kullanıcı listesini güncelle
+                await fetchUsers(); // 👈 EKLENDİ
+            } else {
+                const errorData = await response.json();
+                alert("Unban işlemi başarısız: " + errorData.message);
+            }
+        } catch (error) {
+            console.error("Unban hatası:", error);
+        }
     };
+    
+    
+      
+    
+    
 
     // Yorum silme işlemi
     const handleDeleteComment = async (commentId) => {
@@ -318,7 +328,7 @@ const AdminDashboard = () => {
                     <div className="user-stats">
                         <span>{user.movieCount} films</span>
                     </div>
-                    {user.isBanned && (
+                    {user.banned && (
                         <div className="ban-reason">
                             Reason: {user.banReason}
                         </div>
@@ -326,7 +336,7 @@ const AdminDashboard = () => {
                 </div>
             </div>
             <div className="user-actions">
-                {user.isBanned ? (
+                {user.banned ? (
                     <button 
                         className="unban-button"
                         onClick={(e) => {
@@ -350,6 +360,7 @@ const AdminDashboard = () => {
             </div>
         </div>
     );
+    
 
     // MoviesModal komponentini ekleyelim
     const MoviesModal = () => (
