@@ -80,7 +80,8 @@ public class AdminService {
                     UserBan ban = banMap.get(user.getId());
                     boolean isBanned = ban != null && ban.isActive();
                     String reason = (ban != null) ? ban.getReason() : null;
-                    return new UserAdminDTO(user.getId(), user.getUsername(), user.getEmail(), isBanned, reason);
+                    String role = user.getRole().name(); // Rolü de ekle
+                    return new UserAdminDTO(user.getId(), user.getUsername(), user.getEmail(), isBanned, reason, role);
                 })
                 .collect(Collectors.toList());
     }

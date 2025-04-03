@@ -39,6 +39,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
+
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(jwtUtils.getJwtSecret().getBytes())
                         .build()
@@ -53,11 +54,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         userDetails, null, List.of(authority));
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e.getMessage());
+            logger.error("Kullanıcı yetkilendirmesi yapılamadı: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
@@ -65,11 +66,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
-
         return null;
     }
-} 
+}

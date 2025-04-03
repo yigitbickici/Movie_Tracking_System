@@ -12,12 +12,12 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // it is TMDB ID
+    private Long id; // internal database id
 
-    @Column(unique = true)
-    private Long tmdbId;
+    @Column(nullable = false)
+    private Long tmdbId; // The Movie Database (TMDB) ID
 
-    @Column
+    @Column(nullable = false)
     private String title;
 
     @Column
@@ -44,12 +44,9 @@ public class Movie {
     @Column(name = "runtime")
     private Integer runtime;
 
-    @OneToMany(mappedBy = "movie")
-    private List<Posts> posts;
-
-    @JsonManagedReference
-    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Discussion discussion;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonManagedReference("movie-posts")
+    private List<Posts> posts = new ArrayList<>();
 
     // Constructors
     public Movie() {
@@ -120,14 +117,6 @@ public class Movie {
         this.posts = posts;
     }
 
-    public Discussion getDiscussion() {
-        return discussion;
-    }
-
-    public void setDiscussion(Discussion discussion) {
-        this.discussion = discussion;
-    }
-
     public int getReleaseYear() {
         return releaseYear;
     }
@@ -158,5 +147,16 @@ public class Movie {
 
     public void setRuntime(Integer runtime) {
         this.runtime = runtime;
+    }
+
+    // Helper methods
+    public void addPost(Posts post) {
+        if (!posts.contains(post)) {
+            posts.add(post);
+        }
+    }
+
+    public void removePost(Posts post) {
+        posts.remove(post);
     }
 }

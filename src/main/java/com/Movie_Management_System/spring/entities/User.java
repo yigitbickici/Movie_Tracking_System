@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "users",
@@ -41,12 +41,6 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.CUSTOMER;
 
-    @Column(name = "is_banned")
-    private boolean isBanned;
-
-    @Column(name = "ban_reason")
-    private String banReason;
-
     @ManyToMany
     @JoinTable(
             name = "user_favorite_movies",
@@ -73,11 +67,11 @@ public class User {
     private Set<Movie> watchlist = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonBackReference("user-posts")
+    @JsonManagedReference("user-posts")
     private List<Posts> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonBackReference("user-comments")
+    @JsonManagedReference("user-comments")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "requestedByUser")
@@ -151,142 +145,4 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    public boolean getIsBanned() {
-        return isBanned;
-    }
-
-    public void setIsBanned(boolean isBanned) {
-        this.isBanned = isBanned;
-    }
-
-    public String getBanReason() {
-        return banReason;
-    }
-
-    public void setBanReason(String banReason) {
-        this.banReason = banReason;
-    }
-
-    public Set<Movie> getFavoriteMovies() {
-        return favoriteMovies;
-    }
-
-    public void setFavoriteMovies(Set<Movie> favoriteMovies) {
-        this.favoriteMovies = favoriteMovies;
-    }
-
-    public Set<Movie> getWatchedMovies() {
-        return watchedMovies;
-    }
-
-    public void setWatchedMovies(Set<Movie> watchedMovies) {
-        this.watchedMovies = watchedMovies;
-    }
-
-    public Set<Movie> getWatchlist() {
-        return watchlist;
-    }
-
-    public void setWatchlist(Set<Movie> watchlist) {
-        this.watchlist = watchlist;
-    }
-
-    public List<Posts> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Posts> posts) {
-        this.posts = posts;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public List<SpoilerRequest> getRequestedSpoilers() {
-        return requestedSpoilers;
-    }
-
-    public void setRequestedSpoilers(List<SpoilerRequest> requestedSpoilers) {
-        this.requestedSpoilers = requestedSpoilers;
-    }
-
-    public List<SpoilerRequest> getResolvedSpoilers() {
-        return resolvedSpoilers;
-    }
-
-    public void setResolvedSpoilers(List<SpoilerRequest> resolvedSpoilers) {
-        this.resolvedSpoilers = resolvedSpoilers;
-    }
-
-    public List<User> getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(List<User> followers) {
-        this.followers = followers;
-    }
-
-    public List<User> getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(List<User> following) {
-        this.following = following;
-    }
-
-    // Helper methods
-    public void addToWatchedMovies(Movie movie) {
-        if (watchedMovies == null) {
-            watchedMovies = new HashSet<>();
-        }
-        watchedMovies.add(movie);
-    }
-
-    public void removeFromWatchedMovies(Movie movie) {
-        if (watchedMovies != null) {
-            watchedMovies.remove(movie);
-        }
-    }
-
-    public void addToWatchlist(Movie movie) {
-        if (watchlist == null) {
-            watchlist = new HashSet<>();
-        }
-        watchlist.add(movie);
-    }
-
-    public void removeFromWatchlist(Movie movie) {
-        if (watchlist != null) {
-            watchlist.remove(movie);
-        }
-    }
-
-    public void addToFavoriteMovies(Movie movie) {
-        if (favoriteMovies == null) {
-            favoriteMovies = new HashSet<>();
-        }
-        favoriteMovies.add(movie);
-    }
-
-    public void removeFromFavoriteMovies(Movie movie) {
-        if (favoriteMovies != null) {
-            favoriteMovies.remove(movie);
-        }
-    }
-
-    public void followUser(User user) {
-        following.add(user);
-        user.getFollowers().add(this);
-    }
-
-    public void unfollowUser(User user) {
-        following.remove(user);
-        user.getFollowers().remove(this);
-    }
-}
+} 

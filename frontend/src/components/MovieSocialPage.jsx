@@ -31,51 +31,84 @@ const MovieSocialPage = () => {
             return;
         }
 
+        const cleanMovieId = movieId.split('/')[0];
+
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-TR`),
-            axios.get(`/api/discussions/movie/${movieId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
+            fetch(`https://api.themoviedb.org/3/movie/${cleanMovieId}?api_key=${API_KEY}&language=en-TR`),
+            axios.get(`/api/posts/movie/${cleanMovieId}`)
         ])
-        .then(([movieRes, discussionRes]) => 
-            Promise.all([movieRes.json(), discussionRes.data])
+        .then(([movieRes, postsRes]) => 
+            Promise.all([movieRes.json(), postsRes.data])
         )
-        .then(([movieData, discussionData]) => {
+        .then(([movieData, postsData]) => {
+            console.log('Posts data from API:', postsData);
             setMovie(movieData);
-            if (discussionData && discussionData.posts) {
-                setPosts(discussionData.posts.map(post => ({
-                    ...post,
-                    user: {
-                        name: post.user.username,
-                        avatar: post.user.avatar || post.user.username.substring(0, 2).toUpperCase(),
-                        isFollowing: false
-                    },
-                    timestamp: new Date(post.createdAt).toLocaleString(),
-                    comments: post.comments.map(comment => ({
-                        ...comment,
+            
+            // Ensure postsData is an array
+            const postsArray = Array.isArray(postsData) ? postsData : [];
+            
+            // Process posts data with proper error handling
+            const postsWithLikeStatus = postsArray.map(post => {
+                try {
+                    return {
+                        ...post,
                         user: {
-                            name: comment.user.username,
-                            avatar: comment.user.avatar || comment.user.username.substring(0, 2).toUpperCase(),
-                            isFollowing: false
-                        }
-                    }))
-                })));
-            }
-            setLoading(false);
+                            ...post.user,
+                            name: post.user?.username || 'Unknown User',
+                            avatar: post.user?.avatar || null
+                        },
+                        isLiked: false, // Default value, will be updated
+                        likeNum: post.likeNum || 0,
+                        commentNum: post.commentNum || 0,
+                        comments: Array.isArray(post.comments) ? post.comments : []
+                    };
+                } catch (error) {
+                    console.error('Error processing post:', error, post);
+                    return null;
+                }
+            }).filter(post => post !== null); // Remove any null posts
+            
+            setPosts(postsWithLikeStatus);
+            
+            // Fetch like status for all posts at once
+            const likeStatusPromises = postsWithLikeStatus.map(post => 
+                axios.get(`/api/posts/${post.id}/like-status`)
+                    .then(response => ({ postId: post.id, isLiked: response.data.liked }))
+                    .catch(error => {
+                        console.error(`Error fetching like status for post ${post.id}:`, error);
+                        return { postId: post.id, isLiked: false };
+                    })
+            );
+            
+            Promise.all(likeStatusPromises)
+                .then(likeStatuses => {
+                    setPosts(prevPosts => 
+                        prevPosts.map(post => {
+                            const likeStatus = likeStatuses.find(status => status.postId === post.id);
+                            return likeStatus 
+                                ? { ...post, isLiked: likeStatus.isLiked } 
+                                : post;
+                        })
+                    );
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching like statuses:', error);
+                    setLoading(false);
+                });
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching data:', error);
             if (error.response?.status === 401) {
-                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                localStorage.removeItem('token');
+                setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
                 }, 2000);
             } else {
-                setModalMessage('Film bilgileri yüklenirken bir hata oluştu');
+                setModalMessage('Veri yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -111,94 +144,24 @@ const MovieSocialPage = () => {
         }
 
         try {
-            // Token kontrolü
-            const tokenCheckResponse = await axios.get('/api/auth/check-token', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!tokenCheckResponse.data.valid) {
-                throw new Error('Token geçersiz');
-            }
-
-            // Önce filmin varlığını kontrol et
-            const movieResponse = await axios.get(`/api/movies/${movieId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!movieResponse.data) {
-                throw new Error('Film bulunamadı');
-            }
-
-            // Discussion'ı kontrol et veya oluştur
-            let discussionId;
-            try {
-                const discussionResponse = await axios.get(`/api/discussions/movie/${movieId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                discussionId = discussionResponse.data.id;
-            } catch (error) {
-                if (error.response?.status === 401) {
-                    throw new Error('Oturum süreniz dolmuş');
-                }
-                // Discussion yoksa oluştur
-                const createDiscussionResponse = await axios.post(`/api/discussions/movie/${movieId}`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                discussionId = createDiscussionResponse.data.id;
-            }
-
-            // Post oluştur
-            const formData = new FormData();
-            formData.append('content', newPost);
-            formData.append('discussionId', discussionId);
-            if (selectedMedia) {
-                formData.append('media', selectedMedia);
-            }
-
-            console.log('Post gönderiliyor:', {
-                movieId: movieId,
-                discussionId: discussionId,
+            const cleanMovieId = movieId.split('/')[0];
+            
+            const response = await axios.post('/api/posts/create', {
+                movieId: parseInt(cleanMovieId),
                 content: newPost
             });
-
-            const response = await axios.post(`/api/posts/movie/${movieId}`, formData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                },
-                validateStatus: function (status) {
-                    return status < 500; // 500'den küçük tüm durumları kabul et
-                }
-            });
-
-            if (response.status === 401) {
-                throw new Error('Oturum süreniz dolmuş');
-            }
-
-            if (response.status !== 200 && response.status !== 201) {
-                throw new Error(response.data.message || 'Post oluşturulurken bir hata oluştu');
-            }
             
-            console.log('Post yanıtı:', response.data);
             const newPostData = response.data;
+            console.log('New post data from API:', newPostData);
             
             setPosts([{
                 ...newPostData,
                 user: {
+                    ...newPostData.user,
                     name: newPostData.user.username,
-                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase(),
-                    isFollowing: false
+                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
                 },
-                timestamp: new Date(newPostData.createdAt).toLocaleString(),
-                comments: []
+                isLiked: false
             }, ...posts]);
             
             setNewPost('');
@@ -206,13 +169,11 @@ const MovieSocialPage = () => {
             setMediaPreview(null);
             setModalMessage('Post başarıyla paylaşıldı');
             setShowModal(true);
-            setTimeout(() => setShowModal(false), 2000);
+        
         } catch (error) {
             console.error('Post oluşturma hatası:', error);
-            console.error('Hata detayları:', error.response?.data);
-
-            if (error.message === 'Token geçersiz' || error.message === 'Oturum süreniz dolmuş' || error.response?.status === 401) {
-                localStorage.removeItem('token'); // Token'ı temizle
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
                 setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
                 setShowModal(true);
                 setTimeout(() => {
@@ -220,9 +181,7 @@ const MovieSocialPage = () => {
                     navigate('/login');
                 }, 2000);
             } else {
-                const errorMessage = error.response?.data?.message || error.message;
-                console.error('Detaylı hata:', errorMessage);
-                setModalMessage(`Post paylaşılırken bir hata oluştu: ${errorMessage}`);
+                setModalMessage('Post paylaşılırken bir hata oluştu. Lütfen tekrar deneyin.');
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -242,17 +201,20 @@ const MovieSocialPage = () => {
         }
 
         try {
-            await axios.post(`/api/posts/${postId}/like`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            setPosts(posts.map(post => 
-                post.id === postId ? {...post, likeNum: post.likeNum + 1} : post
+            const response = await axios.post(`/api/posts/${postId}/like`);
+            const isLiked = response.data.liked;
+            
+            setPosts(prevPosts => prevPosts.map(post => 
+                post.id === postId ? {
+                    ...post, 
+                    isLiked: isLiked,
+                    likeNum: isLiked ? (post.likeNum || 0) + 1 : Math.max(0, (post.likeNum || 0) - 1)
+                } : post
             ));
         } catch (error) {
-            console.error('Error liking post:', error);
+            console.error('Error toggling like:', error);
             if (error.response?.status === 401) {
+                localStorage.removeItem('token');
                 setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
                 setShowModal(true);
                 setTimeout(() => {
@@ -276,50 +238,67 @@ const MovieSocialPage = () => {
         }
 
         try {
-            const response = await axios.post(`/api/posts/${postId}/comments`, { content: comment }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const newComment = response.data;
+            const response = await axios.post(`/api/posts/${postId}/comments`, 
+                { content: comment }
+            );
             
-            setPosts(posts.map(post => {
-                if (post.id === postId) {
-                    return {
-                        ...post,
-                        comments: [...post.comments, {
-                            ...newComment,
-                            user: {
-                                name: newComment.user.username,
-                                avatar: newComment.user.avatar || newComment.user.username.substring(0, 2).toUpperCase(),
-                                isFollowing: false
-                            }
-                        }],
-                        commentNum: post.commentNum + 1
-                    };
-                }
-                return post;
-            }));
+            if (response.data) {
+                const newComment = response.data;
+                
+                setPosts(posts.map(post => {
+                    if (post.id === postId) {
+                        return {
+                            ...post,
+                            comments: [...post.comments, {
+                                ...newComment,
+                                user: {
+                                    name: newComment.user.username,
+                                    avatar: newComment.user.avatar || newComment.user.username.substring(0, 2).toUpperCase(),
+                                    isFollowing: false
+                                }
+                            }],
+                            commentNum: post.commentNum + 1
+                        };
+                    }
+                    return post;
+                }));
+                
+                setModalMessage('Yorumunuz başarıyla eklendi');
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            }
         } catch (error) {
             console.error('Error creating comment:', error);
             if (error.response?.status === 401) {
+                localStorage.removeItem('token');
                 setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
                 }, 2000);
+            } else {
+                setModalMessage('Yorum yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
             }
         }
     };
 
     const handleFollow = async (postId, userId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            return;
+        }
+
         try {
-            await axios.post(`/api/profile/follow/${userId}`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await axios.post(`/api/profile/follow/${userId}`);
             setPosts(posts.map(post => {
                 if (post.id === postId) {
                     return {
@@ -334,17 +313,33 @@ const MovieSocialPage = () => {
             }));
         } catch (error) {
             console.error('Error following user:', error);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            }
         }
     };
 
-    const handleSpoilerReport = async (postId, commentId = null) => {
+    const handleReportSpoiler = async (postId, commentId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setModalMessage('Lütfen önce giriş yapın');
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+                navigate('/login');
+            }, 2000);
+            return;
+        }
+
         try {
             if (commentId === null) {
-                await axios.post(`/api/spoiler-requests/post/${postId}`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                await axios.post(`/api/spoiler-requests/post/${postId}`);
                 setPosts(posts.map(post => {
                     if (postId === post.id) {
                         const newSpoilerState = !post.isSpoiler;
@@ -356,11 +351,7 @@ const MovieSocialPage = () => {
                     return post;
                 }));
             } else {
-                await axios.post(`/api/spoiler-requests/comment/${commentId}`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                await axios.post(`/api/spoiler-requests/comment/${commentId}`);
                 setPosts(posts.map(post => {
                     if (postId === post.id) {
                         const updatedComments = post.comments.map(comment => {
@@ -380,6 +371,15 @@ const MovieSocialPage = () => {
             }
         } catch (error) {
             console.error('Error reporting spoiler:', error);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/login');
+                }, 2000);
+            }
         }
     };
 
@@ -483,16 +483,20 @@ const MovieSocialPage = () => {
                     {posts.map(post => (
                         <div key={post.id} className="post">
                             <div className="post-header">
-                                <img src={post.user.avatar} alt={post.user.name} className="user-avatar" />
+                                <img 
+                                    src={post.user.avatar || `https://ui-avatars.com/api/?name=${post.user.username}&background=random`} 
+                                    alt={post.user.username} 
+                                    className="user-avatar" 
+                                />
                                 <div className="post-info">
-                                    <span className="username">{post.user.name}</span>
+                                    <span className="username">{post.user.username}</span>
                                     <button 
                                         className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
-                                        onClick={() => handleFollow(post.id, post.user.name)}
+                                        onClick={() => handleFollow(post.id, post.user.id)}
                                     >
                                         {post.user.isFollowing ? '✓ Following' : '+ Follow'}
                                     </button>
-                                    <span className="timestamp">{post.timestamp}</span>
+                                    <span className="timestamp">{new Date(post.createdAt).toLocaleString()}</span>
                                 </div>
                             </div>
                             <div className="post-content">
@@ -508,12 +512,15 @@ const MovieSocialPage = () => {
                                 )}
                             </div>
                             <div className="post-actions">
-                                <button onClick={() => handleLike(post.id)}>
-                                    ❤️ {post.likes}
-                                </button>
-                                <button>💬 {post.comments.length}</button>
                                 <button 
-                                    onClick={() => handleSpoilerReport(post.id)} 
+                                    onClick={() => handleLike(post.id)}
+                                    className={`like-button ${post.isLiked ? 'liked' : ''}`}
+                                >
+                                    {post.isLiked ? '❤️' : '🤍'} {post.likeNum}
+                                </button>
+                                <button>💬 {post.commentNum}</button>
+                                <button 
+                                    onClick={() => handleReportSpoiler(post.id)} 
                                     className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
                                 >
                                     {post.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
@@ -522,9 +529,13 @@ const MovieSocialPage = () => {
                             <div className="comments-section">
                                 {post.comments.map(comment => (
                                     <div key={comment.id} className="comment">
-                                        <img src={comment.user.avatar} alt={comment.user.name} className="user-avatar-small" />
+                                        <img 
+                                            src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}&background=random`} 
+                                            alt={comment.user.username} 
+                                            className="user-avatar-small" 
+                                        />
                                         <div className="comment-content">
-                                            <span className="username">{comment.user.name}</span>
+                                            <span className="username">{comment.user.username}</span>
                                             {comment.isSpoiler ? (
                                                 <div className="spoiler-warning">
                                                     ⚠️ Bu yorum spoiler içerebilir
@@ -533,7 +544,7 @@ const MovieSocialPage = () => {
                                                 <p>{comment.content}</p>
                                             )}
                                             <button 
-                                                onClick={() => handleSpoilerReport(post.id, comment.id)}
+                                                onClick={() => handleReportSpoiler(post.id, comment.id)}
                                                 className={`spoiler-button-small ${comment.isSpoiler ? 'active' : ''}`}
                                             >
                                                 {comment.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}

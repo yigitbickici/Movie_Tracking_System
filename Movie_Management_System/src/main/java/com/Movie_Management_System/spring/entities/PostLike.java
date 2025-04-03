@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "post_likes")
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,28 +19,14 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
-    @JsonIgnoreProperties("comments")
+    @JsonIgnoreProperties("likes")
     private Posts post;
 
-    @Column(nullable = false, length = 1000)
-    private String content;
-
-    private double rating;
-
-    @Column(name = "created_at")
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column
-    private LocalDateTime updatedAt;
-
-    @Column
-    private Boolean isSpoiler = false;
-
-    @Column
-    private Integer likeCount = 0;
-
     // Constructors
-    public Comment() {
+    public PostLike() {
         this.createdAt = LocalDateTime.now();
     }
 
@@ -69,22 +55,6 @@ public class Comment {
         this.post = post;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -93,39 +63,9 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Boolean getIsSpoiler() {
-        return isSpoiler;
-    }
-
-    public void setIsSpoiler(Boolean isSpoiler) {
-        this.isSpoiler = isSpoiler;
-    }
-
-    public Integer getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(Integer likeCount) {
-        this.likeCount = likeCount;
-    }
-
     // Pre-persist hook to set createdAt
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-    }
-
-    // Pre-update hook to set updatedAt
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 } 

@@ -6,13 +6,15 @@ public class UserAdminDTO {
     private String email;
     private boolean isBanned;
     private String banReason;
+    private String role; 
 
-    public UserAdminDTO(Long id, String username, String email, boolean isBanned, String banReason) {
+    public UserAdminDTO(Long id, String username, String email, boolean isBanned, String banReason, String role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.isBanned = isBanned;
         this.banReason = banReason;
+        this.role = role;
     }
 
     // Getters & Setters
@@ -30,4 +32,7 @@ public class UserAdminDTO {
 
     public String getBanReason() { return banReason; }
     public void setBanReason(String banReason) { this.banReason = banReason; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

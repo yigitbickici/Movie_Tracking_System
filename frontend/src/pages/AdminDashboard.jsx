@@ -9,8 +9,8 @@ const AdminDashboard = () => {
     const [banModal, setBanModal] = useState({ isOpen: false, userId: null, isBanned: false });
     const [selectedReason, setSelectedReason] = useState('');
     const [customReason, setCustomReason] = useState('');
-    const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);  // 🔥 eksikse ekle
-    const [isMoviesModalOpen, setIsMoviesModalOpen] = useState(false); // 🔥 eksikse ekle
+    const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);  
+    const [isMoviesModalOpen, setIsMoviesModalOpen] = useState(false); 
     const token = localStorage.getItem("token");
 
     const fetchUsers = async () => {
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
                 // Modalı kapat
                 setBanModal({ isOpen: false, userId: null, isBanned: false });
                 // Kullanıcı listesini güncelle
-                await fetchUsers(); // 👈 EKLENDİ
+                await fetchUsers(); 
             } else {
                 const errorData = await response.json();
                 alert("Ban işlemi başarısız: " + errorData.message);
@@ -167,7 +167,7 @@ const AdminDashboard = () => {
     
             if (response.ok) {
                 // Kullanıcı listesini güncelle
-                await fetchUsers(); // 👈 EKLENDİ
+                await fetchUsers(); 
             } else {
                 const errorData = await response.json();
                 alert("Unban işlemi başarısız: " + errorData.message);
@@ -282,29 +282,34 @@ const AdminDashboard = () => {
         </div>
     );
 
-    // Users Modal komponenti
-    const UsersModal = () => (
-        <div className={`users-modal-overlay ${isUsersModalOpen ? 'active' : ''}`}>
-            <div className="users-modal-content">
-                <div className="modal-header">
-                    <h2>All Users</h2>
-                    <button 
-                        className="modal-close-button"
-                        onClick={() => setIsUsersModalOpen(false)}
-                    >
-                        ×
-                    </button>
-                </div>
-                <div className="modal-users-container">
-                    <div className="users-grid">
-                        {users.map(user => (
+
+// Users Modal komponenti
+const UsersModal = () => (
+    <div className={`users-modal-overlay ${isUsersModalOpen ? 'active' : ''}`}>
+        <div className="users-modal-content">
+            <div className="modal-header">
+                <h2>All Users</h2>
+                <button 
+                    className="modal-close-button"
+                    onClick={() => setIsUsersModalOpen(false)}
+                >
+                    ×
+                </button>
+            </div>
+            <div className="modal-users-container">
+                <div className="users-grid">
+                    {users
+                        .filter(user => user.role !== "ROLE_ADMIN") //  adminleri filtrele
+                        .map(user => (
                             <UserCard key={user.id} user={user} />
-                        ))}
-                    </div>
+                    ))}
                 </div>
             </div>
         </div>
-    );
+    </div>
+);
+
+
 
     // İsim kısaltması oluşturan fonksiyon
     const getInitials = (name) => {

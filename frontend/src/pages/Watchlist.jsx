@@ -162,7 +162,7 @@ const Watchlist = () => {
             <div className={`movies-container ${isGridView ? 'grid-view' : 'list-view'}`}>
                 {currentMovies && currentMovies.length > 0 ? (
                     currentMovies.map(movie => (
-                        <MovieCard 
+                    <MovieCard 
                             key={movie.tmdbId}
                             movie={{
                                 ...movie,
@@ -171,12 +171,12 @@ const Watchlist = () => {
                                 release_date: movie.releaseDate,
                                 vote_average: movie.voteAverage
                             }}
-                            onClick={() => handleMovieClick(movie)}
-                            isWatchlist={activeTab === 'watchlist'}
+                        onClick={() => handleMovieClick(movie)}
+                        isWatchlist={activeTab === 'watchlist'}
                             isWatched={activeTab === 'watched'}
                             onWatchedToggle={activeTab === 'watchlist' ? () => handleWatchedToggle(movie.tmdbId) : null}
-                            isGridView={isGridView}
-                        />
+                        isGridView={isGridView}
+                    />
                     ))
                 ) : (
                     <div className="no-movies">

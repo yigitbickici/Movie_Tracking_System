@@ -35,6 +35,7 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
         this.role = role;
     }
+
     public static UserDetailsImpl build(User user) {
         System.out.println("Building UserDetailsImpl for user: " + user.getUsername());
         System.out.println("User password hash: " + user.getPassword());
@@ -64,6 +65,10 @@ public class UserDetailsImpl implements UserDetails {
 
     public String getEmail() {
         return email;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     @Override
@@ -104,9 +109,5 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
-    }
-
-    public Role getRole() {
-        return role;
     }
 } 

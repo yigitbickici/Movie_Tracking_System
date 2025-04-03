@@ -5,8 +5,7 @@ import org.hibernate.annotations.Comments;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name ="posts")
@@ -16,18 +15,15 @@ public class Posts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"posts", "comments", "password", "email", "roles"})
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "movie_id", nullable = false)
+    @JsonIgnoreProperties("posts")
     private Movie movie;
-
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "discussion_id")
-    private Discussion discussion;
 
     @Column(nullable = false, length = 2000)
     private String content;
@@ -47,12 +43,17 @@ public class Posts {
     @Column
     private Boolean isSpoiler = false;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("post")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("post")
     private List<SpoilerRequest> spoilerRequests = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("post")
+    private List<PostLike> likes = new ArrayList<>();
 
     // Constructors
     public Posts() {
@@ -81,14 +82,6 @@ public class Posts {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
-    }
-
-    public Discussion getDiscussion() {
-        return discussion;
-    }
-
-    public void setDiscussion(Discussion discussion) {
-        this.discussion = discussion;
     }
 
     public String getContent() {
@@ -154,6 +147,14 @@ public class Posts {
     public void setSpoilerRequests(List<SpoilerRequest> spoilerRequests) {
         this.spoilerRequests = spoilerRequests;
     }
+    
+    public List<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLike> likes) {
+        this.likes = likes;
+    }
 
     // Helper methods for managing comments
     public void addComment(Comment comment) {
@@ -177,6 +178,19 @@ public class Posts {
     public void removeSpoilerRequest(SpoilerRequest request) {
         spoilerRequests.remove(request);
         request.setPost(null);
+    }
+    
+    // Helper methods for likes
+    public void addLike(PostLike like) {
+        likes.add(like);
+        like.setPost(this);
+        this.likeNum++;
+    }
+
+    public void removeLike(PostLike like) {
+        likes.remove(like);
+        like.setPost(null);
+        this.likeNum--;
     }
 
     // Pre-persist hook to set createdAt

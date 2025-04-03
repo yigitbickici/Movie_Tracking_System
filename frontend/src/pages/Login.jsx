@@ -11,6 +11,8 @@ const Login = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const handleChange = (e) => {
         setFormData({
@@ -23,26 +25,26 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
-        
+
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/login', formData);
-            
-            if (response.data) {
+            const response = await axios.post('/api/auth/login', {
+                email: formData.email,
+                password: formData.password
+            });
+
+            if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('userId', response.data.id);
                 localStorage.setItem('userMail', response.data.email);
                 localStorage.setItem('userType', response.data.role.toLowerCase());
                 localStorage.setItem('isAdmin', response.data.role === 'ADMIN' ? 'true' : 'false');
 
-                if (response.data.role === 'ADMIN') {
-                    navigate('/admin');
-                } else if (response.data.role === 'EDITOR') {
-                    navigate('/editor');
-                } else {
-                    navigate('/');
-                }
-            } else {
-                setError('Login failed. Please try again.');
+                setModalMessage('Login successful! Redirecting...');
+                setShowModal(true);
+                setTimeout(() => {
+                    setShowModal(false);
+                    navigate('/explore');
+                }, 2000);
             }
         } catch (error) {
             setError(error.response?.data?.message || 'Login failed. Please try again.');
@@ -55,14 +57,18 @@ const Login = () => {
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Back to Main Page
+                ← Back to Main page
             </Link>
             <div className="auth-box">
-                <h2>Welcome</h2>
-                <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Login and Start Now!</p>
-                
-                {error && <div className="error-message">{error}</div>}
-                
+                <h2>Login</h2>
+                {error && <div className="error">{error}</div>}
+                {showModal && (
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{modalMessage}</p>
+                        </div>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="input-container">
                         <input
@@ -87,14 +93,14 @@ const Login = () => {
                         />
                     </div>
                     <div className="forgot-password">
-                        <Link to="#">Forgot your password?</Link>
+                        <Link to="/forgot-password">Forgot Password?</Link>
                     </div>
-                    <button type="submit" className="auth-button" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                    <button type="submit" disabled={loading} className="auth-button">
+                        {loading ? 'Loading...' : 'Login'}
                     </button>
                 </form>
                 <p className="auth-link">
-                    Do not have any account? <Link to="/register">Register Free</Link>
+                    Don't have an account? <Link to="/register">Register</Link>
                 </p>
             </div>
         </div>
