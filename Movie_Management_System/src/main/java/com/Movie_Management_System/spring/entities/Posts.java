@@ -50,6 +50,10 @@ public class Posts {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("post")
     private List<SpoilerRequest> spoilerRequests = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("post")
+    private List<PostLike> likes = new ArrayList<>();
 
     // Constructors
     public Posts() {
@@ -143,6 +147,14 @@ public class Posts {
     public void setSpoilerRequests(List<SpoilerRequest> spoilerRequests) {
         this.spoilerRequests = spoilerRequests;
     }
+    
+    public List<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLike> likes) {
+        this.likes = likes;
+    }
 
     // Helper methods for managing comments
     public void addComment(Comment comment) {
@@ -166,6 +178,19 @@ public class Posts {
     public void removeSpoilerRequest(SpoilerRequest request) {
         spoilerRequests.remove(request);
         request.setPost(null);
+    }
+    
+    // Helper methods for likes
+    public void addLike(PostLike like) {
+        likes.add(like);
+        like.setPost(this);
+        this.likeNum++;
+    }
+
+    public void removeLike(PostLike like) {
+        likes.remove(like);
+        like.setPost(null);
+        this.likeNum--;
     }
 
     // Pre-persist hook to set createdAt

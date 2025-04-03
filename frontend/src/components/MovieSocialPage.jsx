@@ -43,14 +43,59 @@ const MovieSocialPage = () => {
         .then(([movieData, postsData]) => {
             console.log('Posts data from API:', postsData);
             setMovie(movieData);
-            setPosts(postsData.map(post => ({
-                ...post,
-                user: {
-                    ...post.user,
-                    name: post.user.username
+            
+            // Ensure postsData is an array
+            const postsArray = Array.isArray(postsData) ? postsData : [];
+            
+            // Process posts data with proper error handling
+            const postsWithLikeStatus = postsArray.map(post => {
+                try {
+                    return {
+                        ...post,
+                        user: {
+                            ...post.user,
+                            name: post.user?.username || 'Unknown User',
+                            avatar: post.user?.avatar || null
+                        },
+                        isLiked: false, // Default value, will be updated
+                        likeNum: post.likeNum || 0,
+                        commentNum: post.commentNum || 0,
+                        comments: Array.isArray(post.comments) ? post.comments : []
+                    };
+                } catch (error) {
+                    console.error('Error processing post:', error, post);
+                    return null;
                 }
-            })));
-            setLoading(false);
+            }).filter(post => post !== null); // Remove any null posts
+            
+            setPosts(postsWithLikeStatus);
+            
+            // Fetch like status for all posts at once
+            const likeStatusPromises = postsWithLikeStatus.map(post => 
+                axios.get(`/api/posts/${post.id}/like-status`)
+                    .then(response => ({ postId: post.id, isLiked: response.data.liked }))
+                    .catch(error => {
+                        console.error(`Error fetching like status for post ${post.id}:`, error);
+                        return { postId: post.id, isLiked: false };
+                    })
+            );
+            
+            Promise.all(likeStatusPromises)
+                .then(likeStatuses => {
+                    setPosts(prevPosts => 
+                        prevPosts.map(post => {
+                            const likeStatus = likeStatuses.find(status => status.postId === post.id);
+                            return likeStatus 
+                                ? { ...post, isLiked: likeStatus.isLiked } 
+                                : post;
+                        })
+                    );
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching like statuses:', error);
+                    setLoading(false);
+                });
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -115,7 +160,8 @@ const MovieSocialPage = () => {
                     ...newPostData.user,
                     name: newPostData.user.username,
                     avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
-                }
+                },
+                isLiked: false
             }, ...posts]);
             
             setNewPost('');
@@ -155,12 +201,18 @@ const MovieSocialPage = () => {
         }
 
         try {
-            await axios.post(`/api/posts/${postId}/like`);
-            setPosts(posts.map(post => 
-                post.id === postId ? {...post, likeNum: post.likeNum + 1} : post
+            const response = await axios.post(`/api/posts/${postId}/like`);
+            const isLiked = response.data.liked;
+            
+            setPosts(prevPosts => prevPosts.map(post => 
+                post.id === postId ? {
+                    ...post, 
+                    isLiked: isLiked,
+                    likeNum: isLiked ? (post.likeNum || 0) + 1 : Math.max(0, (post.likeNum || 0) - 1)
+                } : post
             ));
         } catch (error) {
-            console.error('Error liking post:', error);
+            console.error('Error toggling like:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
                 setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
@@ -460,8 +512,11 @@ const MovieSocialPage = () => {
                                 )}
                             </div>
                             <div className="post-actions">
-                                <button onClick={() => handleLike(post.id)}>
-                                    ❤️ {post.likeNum}
+                                <button 
+                                    onClick={() => handleLike(post.id)}
+                                    className={`like-button ${post.isLiked ? 'liked' : ''}`}
+                                >
+                                    {post.isLiked ? '❤️' : '🤍'} {post.likeNum}
                                 </button>
                                 <button>💬 {post.commentNum}</button>
                                 <button 

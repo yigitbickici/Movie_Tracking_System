@@ -4,10 +4,12 @@ import com.Movie_Management_System.spring.entities.Posts;
 import com.Movie_Management_System.spring.entities.Movie;
 import com.Movie_Management_System.spring.entities.User;
 import com.Movie_Management_System.spring.entities.Comment;
+import com.Movie_Management_System.spring.entities.PostLike;
 import com.Movie_Management_System.spring.repository.PostsRepository;
 import com.Movie_Management_System.spring.repository.CommentRepository;
 import com.Movie_Management_System.spring.repository.MovieRepository;
 import com.Movie_Management_System.spring.repository.UserRepository;
+import com.Movie_Management_System.spring.repository.PostLikeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -33,6 +36,9 @@ public class PostService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PostLikeRepository postLikeRepository;
 
     @Autowired
     private UserService userService;
@@ -86,13 +92,52 @@ public class PostService {
         return savedPost;
     }
 
-    public void likePost(Long postId) {
-        logger.info("Liking post: {}", postId);
+    public boolean toggleLikePost(Long postId, Long userId) {
+        logger.info("Toggling like for post: {} by user: {}", postId, userId);
+        
         Posts post = postsRepository.findById(postId)
             .orElseThrow(() -> new RuntimeException("Post not found"));
-        post.setLikeNum(post.getLikeNum() + 1);
-        postsRepository.save(post);
-        logger.info("Post liked successfully");
+            
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            logger.error("User not found with ID: {}", userId);
+            throw new RuntimeException("User not found");
+        }
+        
+        Optional<PostLike> existingLike = postLikeRepository.findByUserAndPost(user, post);
+        
+        if (existingLike.isPresent()) {
+            // User already liked the post, so unlike it
+            PostLike like = existingLike.get();
+            post.removeLike(like);
+            postLikeRepository.delete(like);
+            postsRepository.save(post);
+            logger.info("Post unliked successfully");
+            return false; // Return false to indicate the post is now unliked
+        } else {
+            // User hasn't liked the post yet, so like it
+            PostLike like = new PostLike();
+            like.setUser(user);
+            like.setPost(post);
+            postLikeRepository.save(like);
+            post.addLike(like);
+            postsRepository.save(post);
+            logger.info("Post liked successfully");
+            return true; // Return true to indicate the post is now liked
+        }
+    }
+    
+    public boolean hasUserLikedPost(Long postId, Long userId) {
+        Posts post = postsRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+            
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            logger.error("User not found with ID: {}", userId);
+            throw new RuntimeException("User not found");
+        }
+        
+        return postLikeRepository.existsByUserAndPost(user, post);
     }
 
     public Comment createComment(Long postId, Comment comment) {

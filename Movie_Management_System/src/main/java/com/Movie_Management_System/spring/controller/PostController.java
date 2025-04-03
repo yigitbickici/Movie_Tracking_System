@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -116,8 +117,8 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like")
-    public ResponseEntity<Void> likePost(@PathVariable Long postId) {
-        logger.info("Liking post ID: {}", postId);
+    public ResponseEntity<Map<String, Object>> toggleLikePost(@PathVariable Long postId) {
+        logger.info("Toggling like for post ID: {}", postId);
         
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
@@ -132,8 +133,36 @@ public class PostController {
             return ResponseEntity.status(401).build();
         }
 
-        postService.likePost(postId);
-        return ResponseEntity.ok().build();
+        boolean isLiked = postService.toggleLikePost(postId, user.getId());
+        
+        return ResponseEntity.ok(Map.of(
+            "liked", isLiked,
+            "message", isLiked ? "Post liked successfully" : "Post unliked successfully"
+        ));
+    }
+
+    @GetMapping("/{postId}/like-status")
+    public ResponseEntity<Map<String, Object>> getLikeStatus(@PathVariable Long postId) {
+        logger.info("Getting like status for post ID: {}", postId);
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            logger.error("User not authenticated");
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = auth.getName();
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            logger.error("User not found: {}", username);
+            return ResponseEntity.status(401).build();
+        }
+
+        boolean hasLiked = postService.hasUserLikedPost(postId, user.getId());
+        
+        return ResponseEntity.ok(Map.of(
+            "liked", hasLiked
+        ));
     }
 
     @PostMapping("/{postId}/comments")
