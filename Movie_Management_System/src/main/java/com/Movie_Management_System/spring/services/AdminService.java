@@ -38,7 +38,7 @@ public class AdminService {
         }
 
         // users tablosunu da güncelle
-        user.setIsBanned(true);
+        user.setBanned(true);
         user.setBanReason(reason);
         userRepository.save(user);
     }
@@ -55,7 +55,7 @@ public class AdminService {
         // users tablosunu da güncelle
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
-        user.setIsBanned(false);
+        user.setBanned(false);
         user.setBanReason(null);
         userRepository.save(user);
     }

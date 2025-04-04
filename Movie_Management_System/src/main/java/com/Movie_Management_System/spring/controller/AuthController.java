@@ -89,6 +89,14 @@ public class AuthController {
                     .body(new MessageResponse("Error: User not found with email: " + loginRequest.getEmail()));
             }
 
+            // Ban kontrolü
+            User user = userService.findByEmail(loginRequest.getEmail());
+            if (user.isBanned()) {
+                return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponse("Error: This account has been banned. Reason: " + user.getBanReason()));
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getEmail(),
@@ -132,6 +140,30 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("valid", false));
         } catch (Exception e) {
             return ResponseEntity.ok(Map.of("valid", false));
+        }
+    }
+
+    @GetMapping("/check-ban")
+    public ResponseEntity<?> checkBanStatus(@RequestParam String email) {
+        try {
+            if (!userService.existsByEmail(email)) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Error: User not found with email: " + email));
+            }
+
+            User user = userService.findByEmail(email);
+            if (user.isBanned()) {
+                return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponse("Error: This account has been banned. Reason: " + user.getBanReason()));
+            }
+
+            return ResponseEntity.ok(new MessageResponse("User is not banned"));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error checking ban status: " + e.getMessage()));
         }
     }
 } 

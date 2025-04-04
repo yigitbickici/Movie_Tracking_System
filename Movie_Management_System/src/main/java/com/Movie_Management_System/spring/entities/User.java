@@ -42,7 +42,7 @@ public class User {
     private Role role = Role.CUSTOMER;
 
     @Column(name = "is_banned")
-    private boolean isBanned;
+    private boolean isBanned = false;
 
     @Column(name = "ban_reason")
     private String banReason;
@@ -152,12 +152,12 @@ public class User {
         this.role = role;
     }
 
-    public boolean getIsBanned() {
+    public boolean isBanned() {
         return isBanned;
     }
 
-    public void setIsBanned(boolean isBanned) {
-        this.isBanned = isBanned;
+    public void setBanned(boolean banned) {
+        isBanned = banned;
     }
 
     public String getBanReason() {
