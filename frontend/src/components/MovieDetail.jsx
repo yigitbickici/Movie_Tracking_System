@@ -216,7 +216,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                             alt={movie.title} 
                             className="detail-poster"
                         />
-                        {isInWatchlist && (
+                        {(isInWatchlist || isWatched)&& (
                             <button
                                 className={`watched-button ${isWatched ? 'active' : ''}`}
                                 onClick={handleWatchedToggle}
