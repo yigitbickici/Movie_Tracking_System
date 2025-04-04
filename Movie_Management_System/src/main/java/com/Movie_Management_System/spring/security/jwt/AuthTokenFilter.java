@@ -1,6 +1,8 @@
 package com.Movie_Management_System.spring.security.jwt;
 
 import com.Movie_Management_System.spring.security.services.UserDetailsServiceImpl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,12 +14,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
+import java.util.List;
 
+@Component
 public class AuthTokenFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -31,36 +37,28 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
-            logger.info("Processing request for path: {}", request.getRequestURI());
-            logger.info("Authorization header: {}", request.getHeader("Authorization"));
-            
-            if (jwt != null) {
-                logger.info("JWT token found, validating...");
-                if (jwtUtils.validateJwtToken(jwt)) {
-                    String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                    logger.info("Valid token found for user: {}", username);
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    logger.info("Loaded user details for: {}", userDetails.getUsername());
-                    logger.info("User authorities: {}", userDetails.getAuthorities());
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(jwtUtils.getJwtSecret().getBytes())
+                        .build()
+                        .parseClaimsJws(jwt)
+                        .getBody();
 
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                String role = claims.get("role", String.class);
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.info("Set authentication for user: {}", userDetails.getUsername());
-                } else {
-                    logger.error("Invalid JWT token");
-                    logger.error("Token validation failed");
-                }
-            } else {
-                logger.warn("No JWT token found in request");
-                logger.warn("Headers present: {}", request.getHeaderNames());
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, List.of(authority));
+
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e.getMessage());
-            logger.error("Stack trace: ", e);
+            logger.error("Kullanıcı yetkilendirmesi yapılamadı: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
@@ -68,12 +66,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-        logger.info("Authorization header: {}", headerAuth != null ? headerAuth.substring(0, 20) + "..." : "null");
-
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
-
         return null;
     }
-} 
+}

@@ -35,7 +35,6 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
         this.role = role;
     }
-
     public static UserDetailsImpl build(User user) {
         System.out.println("Building UserDetailsImpl for user: " + user.getUsername());
         System.out.println("User password hash: " + user.getPassword());
