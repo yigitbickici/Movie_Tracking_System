@@ -81,9 +81,11 @@ public class User {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "requestedByUser")
+    @JsonIgnore
     private List<SpoilerRequest> requestedSpoilers = new ArrayList<>();
 
     @OneToMany(mappedBy = "resolvedByUser")
+    @JsonIgnore
     private List<SpoilerRequest> resolvedSpoilers = new ArrayList<>();
 
     @ManyToMany

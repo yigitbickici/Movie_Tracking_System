@@ -16,6 +16,7 @@ const MovieSocialPage = () => {
     const [posts, setPosts] = useState([]);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
+    const [revealedSpoilers, setRevealedSpoilers] = useState(new Set());
 
     useEffect(() => {
         setLoading(true);
@@ -327,6 +328,7 @@ const MovieSocialPage = () => {
 
     const handleReportSpoiler = async (postId, commentId) => {
         const token = localStorage.getItem('token');
+        console.log("Sending spoiler request with token:", localStorage.getItem('token'));
         if (!token) {
             setModalMessage('Lütfen önce giriş yapın');
             setShowModal(true);
@@ -381,6 +383,18 @@ const MovieSocialPage = () => {
                 }, 2000);
             }
         }
+    };
+
+    const toggleSpoilerContent = (id) => {
+        setRevealedSpoilers(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
     };
 
     if (loading) {
@@ -501,10 +515,23 @@ const MovieSocialPage = () => {
                             </div>
                             <div className="post-content">
                                 {post.isSpoiler ? (
-                                    <div className="spoiler-warning">
-                                        ⚠️ This post may contain spoilers
-                                    </div>
-                                ) : post.content}
+                                    <>
+                                        <div 
+                                            className="spoiler-warning"
+                                            onClick={() => toggleSpoilerContent(post.id)}
+                                        >
+                                            ⚠️ Bu gönderi spoiler içerebilir
+                                        </div>
+                                        <div 
+                                            className={`spoiler-content ${revealedSpoilers.has(post.id) ? 'revealed' : ''}`}
+                                            onClick={() => !revealedSpoilers.has(post.id) && toggleSpoilerContent(post.id)}
+                                        >
+                                            {post.content}
+                                        </div>
+                                    </>
+                                ) : (
+                                    post.content
+                                )}
                                 {post.media && (
                                     <div className="post-media">
                                         <img src={post.media} alt="Post media" />
@@ -520,7 +547,7 @@ const MovieSocialPage = () => {
                                 </button>
                                 <button>💬 {post.commentNum}</button>
                                 <button 
-                                    onClick={() => handleReportSpoiler(post.id)} 
+                                    onClick={() => handleReportSpoiler(post.id, null)}
                                     className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
                                 >
                                     {post.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
@@ -537,9 +564,20 @@ const MovieSocialPage = () => {
                                         <div className="comment-content">
                                             <span className="username">{comment.user.username}</span>
                                             {comment.isSpoiler ? (
-                                                <div className="spoiler-warning">
-                                                    ⚠️ Bu yorum spoiler içerebilir
-                                                </div>
+                                                <>
+                                                    <div 
+                                                        className="spoiler-warning"
+                                                        onClick={() => toggleSpoilerContent(`comment-${comment.id}`)}
+                                                    >
+                                                        ⚠️ Bu yorum spoiler içerebilir
+                                                    </div>
+                                                    <div 
+                                                        className={`spoiler-content ${revealedSpoilers.has(`comment-${comment.id}`) ? 'revealed' : ''}`}
+                                                        onClick={() => !revealedSpoilers.has(`comment-${comment.id}`) && toggleSpoilerContent(`comment-${comment.id}`)}
+                                                    >
+                                                        {comment.content}
+                                                    </div>
+                                                </>
                                             ) : (
                                                 <p>{comment.content}</p>
                                             )}

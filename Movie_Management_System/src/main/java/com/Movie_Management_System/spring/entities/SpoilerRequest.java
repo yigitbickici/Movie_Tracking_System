@@ -1,5 +1,6 @@
 package com.Movie_Management_System.spring.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -16,13 +17,14 @@ public class SpoilerRequest {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnoreProperties({"comments", "spoilerRequests", "likes"})
     private Posts post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "comment_id")
+    @JsonIgnoreProperties("post")
     private Comment comment;
 
     @Column(nullable = false)
@@ -52,6 +54,7 @@ public class SpoilerRequest {
 
     @ManyToOne
     @JoinColumn(name = "requested_by_user_id", nullable = false)
+    @JsonIgnoreProperties({"password", "email", "posts", "comments", "watchlist", "watchedMovies", "favoriteMovies", "followers", "following", "requestedSpoilers", "resolvedSpoilers"})
     private User requestedByUser;
 
     @Enumerated(EnumType.STRING)

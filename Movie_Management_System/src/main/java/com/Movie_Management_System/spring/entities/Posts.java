@@ -42,6 +42,7 @@ public class Posts {
 
     @Column
     private Boolean isSpoiler = false;
+    
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("post")
