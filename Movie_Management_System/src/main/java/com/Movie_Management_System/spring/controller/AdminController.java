@@ -3,6 +3,7 @@ package com.Movie_Management_System.spring.controller;
 import com.Movie_Management_System.spring.dto.UserAdminDTO;
 import com.Movie_Management_System.spring.entities.UserBan;
 import com.Movie_Management_System.spring.services.AdminService;
+import com.Movie_Management_System.spring.dto.CommentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,5 +45,22 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserAdminDTO>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsersWithBanInfo());
+    }
+
+    @GetMapping("/recent-comments")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CommentDTO>> getRecentComments() {
+        return ResponseEntity.ok(adminService.getRecentComments());
+    }
+
+    @DeleteMapping("/delete-post/{postId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        try {
+            adminService.deletePost(postId);
+            return ResponseEntity.ok(Map.of("message", "Yorum başarıyla silindi."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

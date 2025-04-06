@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface PostsRepository extends JpaRepository<Posts, Long> {
     List<Posts> findByMovieOrderByCreatedAtDesc(Movie movie);
+    List<Posts> findTop10ByOrderByCreatedAtDesc();
 } 

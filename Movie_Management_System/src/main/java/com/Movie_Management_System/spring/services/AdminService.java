@@ -3,10 +3,17 @@ package com.Movie_Management_System.spring.services;
 import com.Movie_Management_System.spring.dto.UserAdminDTO;
 import com.Movie_Management_System.spring.entities.User;
 import com.Movie_Management_System.spring.entities.UserBan;
+import com.Movie_Management_System.spring.entities.Role;
 import com.Movie_Management_System.spring.repository.UserRepository;
 import com.Movie_Management_System.spring.repository.UserBanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.Movie_Management_System.spring.dto.CommentDTO;
+import com.Movie_Management_System.spring.repository.CommentRepository;
+import com.Movie_Management_System.spring.repository.PostsRepository;
+import com.Movie_Management_System.spring.entities.Posts;
 
 import java.util.List;
 import java.util.Map;
@@ -22,9 +29,31 @@ public class AdminService {
     @Autowired
     private UserBanRepository userBanRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private PostsRepository postsRepository;
+
     public void banUser(Long userId, String reason) {
+        // Önce kullanıcıyı bul
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        // Kullanıcının admin olup olmadığını kontrol et
+        if (user.getRole() == Role.ADMIN) {
+            throw new RuntimeException("Admin kullanıcılar banlanamaz!");
+        }
+
+        // Kendini banlama kontrolü
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = auth.getName();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("Oturum açmış kullanıcı bulunamadı"));
+
+        if (currentUser.getId().equals(userId)) {
+            throw new RuntimeException("Kendinizi banlayamazsınız!");
+        }
 
         Optional<UserBan> existingBanOpt = userBanRepository.findByUserId(userId);
         if (existingBanOpt.isPresent()) {
@@ -84,5 +113,27 @@ public class AdminService {
                     return new UserAdminDTO(user.getId(), user.getUsername(), user.getEmail(), isBanned, reason, role);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<CommentDTO> getRecentComments() {
+        return postsRepository.findTop10ByOrderByCreatedAtDesc()
+            .stream()
+            .map(post -> new CommentDTO(
+                post.getId(),
+                post.getUser().getUsername(),
+                post.getMovie().getTitle(),
+                post.getContent(),
+                post.getCreatedAt(),
+                0.0, // rating için varsayılan değer
+                post.getMovie().getPosterPath() // Film posterini ekleyin
+            ))
+            .collect(Collectors.toList());
+    }
+
+    public void deletePost(Long postId) {
+        Posts post = postsRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post bulunamadı"));
+        
+        postsRepository.delete(post);
     }
 }
