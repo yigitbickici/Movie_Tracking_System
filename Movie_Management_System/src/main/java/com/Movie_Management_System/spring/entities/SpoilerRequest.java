@@ -17,13 +17,13 @@ public class SpoilerRequest {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "post_id", nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = true) // DEĞİŞTİRİLDİ
     @JsonIgnoreProperties({"comments", "spoilerRequests", "likes"})
     private Posts post;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "comment_id")
+    @ManyToOne
+    @JoinColumn(name = "comment_id", nullable = true)
     @JsonIgnoreProperties("post")
     private Comment comment;
 

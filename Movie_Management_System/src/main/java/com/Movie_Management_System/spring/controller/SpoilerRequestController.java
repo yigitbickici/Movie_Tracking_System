@@ -57,6 +57,12 @@ public class SpoilerRequestController {
                     return ResponseEntity.status(403).body("Bu spoiler isteğini kaldırma yetkiniz yok.");
                 }
                 spoilerRequestRepository.delete(request);
+
+                // İsteği kaldırınca spoiler işareti ve pending durumu kaldırılıyor
+                post.setIsSpoiler(false);
+                post.setSpoilerPending(false);
+                postsRepository.save(post);
+
                 return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz kaldırıldı"));
             }
 
@@ -69,12 +75,19 @@ public class SpoilerRequestController {
             request.setCreatedAt(LocalDateTime.now());
 
             spoilerRequestRepository.save(request);
+
+            // İstek gönderildiğinde flag’leri güncelle
+            post.setIsSpoiler(true);
+            post.setSpoilerPending(true);
+            postsRepository.save(post);
+
             return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz gönderildi"));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @PostMapping("/comment/{commentId}")
     public ResponseEntity<?> reportCommentAsSpoiler(@PathVariable Long commentId) {
@@ -100,6 +113,9 @@ public class SpoilerRequestController {
                     return ResponseEntity.status(403).body("Bu spoiler isteğini kaldırma yetkiniz yok.");
                 }
                 spoilerRequestRepository.delete(request);
+                comment.setIsSpoiler(false);
+                comment.setSpoilerPending(false);
+                commentRepository.save(comment);
                 return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz kaldırıldı"));
             }
 
@@ -112,12 +128,18 @@ public class SpoilerRequestController {
             request.setType(SpoilerRequestType.COMMENT);
             request.setCreatedAt(LocalDateTime.now());
 
+            comment.setIsSpoiler(true);
+            comment.setSpoilerPending(true);
+            commentRepository.save(comment);
+
             spoilerRequestRepository.save(request);
+
             return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz gönderildi"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @PostMapping("/{requestId}/approve")
     public ResponseEntity<?> approveSpoilerRequest(@PathVariable Long requestId) {
