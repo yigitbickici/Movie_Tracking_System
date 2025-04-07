@@ -37,6 +37,12 @@ public class Comment {
     private Boolean isSpoiler = false;
 
     @Column
+    private Boolean spoilerPending = false; // 👈 YENİ EKLENEN ALAN
+
+    @Column
+    private Boolean spoilerReviewed = false;
+
+    @Column
     private Integer likeCount = 0;
 
     // Constructors
@@ -109,6 +115,18 @@ public class Comment {
         this.isSpoiler = isSpoiler;
     }
 
+    public Boolean getSpoilerPending() {
+        return spoilerPending;
+    }
+
+    public void setSpoilerPending(Boolean spoilerPending) {
+        this.spoilerPending = spoilerPending;
+    }
+
+    public Boolean getSpoilerReviewed() {return spoilerReviewed;}
+
+    public void setSpoilerReviewed(Boolean spoilerReviewed) {this.spoilerReviewed = spoilerReviewed;}
+
     public Integer getLikeCount() {
         return likeCount;
     }
@@ -117,15 +135,13 @@ public class Comment {
         this.likeCount = likeCount;
     }
 
-    // Pre-persist hook to set createdAt
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    // Pre-update hook to set updatedAt
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-} 
+}

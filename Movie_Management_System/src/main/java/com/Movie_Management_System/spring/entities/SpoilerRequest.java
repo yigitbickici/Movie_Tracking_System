@@ -18,7 +18,7 @@ public class SpoilerRequest {
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = true)
     @JsonIgnoreProperties({"comments", "spoilerRequests", "likes"})
     private Posts post;
 

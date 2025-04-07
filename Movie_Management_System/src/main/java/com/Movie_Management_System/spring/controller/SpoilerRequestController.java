@@ -39,25 +39,26 @@ public class SpoilerRequestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
             Posts post = postsRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Post bulunamadı"));
 
-            // Mevcut aktif isteği kontrol et
+            if (Boolean.TRUE.equals(post.getSpoilerReviewed())) {
+                return ResponseEntity.badRequest().body("Bu postun spoiler durumu editör tarafından belirlenmiştir.");
+            }
+
             Optional<SpoilerRequest> existingRequest = spoilerRequestRepository
-                .findByPostAndRequestedByUserAndStatus(post, user, "PENDING");
+                    .findByPostAndRequestedByUserAndStatus(post, user, "PENDING");
 
             if (existingRequest.isPresent()) {
-                // Eğer daha önce istek yaptıysa ve tekrar basarsa, isteği kaldırıyoruz
                 SpoilerRequest request = existingRequest.get();
-                spoilerRequestRepository.delete(request); // veya request.setStatus("REVOKED")
-                post.setIsSpoiler(false);
+                spoilerRequestRepository.delete(request);
+                post.setSpoilerPending(false);
                 postsRepository.save(post);
                 return ResponseEntity.ok(Map.of("message", "Spoiler isteği kaldırıldı"));
             }
 
-            // Yeni spoiler isteği oluştur
             SpoilerRequest request = new SpoilerRequest();
             request.setUser(user);
             request.setPost(post);
@@ -67,7 +68,7 @@ public class SpoilerRequestController {
             request.setCreatedAt(LocalDateTime.now());
 
             SpoilerRequest savedRequest = spoilerRequestRepository.save(request);
-            post.setIsSpoiler(true);
+            post.setSpoilerPending(true);
             postsRepository.save(post);
 
             return ResponseEntity.ok(savedRequest);
@@ -77,35 +78,43 @@ public class SpoilerRequestController {
         }
     }
 
-
     @PostMapping("/comment/{commentId}")
     public ResponseEntity<?> reportCommentAsSpoiler(@PathVariable Long commentId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
             Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Yorum bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Yorum bulunamadı"));
 
-            // Lazy load post content manually to ensure it's available
-            comment.getContent();
-            if (comment.getPost() != null && comment.getPost().getMovie() != null) {
-                comment.getPost().getMovie().getTitle();
-                comment.getPost().getMovie().getPosterPath();
+            if (Boolean.TRUE.equals(comment.getSpoilerReviewed())) {
+                return ResponseEntity.badRequest().body("Bu yorumun spoiler durumu editör tarafından belirlenmiştir.");
+            }
+
+            Optional<SpoilerRequest> existingRequest = spoilerRequestRepository
+                    .findByCommentAndRequestedByUserAndStatus(comment, user, "PENDING");
+
+            if (existingRequest.isPresent()) {
+                SpoilerRequest request = existingRequest.get();
+                spoilerRequestRepository.delete(request);
+                comment.setSpoilerPending(false);
+                commentRepository.save(comment);
+                return ResponseEntity.ok(Map.of("message", "Spoiler isteği kaldırıldı"));
             }
 
             SpoilerRequest request = new SpoilerRequest();
             request.setUser(user);
             request.setComment(comment);
+            request.setPost(comment.getPost());
             request.setStatus("PENDING");
             request.setRequestedByUser(user);
             request.setType(SpoilerRequestType.COMMENT);
             request.setCreatedAt(LocalDateTime.now());
 
             SpoilerRequest savedRequest = spoilerRequestRepository.save(request);
-            comment.setIsSpoiler(true);
+            comment.setSpoilerPending(true);
             commentRepository.save(comment);
 
             return ResponseEntity.ok(savedRequest);
@@ -120,25 +129,31 @@ public class SpoilerRequestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
             if (user.getRole() != Role.EDITOR) {
                 return ResponseEntity.status(403).body("Bu işlem için editor yetkisine sahip olmanız gerekiyor");
             }
 
             SpoilerRequest request = spoilerRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Spoiler isteği bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Spoiler isteği bulunamadı"));
 
             request.setStatus("APPROVED");
             request.setResolvedByUser(user);
             request.setResolvedAt(LocalDateTime.now());
 
             if (request.getType() == SpoilerRequestType.POST && request.getPost() != null) {
-                request.getPost().setIsSpoiler(true);
-                postsRepository.save(request.getPost());
+                Posts post = request.getPost();
+                post.setIsSpoiler(true);
+                post.setSpoilerPending(false);
+                post.setSpoilerReviewed(true);
+                postsRepository.save(post);
             } else if (request.getType() == SpoilerRequestType.COMMENT && request.getComment() != null) {
-                request.getComment().setIsSpoiler(true);
-                commentRepository.save(request.getComment());
+                Comment comment = request.getComment();
+                comment.setIsSpoiler(true);
+                comment.setSpoilerPending(false);
+                comment.setSpoilerReviewed(true);
+                commentRepository.save(comment);
             }
 
             return ResponseEntity.ok(spoilerRequestRepository.save(request));
@@ -153,25 +168,31 @@ public class SpoilerRequestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
             if (user.getRole() != Role.EDITOR) {
                 return ResponseEntity.status(403).body("Bu işlem için editor yetkisine sahip olmanız gerekiyor");
             }
 
             SpoilerRequest request = spoilerRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Spoiler isteği bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Spoiler isteği bulunamadı"));
 
             request.setStatus("REJECTED");
             request.setResolvedByUser(user);
             request.setResolvedAt(LocalDateTime.now());
 
             if (request.getType() == SpoilerRequestType.POST && request.getPost() != null) {
-                request.getPost().setIsSpoiler(false);
-                postsRepository.save(request.getPost());
+                Posts post = request.getPost();
+                post.setIsSpoiler(false);
+                post.setSpoilerPending(false);
+                post.setSpoilerReviewed(true);
+                postsRepository.save(post);
             } else if (request.getType() == SpoilerRequestType.COMMENT && request.getComment() != null) {
-                request.getComment().setIsSpoiler(false);
-                commentRepository.save(request.getComment());
+                Comment comment = request.getComment();
+                comment.setIsSpoiler(false);
+                comment.setSpoilerPending(false);
+                comment.setSpoilerReviewed(true);
+                commentRepository.save(comment);
             }
 
             return ResponseEntity.ok(spoilerRequestRepository.save(request));
@@ -186,7 +207,7 @@ public class SpoilerRequestController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                    .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
             if (user.getRole() != Role.EDITOR) {
                 return ResponseEntity.status(403).body("Bu sayfayı görüntülemek için editor yetkisine sahip olmanız gerekiyor");
