@@ -53,10 +53,11 @@ public class SpoilerRequestController {
 
             if (existingRequest.isPresent()) {
                 SpoilerRequest request = existingRequest.get();
+                if (!request.getRequestedByUser().getId().equals(user.getId())) {
+                    return ResponseEntity.status(403).body("Bu spoiler isteğini kaldırma yetkiniz yok.");
+                }
                 spoilerRequestRepository.delete(request);
-                post.setSpoilerPending(false);
-                postsRepository.save(post);
-                return ResponseEntity.ok(Map.of("message", "Spoiler isteği kaldırıldı"));
+                return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz kaldırıldı"));
             }
 
             SpoilerRequest request = new SpoilerRequest();
@@ -67,11 +68,8 @@ public class SpoilerRequestController {
             request.setType(SpoilerRequestType.POST);
             request.setCreatedAt(LocalDateTime.now());
 
-            SpoilerRequest savedRequest = spoilerRequestRepository.save(request);
-            post.setSpoilerPending(true);
-            postsRepository.save(post);
-
-            return ResponseEntity.ok(savedRequest);
+            spoilerRequestRepository.save(request);
+            return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz gönderildi"));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -98,10 +96,11 @@ public class SpoilerRequestController {
 
             if (existingRequest.isPresent()) {
                 SpoilerRequest request = existingRequest.get();
+                if (!request.getRequestedByUser().getId().equals(user.getId())) {
+                    return ResponseEntity.status(403).body("Bu spoiler isteğini kaldırma yetkiniz yok.");
+                }
                 spoilerRequestRepository.delete(request);
-                comment.setSpoilerPending(false);
-                commentRepository.save(comment);
-                return ResponseEntity.ok(Map.of("message", "Spoiler isteği kaldırıldı"));
+                return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz kaldırıldı"));
             }
 
             SpoilerRequest request = new SpoilerRequest();
@@ -113,11 +112,8 @@ public class SpoilerRequestController {
             request.setType(SpoilerRequestType.COMMENT);
             request.setCreatedAt(LocalDateTime.now());
 
-            SpoilerRequest savedRequest = spoilerRequestRepository.save(request);
-            comment.setSpoilerPending(true);
-            commentRepository.save(comment);
-
-            return ResponseEntity.ok(savedRequest);
+            spoilerRequestRepository.save(request);
+            return ResponseEntity.ok(Map.of("message", "Spoiler isteğiniz gönderildi"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
