@@ -43,6 +43,12 @@ public class Posts {
     @Column
     private Boolean isSpoiler = false;
 
+    @Column
+    private Boolean spoilerPending = false;
+
+    @Column
+    private Boolean spoilerReviewed = false;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("post")
     private List<Comment> comments = new ArrayList<>();
@@ -132,6 +138,14 @@ public class Posts {
         this.isSpoiler = isSpoiler;
     }
 
+    public Boolean getSpoilerPending() {return spoilerPending;}
+
+    public void setSpoilerPending(Boolean spoilerPending) {this.spoilerPending = spoilerPending;}
+
+    public Boolean getSpoilerReviewed() {return spoilerReviewed;}
+
+    public void setSpoilerReviewed(Boolean spoilerReviewed) {this.spoilerReviewed = spoilerReviewed;}
+
     public List<Comment> getComments() {
         return comments;
     }
@@ -204,4 +218,6 @@ public class Posts {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
 }

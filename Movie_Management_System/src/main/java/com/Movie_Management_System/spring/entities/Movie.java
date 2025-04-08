@@ -3,8 +3,7 @@ package com.Movie_Management_System.spring.entities;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "movies")
@@ -12,10 +11,10 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // internal database id
+    private Long id;
 
     @Column(nullable = false)
-    private Long tmdbId; // The Movie Database (TMDB) ID
+    private Long tmdbId;
 
     @Column(nullable = false)
     private String title;
@@ -45,12 +44,11 @@ public class Movie {
     private Integer runtime;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    @JsonManagedReference("movie-posts")
+    @JsonIgnore // 👈 Bu önemli: Döngüyü kırar ve movie içinde post'lar dönmez
     private List<Posts> posts = new ArrayList<>();
 
-    // Constructors
-    public Movie() {
-    }
+    // Constructor
+    public Movie() {}
 
     // Getters and Setters
     public Long getId() {

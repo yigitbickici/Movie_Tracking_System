@@ -16,6 +16,7 @@ const MovieSocialPage = () => {
     const [posts, setPosts] = useState([]);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
+    const [revealedSpoilers, setRevealedSpoilers] = useState(new Set());
 
     useEffect(() => {
         setLoading(true);
@@ -145,31 +146,38 @@ const MovieSocialPage = () => {
 
         try {
             const cleanMovieId = movieId.split('/')[0];
-            
+
             const response = await axios.post('/api/posts/create', {
                 movieId: parseInt(cleanMovieId),
                 content: newPost
             });
-            
+
             const newPostData = response.data;
             console.log('New post data from API:', newPostData);
-            
+
             setPosts([{
                 ...newPostData,
+                isSpoiler: newPostData.isSpoiler,
+                spoilerPending: newPostData.spoilerPending,
+                spoilerReviewed: newPostData.spoilerReviewed,
+                likeNum: 0,
+                commentNum: 0,
+                comments: [],
+                isLiked: false,
                 user: {
                     ...newPostData.user,
                     name: newPostData.user.username,
                     avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
-                },
-                isLiked: false
+                }
             }, ...posts]);
-            
+
             setNewPost('');
             setSelectedMedia(null);
             setMediaPreview(null);
             setModalMessage('Post başarıyla paylaşıldı');
             setShowModal(true);
-        
+            setTimeout(() => setShowModal(false), 2000);
+
         } catch (error) {
             console.error('Post oluşturma hatası:', error);
             if (error.response?.status === 401) {
@@ -187,6 +195,7 @@ const MovieSocialPage = () => {
             }
         }
     };
+
 
     const handleLike = async (postId) => {
         const token = localStorage.getItem('token');
@@ -238,19 +247,20 @@ const MovieSocialPage = () => {
         }
 
         try {
-            const response = await axios.post(`/api/posts/${postId}/comments`, 
-                { content: comment }
-            );
-            
+            const response = await axios.post(`/api/posts/${postId}/comments`, { content: comment });
+
             if (response.data) {
                 const newComment = response.data;
-                
+
                 setPosts(posts.map(post => {
                     if (post.id === postId) {
                         return {
                             ...post,
                             comments: [...post.comments, {
                                 ...newComment,
+                                isSpoiler: newComment.isSpoiler,
+                                spoilerPending: newComment.spoilerPending,
+                                spoilerReviewed: newComment.spoilerReviewed,
                                 user: {
                                     name: newComment.user.username,
                                     avatar: newComment.user.avatar || newComment.user.username.substring(0, 2).toUpperCase(),
@@ -262,7 +272,7 @@ const MovieSocialPage = () => {
                     }
                     return post;
                 }));
-                
+
                 setModalMessage('Yorumunuz başarıyla eklendi');
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
@@ -284,6 +294,7 @@ const MovieSocialPage = () => {
             }
         }
     };
+
 
     const handleFollow = async (postId, userId) => {
         const token = localStorage.getItem('token');
@@ -327,6 +338,7 @@ const MovieSocialPage = () => {
 
     const handleReportSpoiler = async (postId, commentId) => {
         const token = localStorage.getItem('token');
+        console.log("Sending spoiler request with token:", localStorage.getItem('token'));
         if (!token) {
             setModalMessage('Lütfen önce giriş yapın');
             setShowModal(true);
@@ -381,6 +393,18 @@ const MovieSocialPage = () => {
                 }, 2000);
             }
         }
+    };
+
+    const toggleSpoilerContent = (id) => {
+        setRevealedSpoilers(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
     };
 
     if (loading) {
@@ -501,10 +525,23 @@ const MovieSocialPage = () => {
                             </div>
                             <div className="post-content">
                                 {post.isSpoiler ? (
-                                    <div className="spoiler-warning">
-                                        ⚠️ This post may contain spoilers
-                                    </div>
-                                ) : post.content}
+                                    <>
+                                        <div 
+                                            className="spoiler-warning"
+                                            onClick={() => toggleSpoilerContent(post.id)}
+                                        >
+                                            ⚠️ Bu gönderi spoiler içerebilir
+                                        </div>
+                                        <div 
+                                            className={`spoiler-content ${revealedSpoilers.has(post.id) ? 'revealed' : ''}`}
+                                            onClick={() => !revealedSpoilers.has(post.id) && toggleSpoilerContent(post.id)}
+                                        >
+                                            {post.content}
+                                        </div>
+                                    </>
+                                ) : (
+                                    post.content
+                                )}
                                 {post.media && (
                                     <div className="post-media">
                                         <img src={post.media} alt="Post media" />
@@ -519,12 +556,19 @@ const MovieSocialPage = () => {
                                     {post.isLiked ? '❤️' : '🤍'} {post.likeNum}
                                 </button>
                                 <button>💬 {post.commentNum}</button>
-                                <button 
-                                    onClick={() => handleReportSpoiler(post.id)} 
-                                    className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
-                                >
-                                    {post.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
-                                </button>
+                                {!post.spoilerReviewed && !post.spoilerPending && (
+                                    <button
+                                        onClick={() => handleReportSpoiler(post.id, null)}
+                                        className={`spoiler-button ${post.isSpoiler ? 'active' : ''}`}
+                                    >
+                                        {post.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
+                                    </button>
+                                )}
+                                {post.spoilerReviewed && (
+                                    <div className="spoiler-reviewed-label">
+                                        🛑 Editör tarafından incelendi
+                                    </div>
+                                )}
                             </div>
                             <div className="comments-section">
                                 {post.comments.map(comment => (
@@ -537,21 +581,43 @@ const MovieSocialPage = () => {
                                         <div className="comment-content">
                                             <span className="username">{comment.user.username}</span>
                                             {comment.isSpoiler ? (
-                                                <div className="spoiler-warning">
-                                                    ⚠️ Bu yorum spoiler içerebilir
+                                                // Yorum spoiler onaylandı
+                                                <>
+                                                    <div className="spoiler-warning" onClick={() => toggleSpoilerContent(`comment-${comment.id}`)}>
+                                                        ⚠️ Bu yorum spoiler içerebilir
+                                                    </div>
+                                                    <div className={`spoiler-content ${revealedSpoilers.has(`comment-${comment.id}`) ? 'revealed' : ''}`}
+                                                         onClick={() => !revealedSpoilers.has(`comment-${comment.id}`) && toggleSpoilerContent(`comment-${comment.id}`)}>
+                                                        {comment.content}
+                                                    </div>
+                                                </>
+                                            ) : comment.spoilerPending ? (
+                                                // Yorum kullanıcı tarafından spoiler olarak işaretlendi, editör onayı bekliyor
+                                                <div className="pending-warning">
+                                                    📬 Bu yorumu spoiler olarak işaretlediniz. Editör'e isteğiniz gönderildi.
                                                 </div>
                                             ) : (
+                                                // Normal yorum
                                                 <p>{comment.content}</p>
                                             )}
-                                            <button 
-                                                onClick={() => handleReportSpoiler(post.id, comment.id)}
-                                                className={`spoiler-button-small ${comment.isSpoiler ? 'active' : ''}`}
-                                            >
-                                                {comment.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
-                                            </button>
+                                            {!comment.spoilerReviewed && !comment.spoilerPending && (
+                                                <button
+                                                    onClick={() => handleReportSpoiler(post.id, comment.id)}
+                                                    className={`spoiler-button-small ${comment.isSpoiler ? 'active' : ''}`}
+                                                >
+                                                    {comment.isSpoiler ? '✓ Spoiler' : '🚫 Spoiler'}
+                                                </button>
+                                            )}
                                         </div>
+                                        {comment.spoilerReviewed && (
+                                            <div className="spoiler-reviewed-label">
+                                                🛑 Editör tarafından incelendi
+                                            </div>
+                                        )}
                                     </div>
+
                                 ))}
+
                                 <form onSubmit={(e) => {
                                     e.preventDefault();
                                     const comment = e.target.comment.value;
