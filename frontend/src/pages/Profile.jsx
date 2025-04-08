@@ -36,7 +36,7 @@ const Profile = () => {
     });
 
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         fetchUserProfile();
         fetchMovieTimeStats();
@@ -211,6 +211,12 @@ const Profile = () => {
         } catch (error) {
             console.error("Favori durumu güncellenirken hata oluştu:", error);
         }
+    };
+
+    const getAvatarUrl = (avatarPath) => {
+        if (!avatarPath) return '';
+        if (avatarPath.startsWith('http')) return avatarPath;
+        return `http://localhost:8080${avatarPath}`;
     };
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
@@ -471,7 +477,15 @@ const Profile = () => {
             onClick={() => navigate(`/user/${user.username}`)}
         >
             <div className="user-avatar">
-                {user.avatar || user.username.substring(0, 2).toUpperCase()}
+                {user.avatar ? (
+                    <img 
+                        src={getAvatarUrl(user.avatar)} 
+                        alt={user.username}
+                        className="user-avatar-image"
+                    />
+                ) : (
+                    <span>{user.username.substring(0, 2).toUpperCase()}</span>
+                )}
             </div>
             <div className="user-info">
                 <h4>{user.username}</h4>
@@ -548,8 +562,16 @@ const Profile = () => {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                    <div className="profile-avatar">
-                    <span>{userProfile.avatar}</span>
+                <div className="profile-avatar">
+                    {userProfile.avatar ? (
+                        <img 
+                            src={getAvatarUrl(userProfile.avatar)} 
+                            alt={userProfile.username}
+                            className="profile-avatar-image"
+                        />
+                    ) : (
+                        <span>{userProfile.username.substring(0, 2).toUpperCase()}</span>
+                    )}
                 </div>
                 <h1 className="profile-username">{userProfile.username}</h1>
                 {!username && (
@@ -576,26 +598,26 @@ const Profile = () => {
             <div className="profile-content">
                 <div className="stats-section">
                     <h2>Stats</h2>
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <h4>Movie time</h4>
-                        <div className="time-stats">
-                            <div className="time-stat">
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <h4>Movie time</h4>
+                            <div className="time-stats">
+                                <div className="time-stat">
                                     <span>{movieTimeStats.months}</span>
-                                <label>MONTHS</label>
-                            </div>
-                            <div className="time-stat">
+                                    <label>MONTHS</label>
+                                </div>
+                                <div className="time-stat">
                                     <span>{movieTimeStats.days}</span>
-                                <label>DAYS</label>
-                            </div>
-                            <div className="time-stat">
+                                    <label>DAYS</label>
+                                </div>
+                                <div className="time-stat">
                                     <span>{movieTimeStats.hours}</span>
-                                <label>HOURS</label>
+                                    <label>HOURS</label>
                                 </div>
                             </div>
                         </div>
-                    <div className="stat-card">
-                        <h4>Movies watched</h4>
+                        <div className="stat-card">
+                            <h4>Movies watched</h4>
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                     </div>
@@ -644,7 +666,7 @@ const Profile = () => {
                                     onClick={() => setFollowingModal(true)}
                                 >
                                     See all <FaChevronRight />
-                    </button>
+                                </button>
                             </div>
                         </div>
                         <div className="user-list">
@@ -714,7 +736,7 @@ const Profile = () => {
                             >
                                 {showAllComments ? 'Show Less' : 'See All'} 
                                 <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
-                    </button>
+                            </button>
                         )}
                     </div>
                     

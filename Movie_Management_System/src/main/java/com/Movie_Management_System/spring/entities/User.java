@@ -104,6 +104,16 @@ public class User {
     )
     private List<User> following = new ArrayList<>();
 
+    @Column(nullable = true)
+    private String fullName;
+
+    @Column(nullable = true)
+    private String avatar;
+
+    @Column(nullable = true, length = 1000)
+    private String bio;
+
+
     public User() {
     }
 
@@ -241,6 +251,31 @@ public class User {
     public void setFollowing(List<User> following) {
         this.following = following;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
 
     // Helper methods
     public void addToWatchedMovies(Movie movie) {

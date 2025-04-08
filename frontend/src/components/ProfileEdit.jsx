@@ -1,17 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../services/axiosConfig';
 import './ProfileEdit.css';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        username: 'User1', 
-        email: 'user1@example.com',
-        fullName: 'User1',
-        avatar: 'https://eu.ui-avatars.com/api/?name=User1&size=250',
-        bio: 'Fan of Recep İvedik.',
-        favoriteGenres: ['Action', 'Adventure']
+        username: '',
+        email: '',
+        fullName: '',
+        avatar: '',
+        bio: ''
     });
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchUserProfile();
+    }, []);
+
+    const fetchUserProfile = async () => {
+        try {
+            const response = await axios.get('/users/profile');
+            setFormData({
+                ...response.data,
+                bio: response.data.bio || ''
+            });
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            setError('Failed to load profile data');
+            setIsLoading(false);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,42 +42,72 @@ const ProfileEdit = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError(null);
         
-        console.log('Form sent:', formData);
-        navigate('/profile'); 
+        try {
+            const { username, ...updateData } = formData;
+            await axios.put('/users/profile', updateData);
+            navigate('/profile');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            setError('Failed to update profile');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCancel = () => {
         navigate('/profile');
     };
 
-    const handleAvatarChange = (e) => {
+    const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await axios.post('/users/profile/avatar', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
                 setFormData(prevState => ({
                     ...prevState,
-                    avatar: reader.result
+                    avatar: response.data
                 }));
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                setError('Failed to upload avatar');
+            }
         }
     };
+
+    const getAvatarUrl = (avatarPath) => {
+        if (!avatarPath) return '';
+        if (avatarPath.startsWith('http')) return avatarPath;
+        return `http://localhost:8080${avatarPath}`;
+    };
+
+    if (isLoading) {
+        return <div className="loading">Loading...</div>;
+    }
 
     return (
         <div className="profile-edit-container">
             <h2>Edit Profile</h2>
+            {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit} className="profile-edit-form">
                 <div className="avatar-section">
                     <div className="current-avatar">
-                        {formData.avatar.includes('http') ? (
+                        {formData.avatar ? (
                             <img 
-                                src={formData.avatar} 
+                                src={getAvatarUrl(formData.avatar)} 
                                 alt="Profile" 
-                                className="current-avatar"
                             />
                         ) : (
                             <span>{formData.username.substring(0, 2).toUpperCase()}</span>
@@ -83,12 +134,12 @@ const ProfileEdit = () => {
                         type="text"
                         name="username"
                         value={formData.username}
-                        onChange={handleChange}
+                        disabled
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>E-Mail</label>
+                    <label>Email</label>
                     <input
                         type="email"
                         name="email"
@@ -121,8 +172,8 @@ const ProfileEdit = () => {
                     <button type="button" onClick={handleCancel} className="cancel-button">
                         Cancel
                     </button>
-                    <button type="submit" className="save-button">
-                        Save
+                    <button type="submit" className="save-button" disabled={isLoading}>
+                        {isLoading ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </form>
