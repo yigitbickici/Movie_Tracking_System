@@ -13,6 +13,8 @@ const AdminDashboard = () => {
     const [isMoviesModalOpen, setIsMoviesModalOpen] = useState(false); 
     const token = localStorage.getItem("token");
 
+    const [recentComments, setRecentComments] = useState([]);
+
     const fetchUsers = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/admin/all-users", {
@@ -33,8 +35,24 @@ const AdminDashboard = () => {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        const fetchRecentComments = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/admin/recent-comments", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error("Yorumlar alınamadı");
+                const data = await response.json();
+                setRecentComments(data);
+            } catch (error) {
+                console.error("Yorumları çekerken hata:", error);
+            }
+        };
 
-
+        fetchRecentComments();
+    }, []);
 
     const stats = {
         totalUsers: 1250,
@@ -72,11 +90,6 @@ const AdminDashboard = () => {
             rating: 4.8,
             image: "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg"
         }
-    ];
-
-    const recentComments = [
-        { user: "USER1", movie: "Inception", comment: "Wonderful movie!", date: "2024-03-20" },
-        { user: "USER2", movie: "The Matrix", comment: "CLASSIC!", date: "2024-03-19" }
     ];
 
     // Yeni state'ler ekleyelim
@@ -185,17 +198,29 @@ const AdminDashboard = () => {
     // Yorum silme işlemi
     const handleDeleteComment = async (commentId) => {
         try {
-            // API çağrısı yapılacak
-            // const response = await fetch(`/api/admin/comments/${commentId}`, {
-            //     method: 'DELETE'
-            // });
+            const response = await fetch(`http://localhost:8080/api/admin/delete-post/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             
-            setUserComments(prevComments => 
-                prevComments.filter(comment => comment.id !== commentId)
-            );
-            setDeleteModal({ isOpen: false, commentId: null });
+            if (response.ok) {
+                // UI'dan yorumu kaldır
+                setRecentComments(prevComments => 
+                    prevComments.filter(comment => comment.id !== commentId)
+                );
+                setDeleteModal({ isOpen: false, commentId: null });
+                
+                // Başarı mesajı göster
+                alert("Yorum başarıyla silindi.");
+            } else {
+                const errorData = await response.json();
+                alert("Silme işlemi başarısız: " + errorData.error);
+            }
         } catch (error) {
             console.error('Error deleting comment:', error);
+            alert("Silme işlemi sırasında bir hata oluştu.");
         }
     };
 
@@ -203,11 +228,13 @@ const AdminDashboard = () => {
     const CommentCard = ({ comment }) => (
         <div className="comment-card">
             <div className="comment-movie-info">
-                <img 
-                    src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`} 
-                    alt={comment.movieTitle}
-                    className="comment-movie-poster"
-                />
+                {comment.posterPath && (
+                    <img 
+                        src={`https://image.tmdb.org/t/p/w92${comment.posterPath}`} 
+                        alt={comment.movieTitle}
+                        className="comment-movie-poster"
+                    />
+                )}
                 <div className="comment-movie-details">
                     <h4>{comment.movieTitle}</h4>
                     <div className="comment-rating">
@@ -219,10 +246,10 @@ const AdminDashboard = () => {
             <div className="comment-user-info">
                 <span className="comment-username">{comment.username}</span>
             </div>
-            <p className="comment-text">{comment.comment}</p>
+            <p className="comment-text">{comment.content}</p>
             <div className="comment-footer">
                 <span className="comment-date">
-                    {new Date(comment.date).toLocaleDateString()}
+                    {new Date(comment.createdAt).toLocaleDateString()}
                 </span>
                 <button 
                     className="delete-comment-button"
@@ -273,9 +300,42 @@ const AdminDashboard = () => {
                 </div>
                 <div className="modal-comments-container">
                     <div className="comments-grid">
-                        {userComments.map(comment => (
-                            <CommentCard key={comment.id} comment={comment} />
-                        ))}
+                        {recentComments.length > 0 ? 
+                            recentComments.map(comment => (
+                                <div key={comment.id} className="comment-card">
+                                    <div className="comment-user-info">
+                                        <span className="comment-username">{comment.username}</span>
+                                    </div>
+                                    <p className="comment-text">{comment.content}</p>
+                                    <div className="comment-movie-info">
+                                        {comment.posterPath && (
+                                            <img 
+                                                src={`https://image.tmdb.org/t/p/w92${comment.posterPath}`} 
+                                                alt={comment.movieTitle}
+                                                className="comment-movie-poster"
+                                            />
+                                        )}
+                                        <div className="comment-movie-details">
+                                            <h4>{comment.movieTitle}</h4>
+                                        </div>
+                                    </div>
+                                    <div className="comment-footer">
+                                        <span className="comment-date">
+                                            {new Date(comment.createdAt).toLocaleDateString()}
+                                        </span>
+                                        <button 
+                                            className="delete-comment-button"
+                                            onClick={() => setDeleteModal({ isOpen: true, commentId: comment.id })}
+                                        >
+                                            <FaTrash />
+                                        </button>
+                                    </div>
+                                </div>
+                            )) : 
+                            <div className="empty-state">
+                                <p>No comments yet</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -525,7 +585,7 @@ const UsersModal = () => (
 
                 <div className="dashboard-card">
                     <div className="section-header">
-                            <h2>Last User Comments</h2>
+                        <h2>Last User Comments</h2>
                         <button 
                             className="see-all-button" 
                             onClick={() => setIsCommentsModalOpen(true)}
@@ -535,10 +595,38 @@ const UsersModal = () => (
                     </div>
                     
                     <div className="comments-container">
-                        {userComments.length > 0 ? (
+                        {recentComments.length > 0 ? (
                             <div className="comments-grid">
-                                {userComments.slice(0, 3).map(comment => (
-                                    <CommentCard key={comment.id} comment={comment} />
+                                {recentComments.slice(0, 3).map(comment => (
+                                    <div key={comment.id} className="comment-card">
+                                        <div className="comment-user-info">
+                                            <span className="comment-username">{comment.username}</span>
+                                        </div>
+                                        <p className="comment-text">{comment.content}</p>
+                                        <div className="comment-movie-info">
+                                            {comment.posterPath && (
+                                                <img 
+                                                    src={`https://image.tmdb.org/t/p/w92${comment.posterPath}`} 
+                                                    alt={comment.movieTitle}
+                                                    className="comment-movie-poster"
+                                                />
+                                            )}
+                                            <div className="comment-movie-details">
+                                                <h4>{comment.movieTitle}</h4>
+                                            </div>
+                                        </div>
+                                        <div className="comment-footer">
+                                            <span className="comment-date">
+                                                {new Date(comment.createdAt).toLocaleDateString()}
+                                            </span>
+                                            <button 
+                                                className="delete-comment-button"
+                                                onClick={() => setDeleteModal({ isOpen: true, commentId: comment.id })}
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

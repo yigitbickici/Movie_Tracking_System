@@ -816,4 +816,18 @@
         font-size: 0.85rem;
         min-width: 80px;
     }
+}
+
+.delete-comment-button {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+}
+
+.delete-comment-button:hover {
+    color: #ff7875;
+    transform: scale(1.1);
 } 
