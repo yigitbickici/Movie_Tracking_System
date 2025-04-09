@@ -1,6 +1,7 @@
 package com.Movie_Management_System.spring.repository;
 
 import com.Movie_Management_System.spring.entities.User;
+import com.Movie_Management_System.spring.entities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -21,5 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Checks if a user exists by email
     Boolean existsByEmail(String email);
 
-    List<User> findByUsernameContainingIgnoreCase(String username);
+    List<User> findByUsernameContainingIgnoreCaseAndRoleEquals(String username, Role role);
 }

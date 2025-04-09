@@ -1,6 +1,7 @@
 package com.Movie_Management_System.spring.services;
 
 import com.Movie_Management_System.spring.entities.User;
+import com.Movie_Management_System.spring.entities.Role;
 import com.Movie_Management_System.spring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +71,6 @@ public class UserService {
 
     public List<User> searchUsers(String query) {
         logger.info("Searching users with query: {}", query);
-        return userRepository.findByUsernameContainingIgnoreCase(query);
+        return userRepository.findByUsernameContainingIgnoreCaseAndRoleEquals(query, Role.CUSTOMER);
     }
 }
