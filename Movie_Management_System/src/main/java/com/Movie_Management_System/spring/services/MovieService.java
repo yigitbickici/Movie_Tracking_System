@@ -115,13 +115,6 @@ public class MovieService {
         if (!isAlreadyWatched) {
             logger.info("Movie not in watched list, adding now");
             user.addToWatchedMovies(movie);
-            
-            // Remove from watchlist if present
-            if (user.getWatchlist().contains(movie)) {
-                logger.info("Removing movie from watchlist as it's now watched");
-                user.removeFromWatchlist(movie);
-            }
-            
             userRepository.save(user);
             logger.info("Successfully added movie to watched list");
         } else {
