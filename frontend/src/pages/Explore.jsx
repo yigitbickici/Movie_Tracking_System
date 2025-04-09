@@ -21,7 +21,12 @@ const Explore = () => {
       fetch(SEARCH_API_URL(searchTerm))
         .then((response) => response.json())
         .then((data) => {
-          setMovies(data.results);
+          const sortedMovies = data.results.sort((a, b) => {
+            const yearA = a.release_date ? parseInt(a.release_date.split('-')[0]) : 0;
+            const yearB = b.release_date ? parseInt(b.release_date.split('-')[0]) : 0;
+            return yearA - yearB;
+          });
+          setMovies(sortedMovies);
           setTotalPages(data.total_pages);
         })
         .catch((error) => console.error("Error:", error));
@@ -29,7 +34,12 @@ const Explore = () => {
       fetch(API_URL(currentPage))
         .then((response) => response.json())
         .then((data) => {
-          setMovies(data.results);
+          const sortedMovies = data.results.sort((a, b) => {
+            const yearA = a.release_date ? parseInt(a.release_date.split('-')[0]) : 0;
+            const yearB = b.release_date ? parseInt(b.release_date.split('-')[0]) : 0;
+            return yearA - yearB;
+          });
+          setMovies(sortedMovies);
         })
         .catch((error) => console.error("Error:", error));
     }
