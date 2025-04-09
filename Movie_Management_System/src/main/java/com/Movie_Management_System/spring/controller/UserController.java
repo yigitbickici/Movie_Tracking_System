@@ -15,13 +15,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -30,6 +33,29 @@ public class UserController {
     private UserService userService;
 
     private final String uploadDir = "uploads/avatars";
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(@RequestParam String query) {
+        try {
+            List<User> users = userService.searchUsers(query);
+            
+            List<Map<String, Object>> userList = users.stream()
+                .map(user -> {
+                    Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("id", user.getId());
+                    userMap.put("username", user.getUsername());
+                    userMap.put("avatar", user.getAvatar());
+                    return userMap;
+                })
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(userList);
+        } catch (Exception e) {
+            logger.error("Error searching users: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error searching users"));
+        }
+    }
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile() {

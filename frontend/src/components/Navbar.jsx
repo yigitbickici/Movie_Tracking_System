@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes, FaUsers } from 'react-icons/fa';
 import './Navbar.css';
@@ -34,19 +34,31 @@ const Navbar = () => {
         
         if (query.trim()) {
             try {
-                const response = await fetch(`/api/users/search?query=${query}`);
+                const response = await fetch(`/api/users/search?query=${query}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Search request failed');
+                }
+                
                 const data = await response.json();
                 setSearchResults(data);
             } catch (error) {
                 console.error('Error searching users:', error);
-                const results = mockUsers.filter(user => 
-                    user.username.toLowerCase().includes(query.toLowerCase())
-                );
-                setSearchResults(results);
+                setSearchResults([]);
             }
         } else {
             setSearchResults([]);
         }
+    };
+
+    const handleUserClick = (username) => {
+        setShowSearchDropdown(false);
+        setSearchQuery('');
+        navigate(`/UserProfile/${username}`);
     };
 
     const toggleMobileMenu = () => {
@@ -159,19 +171,20 @@ const Navbar = () => {
                                 {searchResults.length > 0 && (
                                     <div className="search-results">
                                         {searchResults.map(user => (
-                                            <Link 
+                                            <div 
                                                 key={user.id} 
-                                                to={`/UserProfile/${user.username}`}
                                                 className="search-result-item"
-                                                onClick={() => {
-                                                    setShowSearchDropdown(false);
-                                                    navigate(`/UserProfile/${user.username}`);
-                                                }}
+                                                onClick={() => handleUserClick(user.username)}
                                             >
-                                                <div className="user-avatar-small">{user.avatar}</div>
+                                                <div className="user-avatar-small">{user.username.substring(0, 2).toUpperCase()}</div>
                                                 <span className="username">{user.username}</span>
-                                            </Link>
+                                            </div>
                                         ))}
+                                    </div>
+                                )}
+                                {searchQuery && searchResults.length === 0 && (
+                                    <div className="no-results">
+                                        No users found
                                     </div>
                                 )}
                             </div>
@@ -204,14 +217,12 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {}
                     <button className="hamburger-button" onClick={toggleMobileMenu}>
                         {mobileMenuOpen ? <FaTimes /> : <FaBars />}
                     </button>
                 </div>
             </div>
 
-            {}
             <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
                 {renderNavLinks()}
                 {userType !== 'editor' && userType !=='admin' && (
