@@ -21,7 +21,7 @@ const ProfileEdit = () => {
 
     const fetchUserProfile = async () => {
         try {
-            const response = await axios.get('/users/profile');
+            const response = await axios.get('/api/users/profile');
             setFormData({
                 ...response.data,
                 bio: response.data.bio || ''
@@ -49,7 +49,7 @@ const ProfileEdit = () => {
         
         try {
             const { username, ...updateData } = formData;
-            await axios.put('/users/profile', updateData);
+            await axios.put('/api/users/profile', updateData);
             navigate('/profile');
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -70,7 +70,7 @@ const ProfileEdit = () => {
                 const formData = new FormData();
                 formData.append('file', file);
 
-                const response = await axios.post('/users/profile/avatar', formData, {
+                const response = await axios.post('/api/users/profile/avatar', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
