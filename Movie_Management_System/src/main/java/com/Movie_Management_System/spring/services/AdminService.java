@@ -6,17 +6,20 @@ import com.Movie_Management_System.spring.entities.UserBan;
 import com.Movie_Management_System.spring.entities.Role;
 import com.Movie_Management_System.spring.repository.UserRepository;
 import com.Movie_Management_System.spring.repository.UserBanRepository;
+import com.Movie_Management_System.spring.repository.MovieRepository;
+import com.Movie_Management_System.spring.repository.PostsRepository;
+import com.Movie_Management_System.spring.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.Movie_Management_System.spring.dto.CommentDTO;
-import com.Movie_Management_System.spring.repository.CommentRepository;
-import com.Movie_Management_System.spring.repository.PostsRepository;
 import com.Movie_Management_System.spring.entities.Posts;
+import com.Movie_Management_System.spring.services.VisitorService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,10 +33,16 @@ public class AdminService {
     private UserBanRepository userBanRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private MovieRepository movieRepository;
 
     @Autowired
     private PostsRepository postsRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private VisitorService visitorService;
 
     public void banUser(Long userId, String reason) {
         // Önce kullanıcıyı bul
@@ -135,5 +144,50 @@ public class AdminService {
                 .orElseThrow(() -> new RuntimeException("Post bulunamadı"));
         
         postsRepository.delete(post);
+    }
+
+    public Map<String, Object> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        try {
+            // Get real data from repositories
+            Long totalMovies = 10000L; // ← Sabit sayı
+            Long totalUsers = userRepository.count();
+            Long totalReviews = postsRepository.count();
+            // Get visitor stats
+            Map<String, Long> dailyVisitorStats = visitorService.getDailyStats();
+            Map<String, Long> totalVisitorStats = visitorService.getTotalStats();
+            
+            // Debug logs
+            System.out.println("Total Movies: " + totalMovies);
+            System.out.println("Total Users: " + totalUsers);
+            System.out.println("Total Reviews: " + totalReviews);
+            System.out.println("Daily Visitor Stats: " + dailyVisitorStats);
+            System.out.println("Total Visitor Stats: " + totalVisitorStats);
+            
+            // Put all stats in the map
+            stats.put("totalMovies", totalMovies != null ? totalMovies : 0L);
+            stats.put("totalUsers", totalUsers != null ? totalUsers : 0L);
+            stats.put("totalReviews", totalReviews != null ? totalReviews : 0L);
+            stats.put("dailyVisitors", dailyVisitorStats.get("uniqueVisitors") != null ? dailyVisitorStats.get("uniqueVisitors") : 0L);
+            stats.put("totalVisitors", totalVisitorStats.get("totalUniqueVisitors") != null ? totalVisitorStats.get("totalUniqueVisitors") : 0L);
+            
+            System.out.println("Final stats map: " + stats); // Debug log
+            
+            return stats;
+        } catch (Exception e) {
+            // Log the error
+            System.err.println("Error getting dashboard stats: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return default values in case of error
+            stats.put("totalMovies", 10000L);
+            stats.put("totalUsers", 0L);
+            stats.put("totalReviews", 0L);
+            stats.put("dailyVisitors", 0L);
+            stats.put("totalVisitors", 0L);
+            
+            return stats;
+        }
     }
 }

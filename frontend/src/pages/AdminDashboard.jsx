@@ -54,13 +54,33 @@ const AdminDashboard = () => {
         fetchRecentComments();
     }, []);
 
-    const stats = {
-        totalUsers: 1250,
-        dailyVisitors: 456,
-        totalMovies: 2800,
-        totalReviews: 4500
-    };
-
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        dailyVisitors: 0,
+        totalMovies: 10000,
+        totalReviews: 0
+    });
+    
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/admin/stats", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error("İstatistikler alınamadı");
+                const data = await response.json();
+                console.log("İstatistik verisi:", data);
+                setStats(data);
+            } catch (error) {
+                console.error("İstatistikleri çekerken hata:", error);
+            }
+        };
+    
+        fetchStats();
+    }, []);
+    
     const topMovies = [
         { 
             title: "Inception", 

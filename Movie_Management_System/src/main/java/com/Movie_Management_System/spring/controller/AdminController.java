@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
 public class AdminController {
 
     @Autowired
@@ -61,6 +61,20 @@ public class AdminController {
             return ResponseEntity.ok(Map.of("message", "Yorum başarıyla silindi."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        try {
+            Map<String, Object> stats = adminService.getDashboardStats();
+            System.out.println("Returning stats: " + stats); // Debug log
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            System.err.println("Error in getDashboardStats: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
