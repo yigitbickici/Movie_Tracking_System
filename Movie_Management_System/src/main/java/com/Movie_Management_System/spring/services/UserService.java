@@ -69,8 +69,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
 
-    public List<User> searchUsers(String query) {
+    public List<User> searchUsers(String query, String currentUsername) {
         logger.info("Searching users with query: {}", query);
-        return userRepository.findByUsernameContainingIgnoreCaseAndRoleEquals(query, Role.CUSTOMER);
+        return userRepository.findByUsernameContainingIgnoreCaseAndRoleEqualsAndUsernameNot(query, Role.CUSTOMER, currentUsername);
     }
 }

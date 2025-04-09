@@ -326,4 +326,21 @@ public class User {
         following.remove(user);
         user.getFollowers().remove(this);
     }
+
+    // Helper methods for counts
+    public int getFollowingCount() {
+        return following != null ? following.size() : 0;
+    }
+
+    public int getFollowersCount() {
+        return followers != null ? followers.size() : 0;
+    }
+
+    public int getCommentsCount() {
+        return comments != null ? comments.size() : 0;
+    }
+
+    public int getMoviesWatchedCount() {
+        return watchedMovies != null ? watchedMovies.size() : 0;
+    }
 }

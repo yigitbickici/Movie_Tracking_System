@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import ProfileEdit from './components/ProfileEdit';
+import UserProfile from './pages/UserProfile';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
                     <Route path="/explore" element={<Home />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile/edit" element={<ProfileEdit />} />
+                    <Route path="/user/:username" element={<UserProfile />} />
                 </Routes>
                 <Navbar />
             </div>
