@@ -1,0 +1,22 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import './HomeNavbar.css';
+
+const HomeNavbar = () => {
+    const navigate = useNavigate();
+
+    return (
+        <nav className="home-navbar">
+            <div className="home-nav-right">
+                <button className="register-button" onClick={() => navigate('/register')}>
+                    Register
+                </button>
+                <button className="login-button" onClick={() => navigate('/login')}>
+                    Login
+                </button>
+            </div>
+        </nav>
+    );
+};
+
+export default HomeNavbar; 

@@ -1,0 +1,833 @@
+.admin-dashboard {
+    min-height: calc(100vh - 65px);
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    color: #fff;
+    background-color: #1a1a1a;
+}
+
+@media (min-width: 768px) {
+    .admin-dashboard {
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .admin-dashboard {
+        padding: 2rem;
+    }
+}
+
+.admin-dashboard h1 {
+    color: #fff;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .admin-dashboard h1 {
+        font-size: 2rem;
+    }
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .stats-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+}
+
+.stat-card {
+    background: #2d2d2d;
+    padding: 0.75rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: transform 0.2s;
+    color: #fff;
+}
+
+@media (min-width: 768px) {
+    .stat-card {
+        padding: 1.5rem;
+    }
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card i {
+    font-size: 1.5rem;
+    color: #2196f3;
+    margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .stat-card i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.stat-card h3 {
+    color: #bbb;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    color: #bbb;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+@media (min-width: 768px) {
+    .stat-card p {
+        font-size: 1.8rem;
+    }
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+}
+
+.dashboard-card {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    border-top: 1px solid #444;
+}
+
+.dashboard-card h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-card h2 {
+        font-size: 1.2rem;
+    }
+}
+
+.top-movies-list {
+    margin-top: 1rem;
+}
+
+.movie-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.movie-list-item:hover {
+    background: #404040;
+    transform: translateX(5px);
+}
+
+.movie-list-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.movie-list-poster {
+    width: 40px;
+    height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.movie-list-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.movie-list-details h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.movie-list-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.star-icon {
+    color: #ffd700;
+    font-size: 0.9rem;
+}
+
+.movie-list-rating span {
+    color: #ffd700;
+    font-size: 0.9rem;
+}
+
+.movie-list-favorites {
+    color: #bbb;
+    font-size: 0.9rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.see-all-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #2196f3;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.2s ease;
+}
+
+.see-all-button:hover {
+    background: #1976d2;
+}
+
+.recent-comments .comment-card {
+    padding: 0.8rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .comment-card {
+        padding: 1rem;
+    }
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.comment-user {
+    font-weight: bold;
+    color: #2196f3;
+}
+
+.comment-date {
+    color: #bbb;
+    font-size: 0.9rem;
+}
+
+.comment-movie {
+    color: #bbb;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.comment-text {
+    color: #fff;
+}
+
+/* Yorumlar modalı stilleri */
+.comments-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.comments-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.comments-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.comments-modal-overlay.active .comments-modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.modal-close-button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-comments-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.modal-comments-container .comments-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .comments-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #000000;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.user-info-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex: 1;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ban-reason {
+    font-size: 0.8rem;
+    color: #dc3545;
+    margin-top: 0.2rem;
+}
+
+.user-actions {
+    margin-left: 1rem;
+}
+
+.ban-button, .unban-button {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 60px;
+}
+
+.ban-button {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-button:hover {
+    background: #c82333;
+}
+
+.unban-button {
+    background: #28a745;
+    color: white;
+}
+
+.unban-button:hover {
+    background: #218838;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+.user-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.user-stats {
+    margin-top: 0.2rem;
+    color: #808080;
+    font-size: 0.8rem;
+}
+
+.user-join-date {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.section-icon {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Users Modal styles */
+.users-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.users-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.users-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-users-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.users-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Movies Modal styles */
+.movies-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.movies-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.movies-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-movies-container {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+.movies-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Delete Modal z-index değerini daha yüksek yap */
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100; /* Comments modal'dan daha yüksek */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.delete-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 24px;
+}
+
+.delete-modal-button {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.delete-modal-button.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.delete-modal-button.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-modal-button.confirm {
+    background: #dc3545;
+    color: #fff;
+}
+
+.delete-modal-button.confirm:hover {
+    background: #c82333;
+}
+
+/* Ban Modal stilleri */
+.ban-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.ban-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ban-modal-content {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.ban-form {
+    margin: 20px 0;
+}
+
+.ban-reason-select {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.custom-reason-input {
+    width: 100%;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    min-height: 80px;
+    resize: vertical;
+    margin-top: 12px;
+}
+
+.ban-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.ban-modal-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.ban-modal-button.cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.ban-modal-button.cancel:hover {
+    background: #5a6268;
+}
+
+.ban-modal-button.confirm {
+    background: #dc3545;
+    color: white;
+}
+
+.ban-modal-button.confirm:hover {
+    background: #c82333;
+}
+
+.ban-modal-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive düzenlemeler */
+@media screen and (max-width: 768px) {
+    .modal-comments-container .comments-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comments-modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-comments-container {
+        padding: 16px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .users-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .movies-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Modal içerikleri için responsive düzenlemeler */
+.comments-modal-content,
+.users-modal-content,
+.movies-modal-content {
+    width: 95%;
+    margin: 1rem;
+    max-height: 95vh;
+}
+
+@media (min-width: 768px) {
+    .comments-modal-content,
+    .users-modal-content,
+    .movies-modal-content {
+        width: 90%;
+        margin: 2rem;
+        max-height: 90vh;
+    }
+}
+
+/* Modal grid yapıları için responsive düzenlemeler */
+.comments-grid,
+.users-grid,
+.movies-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .comments-grid,
+    .users-grid,
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Ban/Unban butonları için responsive düzenlemeler */
+.ban-button, 
+.unban-button {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    min-width: 60px;
+}
+
+@media (min-width: 768px) {
+    .ban-button, 
+    .unban-button {
+        padding: 6px 16px;
+        font-size: 0.85rem;
+        min-width: 80px;
+    }
+}
+
+.delete-comment-button {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+}
+
+.delete-comment-button:hover {
+    color: #ff7875;
+    transform: scale(1.1);
+} 
