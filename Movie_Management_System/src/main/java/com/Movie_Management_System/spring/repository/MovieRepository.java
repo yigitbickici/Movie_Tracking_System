@@ -26,6 +26,11 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     long countByGenre(String genre);
 
+
+    @Query("SELECT COUNT(m) FROM Movie m")
+    long countTotalMovies();
+
     @Query(value = "SELECT * FROM movies WHERE tmdb_id = :tmdbId ORDER BY id ASC LIMIT 1", nativeQuery = true)
     Optional<Movie> findByTmdbId(@Param("tmdbId") Long tmdbId);
+
 }
