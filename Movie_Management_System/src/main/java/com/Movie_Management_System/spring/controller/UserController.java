@@ -243,30 +243,39 @@ public class UserController {
 
             try {
                 response.put("favorites", user.getFavoriteMovies().stream()
-                    .map(movie -> Map.of(
-                        "id", movie.getId(),
-                        "tmdbId", movie.getTmdbId(),
-                        "title", movie.getTitle(),
-                        "posterPath", movie.getPosterPath()
-                    ))
+                    .map(movie -> {
+                        Map<String, Object> movieMap = new HashMap<>();
+                        movieMap.put("id", movie.getId());
+                        movieMap.put("tmdbId", movie.getTmdbId());
+                        movieMap.put("title", movie.getTitle());
+                        movieMap.put("posterPath", movie.getPosterPath());
+                        movieMap.put("releaseDate", movie.getReleaseDate() != null ? movie.getReleaseDate() : "");
+                        return movieMap;
+                    })
                     .collect(Collectors.toList()));
                     
                 response.put("watched", user.getWatchedMovies().stream()
-                    .map(movie -> Map.of(
-                        "id", movie.getId(),
-                        "tmdbId", movie.getTmdbId(),
-                        "title", movie.getTitle(),
-                        "posterPath", movie.getPosterPath()
-                    ))
+                    .map(movie -> {
+                        Map<String, Object> movieMap = new HashMap<>();
+                        movieMap.put("id", movie.getId());
+                        movieMap.put("tmdbId", movie.getTmdbId());
+                        movieMap.put("title", movie.getTitle());
+                        movieMap.put("posterPath", movie.getPosterPath());
+                        movieMap.put("releaseDate", movie.getReleaseDate() != null ? movie.getReleaseDate() : "");
+                        return movieMap;
+                    })
                     .collect(Collectors.toList()));
                     
                 response.put("watchlist", user.getWatchlist().stream()
-                    .map(movie -> Map.of(
-                        "id", movie.getId(),
-                        "tmdbId", movie.getTmdbId(),
-                        "title", movie.getTitle(),
-                        "posterPath", movie.getPosterPath()
-                    ))
+                    .map(movie -> {
+                        Map<String, Object> movieMap = new HashMap<>();
+                        movieMap.put("id", movie.getId());
+                        movieMap.put("tmdbId", movie.getTmdbId());
+                        movieMap.put("title", movie.getTitle());
+                        movieMap.put("posterPath", movie.getPosterPath());
+                        movieMap.put("releaseDate", movie.getReleaseDate() != null ? movie.getReleaseDate() : "");
+                        return movieMap;
+                    })
                     .collect(Collectors.toList()));
             } catch (Exception e) {
                 logger.error("Error mapping movie lists for user {}: {}", username, e.getMessage());

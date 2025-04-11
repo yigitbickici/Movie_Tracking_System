@@ -413,6 +413,10 @@ const MovieSocialPage = () => {
         });
     };
 
+    const handleUserClick = (username) => {
+        navigate(`/UserProfile/${username}`);
+    };
+
     if (loading) {
         return (
             <div className="social-page-overlay">
@@ -516,10 +520,18 @@ const MovieSocialPage = () => {
                                 <img 
                                     src={post.user.avatar || `https://ui-avatars.com/api/?name=${post.user.username}&background=random`} 
                                     alt={post.user.username} 
-                                    className="user-avatar" 
+                                    className="user-avatar"
+                                    onClick={() => handleUserClick(post.user.username)}
+                                    style={{ cursor: 'pointer' }}
                                 />
                                 <div className="post-info">
-                                    <span className="username">{post.user.username}</span>
+                                    <span 
+                                        className="username"
+                                        onClick={() => handleUserClick(post.user.username)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {post.user.username}
+                                    </span>
                                     <button 
                                         className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
                                         onClick={() => handleFollow(post.id, post.user.id)}
@@ -582,10 +594,18 @@ const MovieSocialPage = () => {
                                         <img 
                                             src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}&background=random`} 
                                             alt={comment.user.username} 
-                                            className="user-avatar-small" 
+                                            className="user-avatar-small"
+                                            onClick={() => handleUserClick(comment.user.username)}
+                                            style={{ cursor: 'pointer' }}
                                         />
                                         <div className="comment-content">
-                                            <span className="username">{comment.user.username}</span>
+                                            <span 
+                                                className="username"
+                                                onClick={() => handleUserClick(comment.user.username)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                {comment.user.username}
+                                            </span>
                                             {comment.isSpoiler ? (
                                                 // Yorum spoiler onaylandı
                                                 <>

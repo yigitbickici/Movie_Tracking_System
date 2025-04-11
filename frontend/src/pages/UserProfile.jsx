@@ -99,18 +99,54 @@ const UserProfile = () => {
         .catch(error => console.error("Error fetching movie details:", error));
     };
 
-    const MoviePreview = ({ movie }) => (
-        <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
-            <img
-                src={`https://image.tmdb.org/t/p/w200${movie.posterPath || movie.poster_path}`} // Use posterPath from backend or poster_path if available
-                alt={movie.title}
-            />
-            <div className="movie-preview-info">
-                <h4>{movie.title}</h4>
-                <p>{(movie.releaseDate || movie.release_date)?.split('-')[0]}</p> // Use releaseDate or release_date
+    const extractYearFromDate = (dateStr) => {
+        if (!dateStr) return 'N/A';
+        if (typeof dateStr !== 'string') return 'N/A';
+        if (dateStr.length >= 4) return dateStr.substring(0, 4);
+        return 'N/A';
+    };
+
+    const MoviePreview = ({ movie }) => {
+        const [releaseYear, setReleaseYear] = useState('N/A');
+        
+        useEffect(() => {
+            // Check if we already have release date
+            if (movie.releaseDate || movie.release_date) {
+                const year = extractYearFromDate(movie.releaseDate || movie.release_date);
+                setReleaseYear(year);
+                return;
+            }
+            
+            // If not, fetch from TMDB API
+            if (movie.tmdbId) {
+                fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.release_date) {
+                            const year = extractYearFromDate(data.release_date);
+                            setReleaseYear(year);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching movie details:', error));
+            }
+        }, [movie.tmdbId, movie.releaseDate, movie.release_date]);
+
+        return (
+            <div className="movie-preview" onClick={() => handleMovieClick(movie)}>
+                <img
+                    src={`https://image.tmdb.org/t/p/w200${movie.posterPath || movie.poster_path}`}
+                    alt={movie.title}
+                />
+                <div className="movie-preview-info">
+                    <h4>{movie.title}</h4>
+                    <div className="movie-year-rating">
+                        <p>{releaseYear}</p>
+                        <span className="movie-star"><FaStar style={{ color: '#FFD700' }} /></span>
+                    </div>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const CommentCard = ({ comment }) => (
         <div className="comment-card" onClick={() => handleMovieClick({ id: comment.movieId })}>
@@ -135,7 +171,13 @@ const UserProfile = () => {
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
-        const visibleMovies = movies.slice(0, 5);
+        
+        // İzlenen filmleri watchlist'ten filtrele
+        const filteredMovies = title === "Watchlist" 
+            ? movies.filter(movie => !userProfile.watched.some(w => w.tmdbId === movie.tmdbId))
+            : movies;
+            
+        const visibleMovies = filteredMovies.slice(0, 5);
 
         return (
             <div className="movies-section">
@@ -144,7 +186,7 @@ const UserProfile = () => {
                         <Icon className="section-icon" />
                         {title}
                     </h2>
-                    {movies.length > 5 && (
+                    {filteredMovies.length > 5 && (
                         <button 
                             className="see-all-button" 
                             onClick={() => setIsModalOpen(true)}
@@ -176,7 +218,7 @@ const UserProfile = () => {
                                 </button>
                             </div>
                             <div className="modal-movies-grid">
-                                {movies.map(movie => (
+                                {filteredMovies.map(movie => (
                                     <MoviePreview key={movie.id} movie={movie} />
                                 ))}
                             </div>

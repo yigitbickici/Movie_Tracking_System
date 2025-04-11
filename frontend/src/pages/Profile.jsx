@@ -471,37 +471,46 @@ const Profile = () => {
         </div>
     );
 
-    const UserCard = ({ user, type, onFollow, onUnfollow }) => (
-        <div 
-            className="user-card"
-            onClick={() => navigate(`/user/${user.username}`)}
-        >
-            <div className="user-avatar">
-                {user.avatar ? (
-                    <img 
-                        src={getAvatarUrl(user.avatar)} 
-                        alt={user.username}
-                        className="user-avatar-image"
-                    />
-                ) : (
-                    <span>{user.username.substring(0, 2).toUpperCase()}</span>
+    const UserCard = ({ user, type, onFollow, onUnfollow }) => {
+        // Kullanıcının takip edilip edilmediğini kontrol et
+        const isAlreadyFollowing = type === 'following' || user.isFollowing || 
+            (userProfile && userProfile.following && 
+             userProfile.following.some(followedUser => followedUser.id === user.id));
+
+        return (
+            <div 
+                className="user-card"
+                onClick={() => navigate(`/user/${user.username}`)}
+            >
+                <div className="user-avatar">
+                    {user.avatar ? (
+                        <img 
+                            src={getAvatarUrl(user.avatar)} 
+                            alt={user.username}
+                            className="user-avatar-image"
+                        />
+                    ) : (
+                        <span>{user.username.substring(0, 2).toUpperCase()}</span>
+                    )}
+                </div>
+                <div className="user-info">
+                    <h4>{user.username}</h4>
+                    <p>{user.movieCount} films</p>
+                </div>
+                {(type === 'following' || (!isAlreadyFollowing && type === 'followers')) && (
+                    <button 
+                        className={`follow-button ${isAlreadyFollowing ? 'following' : ''}`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            isAlreadyFollowing ? onUnfollow(user.id) : onFollow(user.id);
+                        }}
+                    >
+                        {isAlreadyFollowing ? 'Following' : 'Follow'}
+                    </button>
                 )}
             </div>
-            <div className="user-info">
-                <h4>{user.username}</h4>
-                <p>{user.movieCount} films</p>
-            </div>
-            <button 
-                className={`follow-button ${type === 'following' || user.isFollowing ? 'following' : ''}`}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    type === 'following' ? onUnfollow(user.id) : onFollow(user.id);
-                }}
-            >
-                {type === 'following' || user.isFollowing ? 'Following' : 'Follow'}
-            </button>
-        </div>
-    );
+        );
+    };
 
     const ConnectionModal = ({ title, users, isOpen, onClose, icon: Icon, type, onFollow, onUnfollow }) => {
         const [isActive, setIsActive] = useState(false);
