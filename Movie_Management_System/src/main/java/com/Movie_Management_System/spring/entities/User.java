@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "users",
@@ -94,6 +95,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "password", "email", "roles"})
     private List<User> followers = new ArrayList<>();
 
     @ManyToMany
@@ -102,6 +104,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "password", "email", "roles"})
     private List<User> following = new ArrayList<>();
 
     @Column(nullable = true)

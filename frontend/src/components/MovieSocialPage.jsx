@@ -150,48 +150,54 @@ const MovieSocialPage = () => {
             const response = await axios.post('/api/posts/create', {
                 movieId: parseInt(cleanMovieId),
                 content: newPost
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
 
-            const newPostData = response.data;
-            console.log('New post data from API:', newPostData);
+            if (response.status === 200) {
+                const newPostData = response.data;
+                console.log('New post data from API:', newPostData);
 
-            setPosts([{
-                ...newPostData,
-                isSpoiler: newPostData.isSpoiler,
-                spoilerPending: newPostData.spoilerPending,
-                spoilerReviewed: newPostData.spoilerReviewed,
-                likeNum: 0,
-                commentNum: 0,
-                comments: [],
-                isLiked: false,
-                user: {
-                    ...newPostData.user,
-                    name: newPostData.user.username,
-                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
-                }
-            }, ...posts]);
-
-            setNewPost('');
-            setSelectedMedia(null);
-            setMediaPreview(null);
-            setModalMessage('Post başarıyla paylaşıldı');
-            setShowModal(true);
-            setTimeout(() => setShowModal(false), 2000);
-
+                setPosts([{
+                    ...newPostData,
+                    isSpoiler: newPostData.isSpoiler,
+                    spoilerPending: newPostData.spoilerPending,
+                    spoilerReviewed: newPostData.spoilerReviewed,
+                    likeNum: 0,
+                    commentNum: 0,
+                    comments: [],
+                    isLiked: false,
+                    user: {
+                        ...newPostData.user,
+                        name: newPostData.user.username,
+                        avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
+                    }
+                }, ...posts]);
+                
+                setNewPost('');
+                setSelectedMedia(null);
+                setMediaPreview(null);
+            }
         } catch (error) {
-            console.error('Post oluşturma hatası:', error);
-            if (error.response?.status === 401) {
-                localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
-                setShowModal(true);
-                setTimeout(() => {
-                    setShowModal(false);
-                    navigate('/login');
-                }, 2000);
+            console.error('Error creating post:', error);
+            if (error.response) {
+                if (error.response.status === 401) {
+                    setModalMessage('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+                    setShowModal(true);
+                    setTimeout(() => {
+                        setShowModal(false);
+                        navigate('/login');
+                    }, 2000);
+                } else {
+                    setModalMessage('Gönderi oluşturulurken bir hata oluştu: ' + error.response.data);
+                    setShowModal(true);
+                }
             } else {
-                setModalMessage('Post paylaşılırken bir hata oluştu. Lütfen tekrar deneyin.');
+                setModalMessage('Gönderi oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
                 setShowModal(true);
-                setTimeout(() => setShowModal(false), 2000);
             }
         }
     };
