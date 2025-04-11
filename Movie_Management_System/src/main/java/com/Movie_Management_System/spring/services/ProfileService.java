@@ -60,7 +60,7 @@ public class ProfileService {
     private ProfileResponse createProfileResponse(User user) {
         ProfileResponse response = new ProfileResponse();
         response.setUsername(user.getUsername());
-        response.setAvatar(user.getUsername().substring(0, Math.min(2, user.getUsername().length())).toUpperCase());
+        response.setAvatar(user.getAvatar());
 
         // Stats - boş değerlerle başlat
         ProfileResponse.ProfileStats stats = new ProfileResponse.ProfileStats();

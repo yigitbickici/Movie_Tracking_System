@@ -36,7 +36,7 @@ const Profile = () => {
     });
 
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         fetchUserProfile();
         fetchMovieTimeStats();
@@ -211,6 +211,12 @@ const Profile = () => {
         } catch (error) {
             console.error("Favori durumu güncellenirken hata oluştu:", error);
         }
+    };
+
+    const getAvatarUrl = (avatarPath) => {
+        if (!avatarPath) return '';
+        if (avatarPath.startsWith('http')) return avatarPath;
+        return `http://localhost:8080${avatarPath}`;
     };
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
@@ -465,29 +471,46 @@ const Profile = () => {
         </div>
     );
 
-    const UserCard = ({ user, type, onFollow, onUnfollow }) => (
-        <div 
-            className="user-card"
-            onClick={() => navigate(`/user/${user.username}`)}
-        >
-            <div className="user-avatar">
-                {user.avatar || user.username.substring(0, 2).toUpperCase()}
-            </div>
-            <div className="user-info">
-                <h4>{user.username}</h4>
-                <p>{user.movieCount} films</p>
-            </div>
-            <button 
-                className={`follow-button ${type === 'following' || user.isFollowing ? 'following' : ''}`}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    type === 'following' ? onUnfollow(user.id) : onFollow(user.id);
-                }}
+    const UserCard = ({ user, type, onFollow, onUnfollow }) => {
+        // Kullanıcının takip edilip edilmediğini kontrol et
+        const isAlreadyFollowing = type === 'following' || user.isFollowing || 
+            (userProfile && userProfile.following && 
+             userProfile.following.some(followedUser => followedUser.id === user.id));
+
+        return (
+            <div 
+                className="user-card"
+                onClick={() => navigate(`/user/${user.username}`)}
             >
-                {type === 'following' || user.isFollowing ? 'Following' : 'Follow'}
-            </button>
-        </div>
-    );
+                <div className="user-avatar">
+                    {user.avatar ? (
+                        <img 
+                            src={getAvatarUrl(user.avatar)} 
+                            alt={user.username}
+                            className="user-avatar-image"
+                        />
+                    ) : (
+                        <span>{user.username.substring(0, 2).toUpperCase()}</span>
+                    )}
+                </div>
+                <div className="user-info">
+                    <h4>{user.username}</h4>
+                    <p>{user.movieCount} films</p>
+                </div>
+                {(type === 'following' || (!isAlreadyFollowing && type === 'followers')) && (
+                    <button 
+                        className={`follow-button ${isAlreadyFollowing ? 'following' : ''}`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            isAlreadyFollowing ? onUnfollow(user.id) : onFollow(user.id);
+                        }}
+                    >
+                        {isAlreadyFollowing ? 'Following' : 'Follow'}
+                    </button>
+                )}
+            </div>
+        );
+    };
 
     const ConnectionModal = ({ title, users, isOpen, onClose, icon: Icon, type, onFollow, onUnfollow }) => {
         const [isActive, setIsActive] = useState(false);
@@ -548,8 +571,16 @@ const Profile = () => {
     return (
         <div className="profile-container">
             <div className="profile-header">
-                    <div className="profile-avatar">
-                    <span>{userProfile.avatar}</span>
+                <div className="profile-avatar">
+                    {userProfile.avatar ? (
+                        <img 
+                            src={getAvatarUrl(userProfile.avatar)} 
+                            alt={userProfile.username}
+                            className="profile-avatar-image"
+                        />
+                    ) : (
+                        <span>{userProfile.username.substring(0, 2).toUpperCase()}</span>
+                    )}
                 </div>
                 <h1 className="profile-username">{userProfile.username}</h1>
                 {!username && (
@@ -576,26 +607,26 @@ const Profile = () => {
             <div className="profile-content">
                 <div className="stats-section">
                     <h2>Stats</h2>
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <h4>Movie time</h4>
-                        <div className="time-stats">
-                            <div className="time-stat">
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <h4>Movie time</h4>
+                            <div className="time-stats">
+                                <div className="time-stat">
                                     <span>{movieTimeStats.months}</span>
-                                <label>MONTHS</label>
-                            </div>
-                            <div className="time-stat">
+                                    <label>MONTHS</label>
+                                </div>
+                                <div className="time-stat">
                                     <span>{movieTimeStats.days}</span>
-                                <label>DAYS</label>
-                            </div>
-                            <div className="time-stat">
+                                    <label>DAYS</label>
+                                </div>
+                                <div className="time-stat">
                                     <span>{movieTimeStats.hours}</span>
-                                <label>HOURS</label>
+                                    <label>HOURS</label>
                                 </div>
                             </div>
                         </div>
-                    <div className="stat-card">
-                        <h4>Movies watched</h4>
+                        <div className="stat-card">
+                            <h4>Movies watched</h4>
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                     </div>
@@ -644,7 +675,7 @@ const Profile = () => {
                                     onClick={() => setFollowingModal(true)}
                                 >
                                     See all <FaChevronRight />
-                    </button>
+                                </button>
                             </div>
                         </div>
                         <div className="user-list">
@@ -714,7 +745,7 @@ const Profile = () => {
                             >
                                 {showAllComments ? 'Show Less' : 'See All'} 
                                 <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
-                    </button>
+                            </button>
                         )}
                     </div>
                     

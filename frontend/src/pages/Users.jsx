@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Users.css';
 import { FaUsers, FaChevronRight, FaSearch } from 'react-icons/fa';
+import axios from '../services/axiosConfig';
 
 const Users = () => {
     const navigate = useNavigate();
@@ -9,64 +10,40 @@ const Users = () => {
 
     useEffect(() => {
         const userType = localStorage.getItem('userType');
-        if (userType !== 'editor' && userType !== 'admin') {
+        if (userType !== 'editor') {
             navigate('/login');
             alert('Bu sayfaya erişim yetkiniz bulunmamaktadır!');
         }
     }, [navigate]);
 
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            username: "Emircan Çapkan",
-            movieCount: 150,
-            commentCount: 45,
-            joinDate: "2024-01-15",
-            isBanned: false,
-            banReason: null
-        },
-        {
-            id: 2,
-            username: "Yiğit Bıçkıcı",
-            movieCount: 89,
-            commentCount: 23,
-            joinDate: "2024-02-20",
-            isBanned: false,
-            banReason: null
-        },
-        {
-            id: 3,
-            username: "Elif Gülüm",
-            movieCount: 234,
-            commentCount: 78,
-            joinDate: "2023-12-10",
-            isBanned: false,
-            banReason: null
-        },
-        {
-            id: 4,
-            username: "Muhammed Emir Gündoğdu",
-            movieCount: 234,
-            commentCount: 25,
-            joinDate: "2025-03-08",
-            isBanned: false,
-            banReason: null
-        }
-    ]);
+    const [users, setUsers] = useState([]);
 
-    // Filtrelenmiş kullanıcılar
+    const fetchUsers = () => {
+        axios.get('/api/editor/all-users')
+            .then(res => {
+                const updatedUsers = res.data.map(user => ({
+                    ...user,
+                    isBanned: user.banReason !== null
+                }));
+                setUsers(updatedUsers);
+            })
+            .catch(err => console.error("Kullanıcılar alınırken hata oluştu:", err));
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Ban modalı için state
     const [banModal, setBanModal] = useState({
         isOpen: false,
         userId: null,
         isBanned: false
     });
 
-    // Ban sebepleri
     const banReasons = [
         "Unsuitable content sharing",
         "Spam/Advertising",
@@ -75,30 +52,27 @@ const Users = () => {
         "Other"
     ];
 
-    // Ban işlemi için fonksiyon
-    const handleBanUser = (userId, reason) => {
-        setUsers(prevUsers =>
-            prevUsers.map(user =>
-                user.id === userId
-                    ? { ...user, isBanned: true, banReason: reason }
-                    : user
-            )
-        );
-        setBanModal({ isOpen: false, userId: null, isBanned: false });
+    const handleBanUser = async (userId, reason) => {
+        try {
+            await axios.post(`/api/editor/ban/${userId}`, { reason });
+            fetchUsers();
+            setBanModal({ isOpen: false, userId: null, isBanned: false });
+        } catch (error) {
+            console.error("Ban işlemi başarısız:", error);
+            alert("Ban işlemi sırasında bir hata oluştu.");
+        }
     };
 
-    // Unban işlemi için fonksiyon
-    const handleUnbanUser = (userId) => {
-        setUsers(prevUsers =>
-            prevUsers.map(user =>
-                user.id === userId
-                    ? { ...user, isBanned: false, banReason: null }
-                    : user
-            )
-        );
+    const handleUnbanUser = async (userId) => {
+        try {
+            await axios.put(`/api/editor/unban/${userId}`);
+            fetchUsers();
+        } catch (error) {
+            console.error("Unban işlemi başarısız:", error);
+            alert("Unban işlemi sırasında bir hata oluştu.");
+        }
     };
 
-    // İsim kısaltması oluşturan fonksiyon
     const getInitials = (name) => {
         return name
             .split(' ')
@@ -108,7 +82,6 @@ const Users = () => {
             .slice(0, 2);
     };
 
-    // User Card komponenti
     const UserCard = ({ user }) => (
         <div className="user-card">
             <div className="user-info-section" onClick={() => navigate(`/UserProfile/${user.username}`)}>
@@ -134,7 +107,7 @@ const Users = () => {
             </div>
             <div className="user-actions">
                 {user.isBanned ? (
-                    <button 
+                    <button
                         className="unban-button"
                         onClick={(e) => {
                             e.stopPropagation();
@@ -144,7 +117,7 @@ const Users = () => {
                         Unban
                     </button>
                 ) : (
-                    <button 
+                    <button
                         className="ban-button"
                         onClick={(e) => {
                             e.stopPropagation();
@@ -158,7 +131,6 @@ const Users = () => {
         </div>
     );
 
-    // Ban Modal komponenti
     const BanModal = () => {
         const [selectedReason, setSelectedReason] = useState('');
         const [customReason, setCustomReason] = useState('');
@@ -168,7 +140,7 @@ const Users = () => {
                 <div className="ban-modal-content">
                     <h3>Ban User</h3>
                     <div className="ban-form">
-                        <select 
+                        <select
                             value={selectedReason}
                             onChange={(e) => setSelectedReason(e.target.value)}
                             className="ban-reason-select"
@@ -178,7 +150,6 @@ const Users = () => {
                                 <option key={index} value={reason}>{reason}</option>
                             ))}
                         </select>
-                        
                         {selectedReason === "Other" && (
                             <textarea
                                 value={customReason}
@@ -189,15 +160,15 @@ const Users = () => {
                         )}
                     </div>
                     <div className="ban-modal-buttons">
-                        <button 
+                        <button
                             className="ban-modal-button cancel"
                             onClick={() => setBanModal({ isOpen: false, userId: null })}
                         >
                             Cancel
                         </button>
-                        <button 
+                        <button
                             className="ban-modal-button confirm"
-                            onClick={() => handleBanUser(banModal.userId, 
+                            onClick={() => handleBanUser(banModal.userId,
                                 selectedReason === "Other" ? customReason : selectedReason)}
                             disabled={!selectedReason}
                         >
@@ -229,7 +200,6 @@ const Users = () => {
                     </div>
                 </div>
             </div>
-            
             <div className="users-grid">
                 {filteredUsers.length > 0 ? (
                     filteredUsers.map(user => (
@@ -241,10 +211,9 @@ const Users = () => {
                     </div>
                 )}
             </div>
-
             <BanModal />
         </div>
     );
 };
 
-export default Users; 
+export default Users;

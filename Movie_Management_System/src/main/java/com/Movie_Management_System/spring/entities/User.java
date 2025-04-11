@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "users",
@@ -94,6 +95,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "password", "email", "roles"})
     private List<User> followers = new ArrayList<>();
 
     @ManyToMany
@@ -102,7 +104,18 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "password", "email", "roles"})
     private List<User> following = new ArrayList<>();
+
+    @Column(nullable = true)
+    private String fullName;
+
+    @Column(nullable = true)
+    private String avatar;
+
+    @Column(nullable = true, length = 1000)
+    private String bio;
+
 
     public User() {
     }
@@ -242,6 +255,31 @@ public class User {
         this.following = following;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+
     // Helper methods
     public void addToWatchedMovies(Movie movie) {
         if (watchedMovies == null) {
@@ -290,5 +328,22 @@ public class User {
     public void unfollowUser(User user) {
         following.remove(user);
         user.getFollowers().remove(this);
+    }
+
+    // Helper methods for counts
+    public int getFollowingCount() {
+        return following != null ? following.size() : 0;
+    }
+
+    public int getFollowersCount() {
+        return followers != null ? followers.size() : 0;
+    }
+
+    public int getCommentsCount() {
+        return comments != null ? comments.size() : 0;
+    }
+
+    public int getMoviesWatchedCount() {
+        return watchedMovies != null ? watchedMovies.size() : 0;
     }
 }

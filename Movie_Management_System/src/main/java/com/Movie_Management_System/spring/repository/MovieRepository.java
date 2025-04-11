@@ -3,6 +3,7 @@ package com.Movie_Management_System.spring.repository;
 import com.Movie_Management_System.spring.entities.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,8 +26,11 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     long countByGenre(String genre);
 
-    Optional<Movie> findByTmdbId(Long tmdbId);
 
     @Query("SELECT COUNT(m) FROM Movie m")
     long countTotalMovies();
+
+    @Query(value = "SELECT * FROM movies WHERE tmdb_id = :tmdbId ORDER BY id ASC LIMIT 1", nativeQuery = true)
+    Optional<Movie> findByTmdbId(@Param("tmdbId") Long tmdbId);
+
 }

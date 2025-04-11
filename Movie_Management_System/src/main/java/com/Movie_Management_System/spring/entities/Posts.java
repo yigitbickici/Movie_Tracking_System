@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name ="posts")
@@ -17,7 +18,7 @@ public class Posts {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"posts", "comments", "password", "email", "roles"})
+    @JsonIgnoreProperties({"followers", "following", "posts", "comments", "password", "email", "roles"})
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -26,6 +27,7 @@ public class Posts {
     private Movie movie;
 
     @Column(nullable = false, length = 2000)
+    @JsonProperty("content")
     private String content;
 
     @Column

@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MovieService {
@@ -55,8 +56,18 @@ public class MovieService {
         return movieRepository.findByTmdbId(tmdbId);
     }
 
-    public Movie saveMovie(Movie movie) {
-        logger.info("Saving movie: {}", movie.getId());
+    @Transactional
+    public synchronized Movie saveMovie(Movie movie) {
+        logger.info("Saving movie with TMDB ID: {}", movie.getTmdbId());
+        
+        // Check if movie already exists
+        Optional<Movie> existingMovie = movieRepository.findByTmdbId(movie.getTmdbId());
+        if (existingMovie.isPresent()) {
+            logger.info("Movie with TMDB ID {} already exists, returning existing movie", movie.getTmdbId());
+            return existingMovie.get();
+        }
+        
+        logger.info("Saving new movie: {}", movie.getTitle());
         return movieRepository.save(movie);
     }
 
@@ -115,13 +126,6 @@ public class MovieService {
         if (!isAlreadyWatched) {
             logger.info("Movie not in watched list, adding now");
             user.addToWatchedMovies(movie);
-            
-            // Remove from watchlist if present
-            if (user.getWatchlist().contains(movie)) {
-                logger.info("Removing movie from watchlist as it's now watched");
-                user.removeFromWatchlist(movie);
-            }
-            
             userRepository.save(user);
             logger.info("Successfully added movie to watched list");
         } else {

@@ -196,6 +196,18 @@
     opacity: 0.8;
 }
 
+.movie-year-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.movie-star {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;

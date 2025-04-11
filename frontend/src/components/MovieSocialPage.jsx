@@ -17,10 +17,21 @@ const MovieSocialPage = () => {
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
     const [revealedSpoilers, setRevealedSpoilers] = useState(new Set());
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         setLoading(true);
         const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+        
+        if (userId) {
+            setCurrentUserId(userId);
+            console.log('Current User ID set to:', userId);
+        } else {
+            console.log('No user ID found in localStorage');
+        }
+
         if (!token) {
             setModalMessage('Lütfen önce giriş yapın');
             setShowModal(true);
@@ -51,6 +62,7 @@ const MovieSocialPage = () => {
             // Process posts data with proper error handling
             const postsWithLikeStatus = postsArray.map(post => {
                 try {
+                    console.log('Processing post:', post);
                     return {
                         ...post,
                         user: {
@@ -150,48 +162,54 @@ const MovieSocialPage = () => {
             const response = await axios.post('/api/posts/create', {
                 movieId: parseInt(cleanMovieId),
                 content: newPost
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
 
-            const newPostData = response.data;
-            console.log('New post data from API:', newPostData);
+            if (response.status === 200) {
+                const newPostData = response.data;
+                console.log('New post data from API:', newPostData);
 
-            setPosts([{
-                ...newPostData,
-                isSpoiler: newPostData.isSpoiler,
-                spoilerPending: newPostData.spoilerPending,
-                spoilerReviewed: newPostData.spoilerReviewed,
-                likeNum: 0,
-                commentNum: 0,
-                comments: [],
-                isLiked: false,
-                user: {
-                    ...newPostData.user,
-                    name: newPostData.user.username,
-                    avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
-                }
-            }, ...posts]);
-
-            setNewPost('');
-            setSelectedMedia(null);
-            setMediaPreview(null);
-            setModalMessage('Post başarıyla paylaşıldı');
-            setShowModal(true);
-            setTimeout(() => setShowModal(false), 2000);
-
+                setPosts([{
+                    ...newPostData,
+                    isSpoiler: newPostData.isSpoiler,
+                    spoilerPending: newPostData.spoilerPending,
+                    spoilerReviewed: newPostData.spoilerReviewed,
+                    likeNum: 0,
+                    commentNum: 0,
+                    comments: [],
+                    isLiked: false,
+                    user: {
+                        ...newPostData.user,
+                        name: newPostData.user.username,
+                        avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
+                    }
+                }, ...posts]);
+                
+                setNewPost('');
+                setSelectedMedia(null);
+                setMediaPreview(null);
+            }
         } catch (error) {
-            console.error('Post oluşturma hatası:', error);
-            if (error.response?.status === 401) {
-                localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
-                setShowModal(true);
-                setTimeout(() => {
-                    setShowModal(false);
-                    navigate('/login');
-                }, 2000);
+            console.error('Error creating post:', error);
+            if (error.response) {
+                if (error.response.status === 401) {
+                    setModalMessage('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+                    setShowModal(true);
+                    setTimeout(() => {
+                        setShowModal(false);
+                        navigate('/login');
+                    }, 2000);
+                } else {
+                    setModalMessage('Gönderi oluşturulurken bir hata oluştu: ' + error.response.data);
+                    setShowModal(true);
+                }
             } else {
-                setModalMessage('Post paylaşılırken bir hata oluştu. Lütfen tekrar deneyin.');
+                setModalMessage('Gönderi oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
                 setShowModal(true);
-                setTimeout(() => setShowModal(false), 2000);
             }
         }
     };
@@ -407,6 +425,10 @@ const MovieSocialPage = () => {
         });
     };
 
+    const handleUserClick = (username) => {
+        navigate(`/UserProfile/${username}`);
+    };
+
     if (loading) {
         return (
             <div className="social-page-overlay">
@@ -510,16 +532,27 @@ const MovieSocialPage = () => {
                                 <img 
                                     src={post.user.avatar || `https://ui-avatars.com/api/?name=${post.user.username}&background=random`} 
                                     alt={post.user.username} 
-                                    className="user-avatar" 
+                                    className="user-avatar"
+                                    onClick={() => handleUserClick(post.user.username)}
+                                    style={{ cursor: 'pointer' }}
                                 />
                                 <div className="post-info">
-                                    <span className="username">{post.user.username}</span>
-                                    <button 
-                                        className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
-                                        onClick={() => handleFollow(post.id, post.user.id)}
+                                    <span 
+                                        className="username"
+                                        onClick={() => handleUserClick(post.user.username)}
+                                        style={{ cursor: 'pointer' }}
                                     >
-                                        {post.user.isFollowing ? '✓ Following' : '+ Follow'}
-                                    </button>
+                                        {post.user.username}
+                                    </span>
+                                    {console.log('Post User ID:', post.user.id, 'Current User ID:', currentUserId)}
+                                    {parseInt(post.user.id) !== parseInt(currentUserId) && (
+                                        <button 
+                                            className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
+                                            onClick={() => handleFollow(post.id, post.user.id)}
+                                        >
+                                            {post.user.isFollowing ? '✓ Following' : '+ Follow'}
+                                        </button>
+                                    )}
                                     <span className="timestamp">{new Date(post.createdAt).toLocaleString()}</span>
                                 </div>
                             </div>
@@ -576,10 +609,18 @@ const MovieSocialPage = () => {
                                         <img 
                                             src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}&background=random`} 
                                             alt={comment.user.username} 
-                                            className="user-avatar-small" 
+                                            className="user-avatar-small"
+                                            onClick={() => handleUserClick(comment.user.username)}
+                                            style={{ cursor: 'pointer' }}
                                         />
                                         <div className="comment-content">
-                                            <span className="username">{comment.user.username}</span>
+                                            <span 
+                                                className="username"
+                                                onClick={() => handleUserClick(comment.user.username)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                {comment.user.username}
+                                            </span>
                                             {comment.isSpoiler ? (
                                                 // Yorum spoiler onaylandı
                                                 <>

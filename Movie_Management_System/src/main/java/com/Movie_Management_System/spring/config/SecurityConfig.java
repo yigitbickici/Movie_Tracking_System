@@ -80,12 +80,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/avatars/**").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/posts/**").authenticated()
                 .requestMatchers("/api/discussions/**").authenticated()
                 .requestMatchers("/api/movies/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
                 .requestMatchers("/api/spoiler-requests/**").authenticated()
+                .requestMatchers("/api/users/**").authenticated()
                 .anyRequest().authenticated()
             );
 

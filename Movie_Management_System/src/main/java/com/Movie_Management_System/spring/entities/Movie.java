@@ -6,14 +6,17 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "movies")
+@Table(name = "movies",
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "tmdbId")
+       })
 public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long tmdbId;
 
     @Column(nullable = false)
