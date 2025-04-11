@@ -17,10 +17,21 @@ const MovieSocialPage = () => {
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [mediaPreview, setMediaPreview] = useState(null);
     const [revealedSpoilers, setRevealedSpoilers] = useState(new Set());
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         setLoading(true);
         const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+        
+        if (userId) {
+            setCurrentUserId(userId);
+            console.log('Current User ID set to:', userId);
+        } else {
+            console.log('No user ID found in localStorage');
+        }
+
         if (!token) {
             setModalMessage('Lütfen önce giriş yapın');
             setShowModal(true);
@@ -51,6 +62,7 @@ const MovieSocialPage = () => {
             // Process posts data with proper error handling
             const postsWithLikeStatus = postsArray.map(post => {
                 try {
+                    console.log('Processing post:', post);
                     return {
                         ...post,
                         user: {
@@ -532,12 +544,15 @@ const MovieSocialPage = () => {
                                     >
                                         {post.user.username}
                                     </span>
-                                    <button 
-                                        className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
-                                        onClick={() => handleFollow(post.id, post.user.id)}
-                                    >
-                                        {post.user.isFollowing ? '✓ Following' : '+ Follow'}
-                                    </button>
+                                    {console.log('Post User ID:', post.user.id, 'Current User ID:', currentUserId)}
+                                    {parseInt(post.user.id) !== parseInt(currentUserId) && (
+                                        <button 
+                                            className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
+                                            onClick={() => handleFollow(post.id, post.user.id)}
+                                        >
+                                            {post.user.isFollowing ? '✓ Following' : '+ Follow'}
+                                        </button>
+                                    )}
                                     <span className="timestamp">{new Date(post.createdAt).toLocaleString()}</span>
                                 </div>
                             </div>
