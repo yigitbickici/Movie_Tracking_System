@@ -1,11 +1,16 @@
 package com.Movie_Management_System.spring.controller;
 
 import com.Movie_Management_System.spring.dto.UserAdminDTO;
+import com.Movie_Management_System.spring.entities.Role;
+import com.Movie_Management_System.spring.entities.User;
 import com.Movie_Management_System.spring.entities.UserBan;
+import com.Movie_Management_System.spring.repository.UserRepository;
 import com.Movie_Management_System.spring.services.AdminService;
+import com.Movie_Management_System.spring.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +23,10 @@ public class EditorController {
 
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/ban/{userId}")
     @PreAuthorize("hasRole('EDITOR')")
@@ -43,6 +52,14 @@ public class EditorController {
     @GetMapping("/all-users")
     @PreAuthorize("hasRole('EDITOR')")
     public ResponseEntity<List<UserAdminDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsersWithBanInfo());
+        List<UserAdminDTO> allUsers = adminService.getAllUsersWithBanInfo();
+
+        // Sadece rolü CUSTOMER olanları filtrele
+        List<UserAdminDTO> customerUsers = allUsers.stream()
+                .filter(user -> "CUSTOMER".equals(user.getRole()))
+                .toList();
+
+        return ResponseEntity.ok(customerUsers);
     }
+
 }
