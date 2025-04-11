@@ -40,8 +40,9 @@ public class UserService {
     }
     
     public User findByUsername(String username) {
+        logger.info("Finding user by username: {}", username);
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElse(null);
     }
 
     public User findByEmail(String email) {
@@ -72,5 +73,23 @@ public class UserService {
     public List<User> searchUsers(String query, String currentUsername) {
         logger.info("Searching users with query: {}", query);
         return userRepository.findByUsernameContainingIgnoreCaseAndRoleEqualsAndUsernameNot(query, Role.CUSTOMER, currentUsername);
+    }
+
+    public void followUser(User currentUser, User targetUser) {
+        logger.info("Following user: {} -> {}", currentUser.getUsername(), targetUser.getUsername());
+        if (!currentUser.getFollowing().contains(targetUser)) {
+            currentUser.followUser(targetUser);
+            userRepository.save(currentUser);
+            userRepository.save(targetUser);
+        }
+    }
+
+    public void unfollowUser(User currentUser, User targetUser) {
+        logger.info("Unfollowing user: {} -> {}", currentUser.getUsername(), targetUser.getUsername());
+        if (currentUser.getFollowing().contains(targetUser)) {
+            currentUser.unfollowUser(targetUser);
+            userRepository.save(currentUser);
+            userRepository.save(targetUser);
+        }
     }
 }

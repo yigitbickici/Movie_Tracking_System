@@ -184,6 +184,7 @@ public class UserController {
             User user = userService.findByUsername(username);
             
             if (user == null) {
+                logger.error("User not found: {}", username);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
 
@@ -194,60 +195,118 @@ public class UserController {
             response.put("avatar", user.getAvatar());
             response.put("bio", user.getBio());
 
-            // Calculate movie time stats
-            Map<String, Integer> movieTimeStats = movieService.calculateMovieTimeStats(user.getId());
+            try {
+                // Calculate movie time stats
+                Map<String, Integer> movieTimeStats = movieService.calculateMovieTimeStats(user.getId());
+                response.put("stats", Map.of(
+                    "following", user.getFollowingCount(),
+                    "followers", user.getFollowersCount(),
+                    "comments", user.getCommentsCount(),
+                    "moviesWatched", user.getMoviesWatchedCount(),
+                    "movieTime", movieTimeStats
+                ));
+            } catch (Exception e) {
+                logger.error("Error calculating movie stats for user {}: {}", username, e.getMessage());
+                response.put("stats", Map.of(
+                    "following", user.getFollowingCount(),
+                    "followers", user.getFollowersCount(),
+                    "comments", user.getCommentsCount(),
+                    "moviesWatched", user.getMoviesWatchedCount(),
+                    "movieTime", Map.of()
+                ));
+            }
+            
+            try {
+                // Map comments to DTOs including movie info
+                List<Map<String, Object>> commentsDTO = user.getComments().stream()
+                    .map(comment -> {
+                        Map<String, Object> commentMap = new HashMap<>();
+                        commentMap.put("id", comment.getId());
+                        commentMap.put("comment", comment.getContent());
+                        commentMap.put("rating", comment.getRating());
+                        commentMap.put("date", comment.getCreatedAt().toString());
+                        
+                        if (comment.getPost() != null && comment.getPost().getMovie() != null) {
+                            Movie movie = comment.getPost().getMovie();
+                            commentMap.put("movieId", movie.getTmdbId());
+                            commentMap.put("movieTitle", movie.getTitle());
+                            commentMap.put("moviePoster", movie.getPosterPath());
+                        }
+                        return commentMap;
+                    })
+                    .collect(Collectors.toList());
+                response.put("comments", commentsDTO);
+            } catch (Exception e) {
+                logger.error("Error mapping comments for user {}: {}", username, e.getMessage());
+                response.put("comments", List.of());
+            }
 
-            response.put("stats", Map.of(
-                "following", user.getFollowingCount(),
-                "followers", user.getFollowersCount(),
-                "comments", user.getCommentsCount(),
-                "moviesWatched", user.getMoviesWatchedCount(),
-                "movieTime", movieTimeStats // Add movie time stats
-            ));
-            
-            // Map comments to DTOs including movie info
-            List<Map<String, Object>> commentsDTO = user.getComments().stream()
-                .map(comment -> {
-                    Map<String, Object> commentMap = new HashMap<>();
-                    commentMap.put("id", comment.getId());
-                    commentMap.put("comment", comment.getContent()); // Assuming comment text is in 'content'
-                    commentMap.put("rating", comment.getRating());
-                    commentMap.put("date", comment.getCreatedAt().toString()); // Format date as needed
+            try {
+                response.put("favorites", user.getFavoriteMovies().stream()
+                    .map(movie -> Map.of(
+                        "id", movie.getId(),
+                        "tmdbId", movie.getTmdbId(),
+                        "title", movie.getTitle(),
+                        "posterPath", movie.getPosterPath()
+                    ))
+                    .collect(Collectors.toList()));
                     
-                    // Get movie info from the comment's post
-                    if (comment.getPost() != null && comment.getPost().getMovie() != null) {
-                        Movie movie = comment.getPost().getMovie();
-                        commentMap.put("movieId", movie.getTmdbId()); // Use TMDB ID
-                        commentMap.put("movieTitle", movie.getTitle());
-                        commentMap.put("moviePoster", movie.getPosterPath());
-                    }
-                    return commentMap;
-                })
-                .collect(Collectors.toList());
-            
-            response.put("favorites", user.getFavoriteMovies());
-            response.put("watched", user.getWatchedMovies());
-            response.put("watchlist", user.getWatchlist());
-            response.put("comments", commentsDTO); // Use the mapped comments
-            response.put("followers", user.getFollowers().stream()
-                .map(follower -> Map.of(
-                    "id", follower.getId(),
-                    "username", follower.getUsername(),
-                    "avatar", follower.getAvatar()
-                ))
-                .collect(Collectors.toList()));
-            response.put("following", user.getFollowing().stream()
-                .map(following -> Map.of(
-                    "id", following.getId(),
-                    "username", following.getUsername(),
-                    "avatar", following.getAvatar()
-                ))
-                .collect(Collectors.toList()));
+                response.put("watched", user.getWatchedMovies().stream()
+                    .map(movie -> Map.of(
+                        "id", movie.getId(),
+                        "tmdbId", movie.getTmdbId(),
+                        "title", movie.getTitle(),
+                        "posterPath", movie.getPosterPath()
+                    ))
+                    .collect(Collectors.toList()));
+                    
+                response.put("watchlist", user.getWatchlist().stream()
+                    .map(movie -> Map.of(
+                        "id", movie.getId(),
+                        "tmdbId", movie.getTmdbId(),
+                        "title", movie.getTitle(),
+                        "posterPath", movie.getPosterPath()
+                    ))
+                    .collect(Collectors.toList()));
+            } catch (Exception e) {
+                logger.error("Error mapping movie lists for user {}: {}", username, e.getMessage());
+                response.put("favorites", List.of());
+                response.put("watched", List.of());
+                response.put("watchlist", List.of());
+            }
+
+            try {
+                // Simplified followers/following mapping to prevent recursion
+                response.put("followers", user.getFollowers().stream()
+                    .map(follower -> {
+                        Map<String, Object> followerMap = new HashMap<>();
+                        followerMap.put("id", follower.getId());
+                        followerMap.put("username", follower.getUsername());
+                        followerMap.put("avatar", follower.getAvatar());
+                        return followerMap;
+                    })
+                    .collect(Collectors.toList()));
+
+                response.put("following", user.getFollowing().stream()
+                    .map(following -> {
+                        Map<String, Object> followingMap = new HashMap<>();
+                        followingMap.put("id", following.getId());
+                        followingMap.put("username", following.getUsername());
+                        followingMap.put("avatar", following.getAvatar());
+                        return followingMap;
+                    })
+                    .collect(Collectors.toList()));
+            } catch (Exception e) {
+                logger.error("Error mapping followers/following for user {}: {}", username, e.getMessage());
+                response.put("followers", List.of());
+                response.put("following", List.of());
+            }
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error fetching profile data for {}: {}", username, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching profile data");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Error fetching profile data: " + e.getMessage()));
         }
     }
 
@@ -276,21 +335,35 @@ public class UserController {
             User currentUser = userService.findByUsername(currentUsername);
             User targetUser = userService.findByUsername(username);
             
+            if (currentUser == null) {
+                logger.error("Current user not found: {}", currentUsername);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Current user not found"));
+            }
+            
             if (targetUser == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+                logger.error("Target user not found: {}", username);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Target user not found"));
             }
 
             if (currentUser.getFollowing().contains(targetUser)) {
-                return ResponseEntity.badRequest().body("Already following this user");
+                logger.warn("User {} is already following {}", currentUsername, username);
+                return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Already following this user"));
             }
 
-            currentUser.followUser(targetUser);
-            userService.saveUser(currentUser);
-            userService.saveUser(targetUser);
-
-            return ResponseEntity.ok(new MessageResponse("Successfully followed user"));
+            userService.followUser(currentUser, targetUser);
+            logger.info("User {} successfully followed {}", currentUsername, username);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully followed user",
+                "isFollowing", true
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error following user");
+            logger.error("Error following user: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Error following user: " + e.getMessage()));
         }
     }
 
@@ -301,21 +374,35 @@ public class UserController {
             User currentUser = userService.findByUsername(currentUsername);
             User targetUser = userService.findByUsername(username);
             
+            if (currentUser == null) {
+                logger.error("Current user not found: {}", currentUsername);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Current user not found"));
+            }
+            
             if (targetUser == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+                logger.error("Target user not found: {}", username);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Target user not found"));
             }
 
             if (!currentUser.getFollowing().contains(targetUser)) {
-                return ResponseEntity.badRequest().body("Not following this user");
+                logger.warn("User {} is not following {}", currentUsername, username);
+                return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Not following this user"));
             }
 
-            currentUser.unfollowUser(targetUser);
-            userService.saveUser(currentUser);
-            userService.saveUser(targetUser);
-
-            return ResponseEntity.ok(new MessageResponse("Successfully unfollowed user"));
+            userService.unfollowUser(currentUser, targetUser);
+            logger.info("User {} successfully unfollowed {}", currentUsername, username);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Successfully unfollowed user",
+                "isFollowing", false
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error unfollowing user");
+            logger.error("Error unfollowing user: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Error unfollowing user: " + e.getMessage()));
         }
     }
 

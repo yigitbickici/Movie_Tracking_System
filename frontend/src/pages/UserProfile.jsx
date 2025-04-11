@@ -47,19 +47,20 @@ const UserProfile = () => {
             setIsFollowing(response.data.isFollowing);
         } catch (error) {
             console.error('Error checking follow status:', error);
+            setError('Failed to check follow status');
         }
     };
 
     const handleFollowToggle = async () => {
         try {
-            if (isFollowing) {
-                await axios.post(`/api/users/${username}/unfollow`);
-            } else {
-                await axios.post(`/api/users/${username}/follow`);
-            }
-            setIsFollowing(!isFollowing);
+            setError(null);
+            const response = await axios.post(`/api/users/${username}/${isFollowing ? 'unfollow' : 'follow'}`);
+            setIsFollowing(response.data.isFollowing);
+            await checkFollowStatus();
         } catch (error) {
             console.error('Error toggling follow:', error);
+            setError(error.response?.data?.message || 'An error occurred while updating follow status');
+            await checkFollowStatus();
         }
     };
 
@@ -331,6 +332,8 @@ const UserProfile = () => {
                     isInList={true}
                 />
             )}
+
+            {error && <div className="error-message">{error}</div>}
         </div>
     );
 };
