@@ -12,7 +12,7 @@ const Users = () => {
         const userType = localStorage.getItem('userType');
         if (userType !== 'editor') {
             navigate('/login');
-            alert('Bu sayfaya erişim yetkiniz bulunmamaktadır!');
+            alert('You do not have permission to access this page!');
         }
     }, [navigate]);
 
@@ -27,7 +27,7 @@ const Users = () => {
                 }));
                 setUsers(updatedUsers);
             })
-            .catch(err => console.error("Kullanıcılar alınırken hata oluştu:", err));
+            .catch(err => console.error("Error while retrieving users:", err));
     };
 
     useEffect(() => {
@@ -58,8 +58,8 @@ const Users = () => {
             fetchUsers();
             setBanModal({ isOpen: false, userId: null, isBanned: false });
         } catch (error) {
-            console.error("Ban işlemi başarısız:", error);
-            alert("Ban işlemi sırasında bir hata oluştu.");
+            console.error("Ban failed:", error);
+            alert("An error occurred during the ban process.");
         }
     };
 
@@ -68,8 +68,8 @@ const Users = () => {
             await axios.put(`/api/editor/unban/${userId}`);
             fetchUsers();
         } catch (error) {
-            console.error("Unban işlemi başarısız:", error);
-            alert("Unban işlemi sırasında bir hata oluştu.");
+            console.error("Unban failed:", error);
+            alert("An error occurred during the unban process.");
         }
     };
 

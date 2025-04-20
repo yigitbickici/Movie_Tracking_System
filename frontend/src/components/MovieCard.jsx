@@ -32,7 +32,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                             e.stopPropagation();
                             onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                         }}
-                        title={isWatched ? "İzlendi" : "İzlenmedi"}
+                        title={isWatched ? "Watched" : "Unwatched"}
                     >
                         ✓
                     </button>
@@ -61,7 +61,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                         e.stopPropagation();
                         onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                     }}
-                    title={isWatched ? "İzlendi" : "İzlenmedi"}
+                    title={isWatched ? "Watched" : "Unwatched"}
                 >
                     ✓
                 </button>

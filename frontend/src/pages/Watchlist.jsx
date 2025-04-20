@@ -27,7 +27,7 @@ const Watchlist = () => {
             setError(null);
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('Lütfen giriş yapın');
+                setError('Please login');
                 setLoading(false);
                 return;
             }
@@ -53,13 +53,13 @@ const Watchlist = () => {
                     console.log('Setting watched movies:', movies.length, 'items');
                     setWatchedMovies(movies);
                 } else {
-                    console.error('API yanıtı dizi değil:', movies);
+                    console.error('API response is not an array:', movies);
                     setWatchedMovies([]);
                 }
             }
         } catch (error) {
-            console.error('Filmler yüklenirken hata oluştu:', error);
-            setError('Filmler yüklenirken bir hata oluştu');
+            console.error('An error occurred while loading movies:', error);
+            setError('An error occurred while loading movies');
             if (activeTab === 'watchlist') {
                 setWatchlistMovies([]);
             } else {
@@ -74,7 +74,7 @@ const Watchlist = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('Lütfen giriş yapın');
+                setError('Please login');
                 return;
             }
 
@@ -90,8 +90,8 @@ const Watchlist = () => {
                 setWatchedMovies(prev => prev.filter(movie => movie.tmdbId !== movieId));
             }
         } catch (error) {
-            console.error('İzlenme durumu güncellenirken hata oluştu:', error);
-            setError('İzlenme durumu güncellenirken bir hata oluştu');
+            console.error('An error occurred while updating the viewing status:', error);
+            setError('An error occurred while updating the viewing status');
         }
     };
 
@@ -126,7 +126,7 @@ const Watchlist = () => {
     };
 
     if (loading) {
-        return <div className="loading">Yükleniyor...</div>;
+        return <div className="loading">Loading...</div>;
     }
 
     if (error) {
@@ -180,7 +180,7 @@ const Watchlist = () => {
                     ))
                 ) : (
                     <div className="no-movies">
-                        {activeTab === 'watchlist' ? 'İzleme listenizde henüz film bulunmuyor.' : 'Henüz izlenen film bulunmuyor.'}
+                        {activeTab === 'watchlist' ? 'There are no movies in your watchlist yet.' : 'There are no movies watched yet.'}
                     </div>
                 )}
             </div>

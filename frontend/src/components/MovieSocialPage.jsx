@@ -33,7 +33,7 @@ const MovieSocialPage = () => {
         }
 
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage('Please login first');
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -114,14 +114,14 @@ const MovieSocialPage = () => {
             console.error('Error fetching data:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş, lütfen tekrar giriş yapın');
+                setModalMessage('Your session has expired, please log in again.');
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
                 }, 2000);
             } else {
-                setModalMessage('Veri yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                setModalMessage('An error occurred while loading data. Please try again.');
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -147,7 +147,7 @@ const MovieSocialPage = () => {
 
         const token = localStorage.getItem('token');
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage('Please login first');
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -197,18 +197,18 @@ const MovieSocialPage = () => {
             console.error('Error creating post:', error);
             if (error.response) {
                 if (error.response.status === 401) {
-                    setModalMessage('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+                    setModalMessage('Your session has expired. Please log in again.');
                     setShowModal(true);
                     setTimeout(() => {
                         setShowModal(false);
                         navigate('/login');
                     }, 2000);
                 } else {
-                    setModalMessage('Gönderi oluşturulurken bir hata oluştu: ' + error.response.data);
+                    setModalMessage('An error occurred while creating the post: ' + error.response.data);
                     setShowModal(true);
                 }
             } else {
-                setModalMessage('Gönderi oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+                setModalMessage('An error occurred while creating the post. Please try again.');
                 setShowModal(true);
             }
         }

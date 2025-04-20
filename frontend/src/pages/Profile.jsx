@@ -189,7 +189,7 @@ const Profile = () => {
                 }));
             }
         } catch (error) {
-            console.error("İzlenme durumu güncellenirken hata oluştu:", error);
+            console.error("An error occurred while updating the viewing status:", error);
         }
     };
 
@@ -209,7 +209,7 @@ const Profile = () => {
                 }));
             }
         } catch (error) {
-            console.error("Favori durumu güncellenirken hata oluştu:", error);
+            console.error("An error occurred while updating the favorite status:", error);
         }
     };
 

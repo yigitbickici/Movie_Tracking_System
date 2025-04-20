@@ -17,8 +17,8 @@ const SpoilerRequests = () => {
             setRequests(response.data);
             setLoading(false);
         } catch (error) {
-            console.error('Spoiler istekleri yüklenirken hata:', error);
-            setError('Spoiler istekleri yüklenemedi');
+            console.error('Error loading spoiler requests:', error);
+            setError('Spoiler requests could not be loaded');
             setLoading(false);
         }
     };
@@ -32,7 +32,7 @@ const SpoilerRequests = () => {
                     : request
             ));
         } catch (error) {
-            console.error('Spoiler onaylanırken hata:', error);
+            console.error('Error while approving spoiler:', error);
         }
     };
 
@@ -45,20 +45,20 @@ const SpoilerRequests = () => {
                     : request
             ));
         } catch (error) {
-            console.error('Spoiler reddedilirken hata:', error);
+            console.error('Error while denying spoiler:', error);
         }
     };
 
-    if (loading) return <div>Yükleniyor...</div>;
+    if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
     return (
         <div className="spoiler-requests-container">
-            <h1>Spoiler Bildirimleri</h1>
+            <h1>Spoiler Notifications</h1>
             <div className="requests-list">
                 {requests.map((request, index) => {
                     console.log(`[${index}] Spoiler Request:`, request);
-                    console.log(`Post içeriği: ${request.post?.content}`);
+                    console.log(`Post content: ${request.post?.content}`);
                     console.log(`Poster path: ${request.post?.movie?.posterPath}`);
                     console.log(`Request Type: ${request.type}`);
     
@@ -83,7 +83,7 @@ const SpoilerRequests = () => {
                                             {request.type === 'POST' ? request.post?.content : request.comment?.content}
                                         </p>
                                         <p className="reported-by">
-                                            Bildiren: {request.requestedByUser?.username}
+                                            Reporter: {request.requestedByUser?.username}
                                         </p>
                                     </div>
                                     {request.status === 'PENDING' && (
@@ -92,19 +92,19 @@ const SpoilerRequests = () => {
                                                 className="approve-button"
                                                 onClick={() => handleApprove(request.id)}
                                             >
-                                                Spoiler Olarak İşaretle
+                                                Mark as Spoiler
                                             </button>
                                             <button 
                                                 className="reject-button"
                                                 onClick={() => handleReject(request.id)}
                                             >
-                                                Reddet
+                                                Decline
                                             </button>
                                         </div>
                                     )}
                                     {request.status !== 'PENDING' && (
                                         <div className="request-status">
-                                            Durum: {request.status === 'APPROVED' ? 'Onaylandı' : 'Reddedildi'}
+                                            Status: {request.status === 'APPROVED' ? 'Onaylandı' : 'Reddedildi'}
                                         </div>
                                     )}
                                 </div>

@@ -12,7 +12,7 @@ const Watchlist = () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
-                    setError('Lütfen giriş yapın');
+                    setError('Please login!');
                     setLoading(false);
                     return;
                 }
@@ -27,8 +27,8 @@ const Watchlist = () => {
                 const data = response.data || [];
                 setWatchlist(Array.isArray(data) ? data : []);
             } catch (err) {
-                console.error('Watchlist yüklenirken hata:', err);
-                setError('Watchlist yüklenirken bir hata oluştu');
+                console.error('Error loading watchlist:', err);
+                setError('An error occurred while loading watchlist');
                 setWatchlist([]);
             } finally {
                 setLoading(false);
@@ -42,7 +42,7 @@ const Watchlist = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('Lütfen giriş yapın');
+                setError('Please login!');
                 return;
             }
 
@@ -54,13 +54,13 @@ const Watchlist = () => {
 
             setWatchlist(prevWatchlist => prevWatchlist.filter(movie => movie.tmdbId !== movieId));
         } catch (err) {
-            console.error('Film watchlistten kaldırılırken hata:', err);
-            setError('Film watchlistten kaldırılırken bir hata oluştu');
+            console.error('Error while removing movie from watchlist:', err);
+            setError('An error occurred while removing the movie from the watchlist');
         }
     };
 
     if (loading) {
-        return <div className="watchlist-container">Yükleniyor...</div>;
+        return <div className="watchlist-container">Loading...</div>;
     }
 
     if (error) {
@@ -69,9 +69,9 @@ const Watchlist = () => {
 
     return (
         <div className="watchlist-container">
-            <h2>İzleme Listem</h2>
+            <h2>My Watchlist</h2>
             {!watchlist || watchlist.length === 0 ? (
-                <p>İzleme listenizde henüz film bulunmuyor.</p>
+                <p>There are no movies in your watchlist yet..</p>
             ) : (
                 <div className="watchlist-grid">
                     {watchlist.map(movie => (
@@ -89,7 +89,7 @@ const Watchlist = () => {
                                 onClick={() => removeFromWatchlist(movie.tmdbId)}
                                 className="remove-button"
                             >
-                                Kaldır
+                                Remove
                             </button>
                         </div>
                     ))}

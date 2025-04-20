@@ -50,7 +50,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             const response = await axios.get(`/api/movies/${movie.tmdbId}/watchlist/check`);
             setIsInWatchlist(response.data.inWatchlist);
         } catch (error) {
-            console.error('Watchlist durumu kontrol edilirken hata:', error);
+            console.error('Error checking watchlist status:', error);
             setIsInWatchlist(false);
         } finally {
             setIsLoading(false);
@@ -62,7 +62,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             const response = await axios.get(`/api/movies/${movie.tmdbId}/watched/check`);
             setIsWatched(response.data.isWatched);
         } catch (error) {
-            console.error("İzlenme durumu kontrol edilirken hata oluştu:", error);
+            console.error("An error occurred while checking the viewing status:", error);
         }
     };
 
@@ -71,7 +71,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             const response = await axios.get(`/api/movies/${movie.tmdbId}/favorites/check`);
             setIsFavorite(response.data.isFavorite);
         } catch (error) {
-            console.error("Favori durumu kontrol edilirken hata oluştu:", error);
+            console.error("Error checking favorite status:", error);
         }
     };
 
@@ -83,7 +83,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                 runtime: movie.runtime
             });
         } catch (error) {
-            console.error("Film süresi güncellenirken hata oluştu:", error);
+            console.error("An error occurred while updating the movie duration:", error);
         }
     };
 
@@ -117,7 +117,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const handleAddToWatchlist = async () => {
         try {
             if (!movie?.tmdbId) {
-                console.error("tmdbId bulunamadı:", movie);
+                console.error("tmdbId is not found:", movie);
                 return;
             }
 
@@ -150,7 +150,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
 
     const handleWatchedToggle = async () => {
         if (!movie?.tmdbId) {
-            console.error("tmdbId bulunamadı:", movie);
+            console.error("tmdbId is not found:", movie);
             return;
         }
 
@@ -164,7 +164,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                 setIsWatched(true);
             }
         } catch (error) {
-            console.error("İzlenme durumu güncellenirken hata oluştu:", error);
+            console.error("An error occurred while updating the viewing status:", error);
         } finally {
             setIsLoading(false);
         }
@@ -189,7 +189,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
 
     const handleFavoriteToggle = async () => {
         if (!movie?.tmdbId) {
-            console.error("tmdbId bulunamadı:", movie);
+            console.error("tmdbId is not found:", movie);
             return;
         }
 
@@ -207,7 +207,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                 window.location.reload();
             }
         } catch (error) {
-            console.error("Favori durumu güncellenirken hata oluştu:", error);
+            console.error("An error occurred while updating the favorite status:", error);
         } finally {
             setIsLoading(false);
         }
@@ -273,7 +273,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`${provider.provider_name}'de izle`}
+                                                                title={`Watch in ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -294,7 +294,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`${provider.provider_name}'de izle`}
+                                                                title={`Watch in ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -315,7 +315,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`${provider.provider_name}'de izle`}
+                                                                title={`Watch in ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}

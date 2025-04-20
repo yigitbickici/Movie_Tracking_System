@@ -22,12 +22,12 @@ const AdminDashboard = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            if (!response.ok) throw new Error("Kullanıcılar alınamadı");
+            if (!response.ok) throw new Error("Users could not be retrieved");
             const data = await response.json();
-            console.log("Gelen kullanıcı verisi:", data);
+            console.log("Incoming user data:", data);
             setUsers(data);
         } catch (error) {
-            console.error("Kullanıcıları çekerken hata:", error);
+            console.error("Error while retrieving users:", error);
         }
     };
 
@@ -43,11 +43,11 @@ const AdminDashboard = () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                if (!response.ok) throw new Error("Yorumlar alınamadı");
+                if (!response.ok) throw new Error("Comments couldn't retrieved");
                 const data = await response.json();
                 setRecentComments(data);
             } catch (error) {
-                console.error("Yorumları çekerken hata:", error);
+                console.error("Error while retrieving comments:", error);
             }
         };
 
@@ -69,12 +69,12 @@ const AdminDashboard = () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                if (!response.ok) throw new Error("İstatistikler alınamadı");
+                if (!response.ok) throw new Error("Statistics could not be retrieved");
                 const data = await response.json();
-                console.log("İstatistik verisi:", data);
+                console.log("Statistics data:", data);
                 setStats(data);
             } catch (error) {
-                console.error("İstatistikleri çekerken hata:", error);
+                console.error("Statistics could not be retrieved:", error);
             }
         };
     
@@ -176,10 +176,10 @@ const AdminDashboard = () => {
                 await fetchUsers(); 
             } else {
                 const errorData = await response.json();
-                alert("Ban işlemi başarısız: " + errorData.message);
+                alert("Ban process is unsuccessful: " + errorData.message);
             }
         } catch (error) {
-            console.error("Ban hatası:", error);
+            console.error("Ban error:", error);
         }
     };
     
@@ -203,10 +203,10 @@ const AdminDashboard = () => {
                 await fetchUsers(); 
             } else {
                 const errorData = await response.json();
-                alert("Unban işlemi başarısız: " + errorData.message);
+                alert("Unban process is unsuccessful: " + errorData.message);
             }
         } catch (error) {
-            console.error("Unban hatası:", error);
+            console.error("Unban error:", error);
         }
     };
     
@@ -233,14 +233,14 @@ const AdminDashboard = () => {
                 setDeleteModal({ isOpen: false, commentId: null });
                 
                 // Başarı mesajı göster
-                alert("Yorum başarıyla silindi.");
+                alert("Comment deleted successfully.");
             } else {
                 const errorData = await response.json();
-                alert("Silme işlemi başarısız: " + errorData.error);
+                alert("Deletion failed: " + errorData.error);
             }
         } catch (error) {
             console.error('Error deleting comment:', error);
-            alert("Silme işlemi sırasında bir hata oluştu.");
+            alert("An error occurred during deletion.");
         }
     };
 
