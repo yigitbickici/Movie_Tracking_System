@@ -8,6 +8,7 @@ import ProfileEdit from './components/ProfileEdit';
 import MovieSocialPage from './components/MovieSocialPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Watchlist from './pages/Watchlist';
 import AdminDashboard from './pages/AdminDashboard';
 import Explore from './pages/Explore';
@@ -20,7 +21,7 @@ import './App.css';
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
   const isLoggedIn = localStorage.getItem('userType'); // Kullanıcı girişi kontrolü
 
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/movies/:movieId/social" element={<MovieSocialPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/users" element={<Users />} />

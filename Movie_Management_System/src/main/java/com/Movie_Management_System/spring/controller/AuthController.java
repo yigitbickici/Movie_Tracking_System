@@ -142,6 +142,27 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("valid", false));
         }
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String newPassword) {
+        try {
+            if (!userService.existsByEmail(email)) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Error: User not found with email: " + email));
+            }
+
+            User user = userService.findByEmail(email);
+            user.setPassword(newPassword);
+            userService.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error: Failed to reset password"));
+        }
+    }
+    
 
     @GetMapping("/check-ban")
     public ResponseEntity<?> checkBanStatus(@RequestParam String email) {
