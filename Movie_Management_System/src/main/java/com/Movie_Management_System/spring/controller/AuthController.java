@@ -7,6 +7,7 @@ import com.Movie_Management_System.spring.payload.request.RegisterRequest;
 import com.Movie_Management_System.spring.payload.response.JwtResponse;
 import com.Movie_Management_System.spring.security.jwt.JwtUtils;
 import com.Movie_Management_System.spring.payload.response.MessageResponse;
+import com.Movie_Management_System.spring.services.PasswordResetService;
 import com.Movie_Management_System.spring.services.UserService;
 import com.Movie_Management_System.spring.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,17 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final PasswordResetService passwordResetService;
     
     @Autowired
     public AuthController(UserService userService, 
                          AuthenticationManager authenticationManager,
-                         JwtUtils jwtUtils) {
+                         JwtUtils jwtUtils,
+                         PasswordResetService passwordResetService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.passwordResetService = passwordResetService;
     }
     
     @PostMapping("/register")
@@ -142,8 +146,9 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("valid", false));
         }
     }
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String newPassword) {
+
+    @PostMapping("/forgot-password/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestParam String email) {
         try {
             if (!userService.existsByEmail(email)) {
                 return ResponseEntity
@@ -151,18 +156,53 @@ public class AuthController {
                     .body(new MessageResponse("Error: User not found with email: " + email));
             }
 
+            passwordResetService.sendResetCode(email);
+            return ResponseEntity.ok(new MessageResponse("Reset code has been sent to your email"));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error: Failed to send reset code"));
+        }
+    }
+
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<?> verifyResetCode(@RequestParam String email, @RequestParam String code) {
+        try {
+            if (!passwordResetService.validateResetCode(email, code)) {
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Error: Invalid or expired reset code"));
+            }
+
+            return ResponseEntity.ok(new MessageResponse("Reset code is valid"));
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Error: Failed to verify reset code"));
+        }
+    }
+
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
+        try {
+            if (!passwordResetService.validateResetCode(email, code)) {
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Error: Invalid or expired reset code"));
+            }
+
             User user = userService.findByEmail(email);
             user.setPassword(newPassword);
             userService.save(user);
 
-            return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+            passwordResetService.removeResetCode(email);
+            return ResponseEntity.ok(new MessageResponse("Password has been reset successfully"));
         } catch (Exception e) {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageResponse("Error: Failed to reset password"));
         }
     }
-    
 
     @GetMapping("/check-ban")
     public ResponseEntity<?> checkBanStatus(@RequestParam String email) {
