@@ -159,15 +159,23 @@ public class AuthController {
             passwordResetService.sendResetCode(email);
             return ResponseEntity.ok(new MessageResponse("Reset code has been sent to your email"));
         } catch (Exception e) {
+            System.err.println("Error in password reset request: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse("Error: Failed to send reset code"));
+                .body(new MessageResponse("Error: Failed to send reset code. Please try again later."));
         }
     }
 
     @PostMapping("/forgot-password/verify")
     public ResponseEntity<?> verifyResetCode(@RequestParam String email, @RequestParam String code) {
         try {
+            if (!userService.existsByEmail(email)) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Error: User not found with email: " + email));
+            }
+
             if (!passwordResetService.validateResetCode(email, code)) {
                 return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -176,15 +184,23 @@ public class AuthController {
 
             return ResponseEntity.ok(new MessageResponse("Reset code is valid"));
         } catch (Exception e) {
+            System.err.println("Error in verify reset code: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse("Error: Failed to verify reset code"));
+                .body(new MessageResponse("Error: Failed to verify reset code. Please try again later."));
         }
     }
 
     @PostMapping("/forgot-password/reset")
     public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
         try {
+            if (!userService.existsByEmail(email)) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Error: User not found with email: " + email));
+            }
+
             if (!passwordResetService.validateResetCode(email, code)) {
                 return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -192,15 +208,23 @@ public class AuthController {
             }
 
             User user = userService.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("Error: User not found"));
+            }
+
             user.setPassword(newPassword);
             userService.save(user);
-
             passwordResetService.removeResetCode(email);
+            
             return ResponseEntity.ok(new MessageResponse("Password has been reset successfully"));
         } catch (Exception e) {
+            System.err.println("Error in reset password: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponse("Error: Failed to reset password"));
+                .body(new MessageResponse("Error: Failed to reset password. Please try again later."));
         }
     }
 

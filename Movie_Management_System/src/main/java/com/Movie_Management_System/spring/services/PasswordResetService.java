@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class PasswordResetService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PasswordResetService.class);
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -19,33 +23,55 @@ public class PasswordResetService {
     private final Random random = new Random();
 
     public void sendResetCode(String email) {
-        String code = generateResetCode();
-        resetCodes.put(email, new ResetCode(code, LocalDateTime.now()));
+        try {
+            String code = generateResetCode();
+            resetCodes.put(email, new ResetCode(code, LocalDateTime.now()));
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Password Reset Code");
-        message.setText("Your password reset code is: " + code + "\nThis code will expire in 10 minutes.");
-        
-        mailSender.send(message);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Password Reset Code");
+            message.setText("Your password reset code is: " + code + "\nThis code will expire in 10 minutes.");
+            
+            mailSender.send(message);
+            logger.info("Reset code sent successfully to: {}", email);
+        } catch (Exception e) {
+            logger.error("Failed to send reset code to: {}. Error: {}", email, e.getMessage());
+            throw new RuntimeException("Failed to send reset code. Please try again later.");
+        }
     }
 
     public boolean validateResetCode(String email, String code) {
-        ResetCode resetCode = resetCodes.get(email);
-        if (resetCode == null) {
+        try {
+            ResetCode resetCode = resetCodes.get(email);
+            if (resetCode == null) {
+                logger.warn("No reset code found for email: {}", email);
+                return false;
+            }
+
+            if (ChronoUnit.MINUTES.between(resetCode.getTimestamp(), LocalDateTime.now()) > 10) {
+                resetCodes.remove(email);
+                logger.warn("Reset code expired for email: {}", email);
+                return false;
+            }
+
+            boolean isValid = resetCode.getCode().equals(code);
+            if (!isValid) {
+                logger.warn("Invalid reset code provided for email: {}", email);
+            }
+            return isValid;
+        } catch (Exception e) {
+            logger.error("Error validating reset code for email: {}. Error: {}", email, e.getMessage());
             return false;
         }
-
-        if (ChronoUnit.MINUTES.between(resetCode.getTimestamp(), LocalDateTime.now()) > 10) {
-            resetCodes.remove(email);
-            return false;
-        }
-
-        return resetCode.getCode().equals(code);
     }
 
     public void removeResetCode(String email) {
-        resetCodes.remove(email);
+        try {
+            resetCodes.remove(email);
+            logger.info("Reset code removed for email: {}", email);
+        } catch (Exception e) {
+            logger.error("Error removing reset code for email: {}. Error: {}", email, e.getMessage());
+        }
     }
 
     private String generateResetCode() {

@@ -36,8 +36,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            // Skip token validation for forgot-password endpoint
-            if (request.getRequestURI().contains("/forgot-password")) {
+            // Skip token validation for forgot-password and auth endpoints
+            String requestURI = request.getRequestURI();
+            if (requestURI.contains("/api/auth/forgot-password") || 
+                requestURI.contains("/api/auth/login") || 
+                requestURI.contains("/api/auth/register")) {
                 filterChain.doFilter(request, response);
                 return;
             }
