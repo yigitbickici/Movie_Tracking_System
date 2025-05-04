@@ -19,11 +19,13 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AzureBlobService azureBlobService;
     
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AzureBlobService azureBlobService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.azureBlobService = azureBlobService;
     }
     
     public boolean existsByEmail(String email) {
@@ -90,6 +92,18 @@ public class UserService {
             currentUser.unfollowUser(targetUser);
             userRepository.save(currentUser);
             userRepository.save(targetUser);
+        }
+    }
+
+    public void updateUserAvatar(String username, String avatarUrl) {
+        User user = findByUsername(username);
+        if (user != null) {
+            // Delete old avatar from Azure if exists
+            if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                azureBlobService.deleteFile(user.getAvatar());
+            }
+            user.setAvatar(avatarUrl);
+            userRepository.save(user);
         }
     }
 }

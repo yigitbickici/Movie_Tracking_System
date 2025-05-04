@@ -116,6 +116,8 @@ public class User {
     @Column(nullable = true, length = 1000)
     private String bio;
 
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
 
     public User() {
     }
@@ -279,6 +281,13 @@ public class User {
         this.bio = bio;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 
     // Helper methods
     public void addToWatchedMovies(Movie movie) {

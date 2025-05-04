@@ -76,10 +76,14 @@ const ProfileEdit = () => {
                     }
                 });
 
-                setFormData(prevState => ({
-                    ...prevState,
-                    avatar: response.data
-                }));
+                if (response.data) {
+                    setFormData(prevState => ({
+                        ...prevState,
+                        avatar: response.data
+                    }));
+                } else {
+                    throw new Error('No URL returned from server');
+                }
             } catch (error) {
                 console.error('Error uploading avatar:', error);
                 setError('Failed to upload avatar');
@@ -89,8 +93,7 @@ const ProfileEdit = () => {
 
     const getAvatarUrl = (avatarPath) => {
         if (!avatarPath) return '';
-        if (avatarPath.startsWith('http')) return avatarPath;
-        return `http://localhost:8080${avatarPath}`;
+        return avatarPath; // Return the Azure Blob Storage URL directly
     };
 
     if (isLoading) {

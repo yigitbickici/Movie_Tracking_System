@@ -175,7 +175,9 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
             if (!movie?.tmdbId) return;
             await axios.delete(`/api/movies/${movie.tmdbId}/watchlist`);
             setIsInWatchlist(false);
-            onWatchlistUpdate?.(movie.tmdbId, false);
+            if (onWatchlistUpdate) {
+                onWatchlistUpdate(movie.tmdbId, false);
+            }
             window.location.reload(); // Sayfayı yenile
         } catch (error) {
             console.error('Watchlist\'ten çıkarılırken hata:', error);

@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // @PreAuthorize için gerekli
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -60,10 +60,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -78,11 +80,26 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/auth/forgot-password/**").permitAll()
-                .requestMatchers("/avatars/**").authenticated()
+                .requestMatchers("/api/movies/search/**").permitAll()
+                .requestMatchers("/api/movies/popular").permitAll()
+                .requestMatchers("/api/movies/trending").permitAll()
+                .requestMatchers("/api/movies/upcoming").permitAll()
+                .requestMatchers("/api/movies/top-rated").permitAll()
+                .requestMatchers("/api/movies/now-playing").permitAll()
+                
+                // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
+                // Media endpoints
+                .requestMatchers("/avatars/**").authenticated()
+                .requestMatchers("/api/users/profile/avatar").authenticated()
+                .requestMatchers("/api/posts/upload-media").authenticated()
+                
+                // Protected endpoints
                 .requestMatchers("/api/posts/**").authenticated()
                 .requestMatchers("/api/discussions/**").authenticated()
                 .requestMatchers("/api/movies/**").authenticated()

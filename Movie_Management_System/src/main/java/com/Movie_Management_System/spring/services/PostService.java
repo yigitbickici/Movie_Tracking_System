@@ -164,4 +164,8 @@ public class PostService {
         logger.info("Fetching comments for post: {}", post.getId());
         return commentRepository.findByPostOrderByCreatedAtDesc(post);
     }
+
+    public Posts save(Posts post) {
+        return postsRepository.save(post);
+    }
 } 

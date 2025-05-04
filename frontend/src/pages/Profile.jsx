@@ -215,8 +215,7 @@ const Profile = () => {
 
     const getAvatarUrl = (avatarPath) => {
         if (!avatarPath) return '';
-        if (avatarPath.startsWith('http')) return avatarPath;
-        return `http://localhost:8080${avatarPath}`;
+        return avatarPath; // Return the Azure Blob Storage URL directly
     };
 
     const MovieSection = ({ title, movies, icon: Icon }) => {

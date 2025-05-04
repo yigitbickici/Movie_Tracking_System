@@ -16,9 +16,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
+import com.Movie_Management_System.spring.services.AzureBlobService;
 
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -35,6 +38,9 @@ public class PostController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AzureBlobService azureBlobService;
 
     @GetMapping("/movie/{tmdbId}")
     public ResponseEntity<List<Posts>> getPostsByMovie(@PathVariable Long tmdbId) {
@@ -73,6 +79,7 @@ public class PostController {
     public ResponseEntity<?> createPost(@RequestBody PostRequest request) {
         logger.info("Creating new post for movie with TMDB ID: {}", request.getMovieId());
         logger.info("Post content: {}", request.getContent());
+        logger.info("Media URL: {}", request.getMediaUrl());
         
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         logger.info("Authentication object: {}", auth);
@@ -101,6 +108,14 @@ public class PostController {
             }
 
             Posts post = postService.createPost(request.getContent(), user.getId(), movie);
+            
+            // Set media URL if exists
+            if (request.getMediaUrl() != null && !request.getMediaUrl().isEmpty()) {
+                logger.info("Setting media URL for post: {}", request.getMediaUrl());
+                post.setMediaUrl(request.getMediaUrl());
+                post = postService.save(post);
+            }
+            
             logger.info("Post created successfully with ID: {}", post.getId());
             return ResponseEntity.ok(post);
         } catch (RuntimeException e) {
@@ -111,7 +126,7 @@ public class PostController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected error creating post: {}", e.getMessage());
-            e.printStackTrace(); // Stack trace'i logla
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body("An unexpected error occurred");
         }
     }
@@ -196,5 +211,37 @@ public class PostController {
         
         logger.info("Comment created successfully with ID: {}", createdComment.getId());
         return ResponseEntity.ok(createdComment);
+    }
+
+    @PostMapping("/upload-media")
+    public ResponseEntity<?> uploadMedia(@RequestParam("file") MultipartFile file) {
+        logger.info("Uploading media file: {}", file.getOriginalFilename());
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            logger.error("User not authenticated");
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+
+        try {
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.startsWith("image/") && !contentType.equals("image/gif"))) {
+                logger.error("Invalid file type: {}", contentType);
+                return ResponseEntity.badRequest().body("Only image files and GIFs are allowed");
+            }
+
+            // Upload to Azure Blob Storage
+            String blobUrl = azureBlobService.uploadFile(file, "posts");
+            logger.info("File uploaded successfully. URL: {}", blobUrl);
+
+            return ResponseEntity.ok(Map.of(
+                "url", blobUrl,
+                "message", "File uploaded successfully"
+            ));
+        } catch (IOException e) {
+            logger.error("Error uploading file: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to upload file");
+        }
     }
 } 

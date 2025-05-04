@@ -6,18 +6,16 @@ import com.Movie_Management_System.spring.entities.User;
 import com.Movie_Management_System.spring.services.MovieService;
 import com.Movie_Management_System.spring.services.UserService;
 import com.Movie_Management_System.spring.payload.response.MessageResponse;
+import com.Movie_Management_System.spring.services.AzureBlobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,9 @@ public class UserController {
 
     @Autowired
     private MovieService movieService;
+
+    @Autowired
+    private AzureBlobService azureBlobService;
 
     private final String uploadDir = "uploads/avatars";
 
@@ -89,57 +90,28 @@ public class UserController {
     }
 
     @PostMapping("/profile/avatar")
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
         try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userService.findByUsername(username);
-            
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated()) {
+                return ResponseEntity.status(401).body("User not authenticated");
             }
 
-            // Check file extension
-            String fileExtension = getFileExtension(file.getOriginalFilename());
-            if (!isValidImageExtension(fileExtension)) {
-                return ResponseEntity.badRequest().body("Invalid file format. Only jpg, jpeg, png, and gif files are allowed.");
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return ResponseEntity.badRequest().body("Only image files are allowed");
             }
 
-            // Create upload directory if it doesn't exist
-            File directory = new File(uploadDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
+            // Upload to Azure Blob Storage
+            String blobUrl = azureBlobService.uploadFile(file, "avatars");
 
-            // Generate unique filename
-            String fileName = UUID.randomUUID().toString() + fileExtension;
+            // Update user's avatar URL in database
+            userService.updateUserAvatar(auth.getName(), blobUrl);
 
-            // Delete old avatar if exists
-            if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-                try {
-                    String oldAvatarPath = user.getAvatar();
-                    // URL'den path kısmını ayıkla
-                    if (oldAvatarPath.contains("/avatars/")) {
-                        oldAvatarPath = oldAvatarPath.substring(oldAvatarPath.indexOf("/avatars/"));
-                    }
-                    oldAvatarPath = "uploads" + oldAvatarPath;
-                    Files.deleteIfExists(Paths.get(oldAvatarPath));
-                } catch (IOException e) {
-                    // Continue with new file upload even if old file deletion fails
-                    logger.error("Error deleting old avatar: " + e.getMessage());
-                }
-            }
-
-            // Save file
-            Files.copy(file.getInputStream(), Paths.get(uploadDir, fileName));
-
-            // Update user avatar in database
-            String avatarPath = "/avatars/" + fileName;
-            user.setAvatar(avatarPath);
-            userService.saveUser(user);
-
-            return ResponseEntity.ok(avatarPath);
+            return ResponseEntity.ok(blobUrl);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading avatar");
+            return ResponseEntity.internalServerError().body("Failed to upload profile photo");
         }
     }
 
@@ -413,19 +385,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Error unfollowing user: " + e.getMessage()));
         }
-    }
-
-    private String getFileExtension(String fileName) {
-        if (fileName == null) return "";
-        int lastDotIndex = fileName.lastIndexOf('.');
-        if (lastDotIndex == -1) return "";
-        return fileName.substring(lastDotIndex).toLowerCase();
-    }
-
-    private boolean isValidImageExtension(String extension) {
-        return extension.equals(".jpg") || 
-               extension.equals(".jpeg") || 
-               extension.equals(".png") || 
-               extension.equals(".gif");
     }
 } 

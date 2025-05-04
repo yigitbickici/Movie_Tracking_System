@@ -63,6 +63,9 @@ public class Posts {
     @JsonIgnoreProperties("post")
     private List<PostLike> likes = new ArrayList<>();
 
+    @Column(name = "media_url", length = 500)
+    private String mediaUrl;
+
     // Constructors
     public Posts() {
     }
@@ -170,6 +173,14 @@ public class Posts {
 
     public void setLikes(List<PostLike> likes) {
         this.likes = likes;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
     }
 
     // Helper methods for managing comments

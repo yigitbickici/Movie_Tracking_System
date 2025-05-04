@@ -129,21 +129,37 @@ const MovieSocialPage = () => {
         });
     }, [movieId, navigate]);
 
-    const handleMediaSelect = (e) => {
+    const handleMediaSelect = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedMedia(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setMediaPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await axios.post('/api/posts/upload-media', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                if (response.data && response.data.url) {
+                    setSelectedMedia(file);
+                    setMediaPreview(response.data.url);
+                } else {
+                    throw new Error('No URL returned from server');
+                }
+            } catch (error) {
+                console.error('Error uploading media:', error);
+                setModalMessage('Failed to upload media');
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            }
         }
     };
 
     const handlePostSubmit = async (e) => {
         e.preventDefault();
-        if (!newPost.trim() && !selectedMedia) return;
+        if (!newPost.trim() && !mediaPreview) return;
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -159,15 +175,15 @@ const MovieSocialPage = () => {
         try {
             const cleanMovieId = movieId.split('/')[0];
 
-            const response = await axios.post('/api/posts/create', {
+            const postData = {
                 movieId: parseInt(cleanMovieId),
-                content: newPost
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+                content: newPost,
+                mediaUrl: mediaPreview // Add the Azure Blob Storage URL
+            };
+
+            console.log('Sending post data:', postData); // Debug log
+
+            const response = await axios.post('/api/posts/create', postData);
 
             if (response.status === 200) {
                 const newPostData = response.data;
@@ -182,10 +198,11 @@ const MovieSocialPage = () => {
                     commentNum: 0,
                     comments: [],
                     isLiked: false,
+                    mediaUrl: newPostData.mediaUrl, // Make sure to include mediaUrl
                     user: {
                         ...newPostData.user,
                         name: newPostData.user.username,
-                        avatar: newPostData.user.avatar || newPostData.user.username.substring(0, 2).toUpperCase()
+                        avatar: newPostData.user.avatarUrl || newPostData.user.username.substring(0, 2).toUpperCase()
                     }
                 }, ...posts]);
                 
@@ -575,9 +592,9 @@ const MovieSocialPage = () => {
                                 ) : (
                                     post.content
                                 )}
-                                {post.media && (
+                                {post.mediaUrl && (
                                     <div className="post-media">
-                                        <img src={post.media} alt="Post media" />
+                                        <img src={post.mediaUrl} alt="Post media" />
                                     </div>
                                 )}
                             </div>

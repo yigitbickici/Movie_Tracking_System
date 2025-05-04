@@ -1,8 +1,17 @@
 package com.Movie_Management_System.spring.payload.request;
 
 public class PostRequest {
-    private String content;
     private Long movieId;
+    private String content;
+    private String mediaUrl;
+
+    public Long getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(Long movieId) {
+        this.movieId = movieId;
+    }
 
     public String getContent() {
         return content;
@@ -12,11 +21,11 @@ public class PostRequest {
         this.content = content;
     }
 
-    public Long getMovieId() {
-        return movieId;
+    public String getMediaUrl() {
+        return mediaUrl;
     }
 
-    public void setMovieId(Long movieId) {
-        this.movieId = movieId;
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
     }
 } 
