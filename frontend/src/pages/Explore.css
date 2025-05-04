@@ -84,14 +84,14 @@
 }
 
 .sort-options span {
-    color: #a1a1a1;
+    color: white;
     font-size: 14px;
 }
 
 .sort-button {
     background-color: #27272a;
     border: 1px solid #3f3f46;
-    color: #a1a1a1;
+    color: white;
     padding: 6px 12px;
     border-radius: 4px;
     font-size: 13px;
