@@ -6,18 +6,29 @@ import './Explore.css';
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-TR&page=${page}`;
 const SEARCH_API_URL = (query) => `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-TR&query=${query}`;
+const GENRES_API_URL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=en-TR`;
 
 const Explore = () => {
     const [movies, setMovies] = useState([]);
+    const [filteredMovies, setFilteredMovies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(500);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState('year'); // Default sorting by year
+    const [sortBy, setSortBy] = useState('year');
     const [loading, setLoading] = useState(false);
-    const [progress, setProgress] = useState(0); // Progress state for loading bar
-    const [loadedPages, setLoadedPages] = useState(0); // Track number of loaded pages
+    const [progress, setProgress] = useState(0);
+    const [loadedPages, setLoadedPages] = useState(0);
+    const [genres, setGenres] = useState([]);
+
+    // Kategorileri (türleri) API'den al
+    useEffect(() => {
+        fetch(GENRES_API_URL)
+            .then(res => res.json())
+            .then(data => setGenres(data.genres))
+            .catch(error => console.error("Error fetching genres:", error));
+    }, []);
 
     useEffect(() => {
         const fetchAllMovies = async () => {
@@ -43,13 +54,20 @@ const Explore = () => {
                 );
 
                 const allMovies = allResults.flat();
-
-                // Remove duplicate movies based on ID
                 const uniqueMoviesMap = new Map();
                 allMovies.forEach(movie => uniqueMoviesMap.set(movie.id, movie));
                 const uniqueMovies = Array.from(uniqueMoviesMap.values());
 
-                sortMovies(uniqueMovies, sortBy);
+                // Filmlerin genre isimlerini ekle
+                const moviesWithGenreNames = uniqueMovies.map(movie => ({
+                    ...movie,
+                    genreNames: movie.genre_ids.map(id =>
+                        genres.find(genre => genre.id === id)?.name || 'Unknown'
+                    )
+                }));
+
+                setMovies(moviesWithGenreNames);
+                filterAndSortMovies(moviesWithGenreNames, selectedCategory, sortBy);
             } catch (error) {
                 console.error("Error fetching all 500 pages:", error);
             } finally {
@@ -62,18 +80,35 @@ const Explore = () => {
             fetch(SEARCH_API_URL(searchTerm))
                 .then((response) => response.json())
                 .then((data) => {
-                    sortMovies(data.results, sortBy);
+                    const moviesWithGenreNames = data.results.map(movie => ({
+                        ...movie,
+                        genreNames: movie.genre_ids.map(id =>
+                            genres.find(genre => genre.id === id)?.name || 'Unknown'
+                        )
+                    }));
+                    setMovies(moviesWithGenreNames);
+                    filterAndSortMovies(moviesWithGenreNames, selectedCategory, sortBy);
                     setTotalPages(data.total_pages);
                 })
                 .catch((error) => console.error("Error:", error));
         } else {
             fetchAllMovies();
         }
-    }, [searchTerm]);
+    }, [searchTerm, genres]);
 
-    // Sorting function
-    const sortMovies = (moviesToSort, sortingOption) => {
-        let sortedMovies = [...moviesToSort];
+    // Kategoriye ve sıralamaya göre filmleri filtrele ve sırala
+    const filterAndSortMovies = (moviesToFilter, category, sortingOption) => {
+        // Kategoriye göre filtrele
+        let filtered = category === 'all'
+            ? [...moviesToFilter]
+            : moviesToFilter.filter(movie =>
+                movie.genreNames.some(genre =>
+                    genre.toLowerCase() === category.toLowerCase()
+                )
+            );
+
+        // Sıralamayı uygula
+        let sortedMovies = [...filtered];
 
         switch (sortingOption) {
             case 'az':
@@ -107,14 +142,21 @@ const Explore = () => {
                 });
         }
 
-        setMovies(sortedMovies);
+        setFilteredMovies(sortedMovies);
     };
 
     const handleSortChange = (sortOption) => {
         setSortBy(sortOption);
-        sortMovies(movies, sortOption);
+        filterAndSortMovies(movies, selectedCategory, sortOption);
     };
 
+    const handleCategoryClick = (category) => {
+        setSelectedCategory(category);
+        filterAndSortMovies(movies, category, sortBy);
+        setCurrentPage(1);
+    };
+
+    // Diğer fonksiyonlar aynı kalıyor...
     const goToNextPage = () => {
         setCurrentPage(prev => prev + 1);
     };
@@ -148,10 +190,6 @@ const Explore = () => {
             .catch(error => console.error("Error fetching movie details:", error));
     };
 
-    const handleCategoryClick = (category) => {
-        setSelectedCategory(category);
-    };
-
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
         setCurrentPage(1);
@@ -162,13 +200,16 @@ const Explore = () => {
             setMovies(prev => prev.map(movie =>
                 movie.id === movieId ? { ...movie, isInWatchlist: true } : movie
             ));
+            setFilteredMovies(prev => prev.map(movie =>
+                movie.id === movieId ? { ...movie, isInWatchlist: true } : movie
+            ));
         }
     };
 
     // Sayfaya göre slice'la
     const moviesPerPage = 20;
     const startIndex = (currentPage - 1) * moviesPerPage;
-    const currentMovies = movies.slice(startIndex, startIndex + moviesPerPage);
+    const currentMovies = filteredMovies.slice(startIndex, startIndex + moviesPerPage);
 
     if (loading) {
         return (
@@ -183,6 +224,7 @@ const Explore = () => {
                             <span className="progress-text">{progress}%</span>
                         </div>
                     </div>
+                    <p className="progress-detail">Loaded {loadedPages} of 500 pages</p>
                     <p className="progress-info">Please wait while we fetch all movies...</p>
                 </div>
             </div>
@@ -205,21 +247,15 @@ const Explore = () => {
                     <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
                         All
                     </button>
-                    <button className={`category-button ${selectedCategory === 'action' ? 'active' : ''}`} onClick={() => handleCategoryClick('action')}>
-                        Action
-                    </button>
-                    <button className={`category-button ${selectedCategory === 'drama' ? 'active' : ''}`} onClick={() => handleCategoryClick('drama')}>
-                        Drama
-                    </button>
-                    <button className={`category-button ${selectedCategory === 'comedy' ? 'active' : ''}`} onClick={() => handleCategoryClick('comedy')}>
-                        Comedy
-                    </button>
-                    <button className={`category-button ${selectedCategory === 'horror' ? 'active' : ''}`} onClick={() => handleCategoryClick('horror')}>
-                        Horror
-                    </button>
-                    <button className={`category-button ${selectedCategory === 'sci-fi' ? 'active' : ''}`} onClick={() => handleCategoryClick('sci-fi')}>
-                        Sci-Fi
-                    </button>
+                    {genres.slice(0, 6).map(genre => (
+                        <button
+                            key={genre.id}
+                            className={`category-button ${selectedCategory === genre.name.toLowerCase() ? 'active' : ''}`}
+                            onClick={() => handleCategoryClick(genre.name.toLowerCase())}
+                        >
+                            {genre.name}
+                        </button>
+                    ))}
                 </div>
             </header>
 
@@ -254,8 +290,8 @@ const Explore = () => {
 
             <div className="pagination">
                 <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>
-                <span>{currentPage} / {Math.ceil(movies.length / moviesPerPage)}</span>
-                <button onClick={goToNextPage} disabled={currentPage === Math.ceil(movies.length / moviesPerPage)}>→</button>
+                <span>{currentPage} / {Math.ceil(filteredMovies.length / moviesPerPage)}</span>
+                <button onClick={goToNextPage} disabled={currentPage === Math.ceil(filteredMovies.length / moviesPerPage)}>→</button>
             </div>
         </div>
     );
