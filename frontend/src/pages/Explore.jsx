@@ -30,36 +30,16 @@ const Explore = () => {
             .catch(error => console.error("Error fetching genres:", error));
     }, []);
 
+    // Sayfa değiştiğinde veya arama yapıldığında filmleri getir
     useEffect(() => {
-        const fetchAllMovies = async () => {
+        const fetchMovies = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
-                setProgress(0);
-                setLoadedPages(0);
-                const TOTAL_PAGES = 500;
-                const pageNumbers = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
-
-                const allResults = await Promise.all(
-                    pageNumbers.map((page, index) =>
-                        fetch(API_URL(page))
-                            .then(res => res.json())
-                            .then(data => {
-                                const newLoaded = index + 1;
-                                setLoadedPages(newLoaded);
-                                const newProgress = Math.floor((newLoaded / TOTAL_PAGES) * 100);
-                                setProgress(newProgress);
-                                return data.results || [];
-                            })
-                    )
-                );
-
-                const allMovies = allResults.flat();
-                const uniqueMoviesMap = new Map();
-                allMovies.forEach(movie => uniqueMoviesMap.set(movie.id, movie));
-                const uniqueMovies = Array.from(uniqueMoviesMap.values());
-
-                // Filmlerin genre isimlerini ekle
-                const moviesWithGenreNames = uniqueMovies.map(movie => ({
+                const url = searchTerm ? SEARCH_API_URL(searchTerm) : API_URL(currentPage);
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const moviesWithGenreNames = data.results.map(movie => ({
                     ...movie,
                     genreNames: movie.genre_ids.map(id =>
                         genres.find(genre => genre.id === id)?.name || 'Unknown'
@@ -67,34 +47,17 @@ const Explore = () => {
                 }));
 
                 setMovies(moviesWithGenreNames);
+                setTotalPages(data.total_pages > 500 ? 500 : data.total_pages);
                 filterAndSortMovies(moviesWithGenreNames, selectedCategory, sortBy);
             } catch (error) {
-                console.error("Error fetching all 500 pages:", error);
+                console.error("Error fetching movies:", error);
             } finally {
                 setLoading(false);
-                setProgress(100);
             }
         };
 
-        if (searchTerm) {
-            fetch(SEARCH_API_URL(searchTerm))
-                .then((response) => response.json())
-                .then((data) => {
-                    const moviesWithGenreNames = data.results.map(movie => ({
-                        ...movie,
-                        genreNames: movie.genre_ids.map(id =>
-                            genres.find(genre => genre.id === id)?.name || 'Unknown'
-                        )
-                    }));
-                    setMovies(moviesWithGenreNames);
-                    filterAndSortMovies(moviesWithGenreNames, selectedCategory, sortBy);
-                    setTotalPages(data.total_pages);
-                })
-                .catch((error) => console.error("Error:", error));
-        } else {
-            fetchAllMovies();
-        }
-    }, [searchTerm, genres]);
+        fetchMovies();
+    }, [currentPage, searchTerm, genres]);
 
     // Kategoriye ve sıralamaya göre filmleri filtrele ve sırala
     const filterAndSortMovies = (moviesToFilter, category, sortingOption) => {
@@ -156,13 +119,16 @@ const Explore = () => {
         setCurrentPage(1);
     };
 
-    // Diğer fonksiyonlar aynı kalıyor...
     const goToNextPage = () => {
-        setCurrentPage(prev => prev + 1);
+        if (currentPage < totalPages) {
+            setCurrentPage(prev => prev + 1);
+        }
     };
 
     const goToPrevPage = () => {
-        setCurrentPage(prev => prev - 1);
+        if (currentPage > 1) {
+            setCurrentPage(prev => prev - 1);
+        }
     };
 
     const handleMovieClick = (movie) => {
@@ -206,26 +172,16 @@ const Explore = () => {
         }
     };
 
-    // Sayfaya göre slice'la
-    const moviesPerPage = 20;
-    const startIndex = (currentPage - 1) * moviesPerPage;
-    const currentMovies = filteredMovies.slice(startIndex, startIndex + moviesPerPage);
-
     if (loading) {
         return (
             <div className="loading-container">
                 <div className="loading-content">
                     <h2>Loading Movies...</h2>
                     <div className="progress-bar-container">
-                        <div
-                            className="progress-bar"
-                            style={{ width: `${progress}%` }}
-                        >
-                            <span className="progress-text">{progress}%</span>
+                        <div className="progress-bar" style={{ width: '100%' }}>
+                            <span className="progress-text">Loading...</span>
                         </div>
                     </div>
-                    <p className="progress-detail">Loaded {loadedPages} of 500 pages</p>
-                    <p className="progress-info">Please wait while we fetch all movies...</p>
                 </div>
             </div>
         );
@@ -269,7 +225,7 @@ const Explore = () => {
             </div>
 
             <div className="movie-list">
-                {currentMovies.map(movie => (
+                {filteredMovies.map(movie => (
                     <MovieCard
                         key={movie.id}
                         movie={movie}
@@ -290,8 +246,8 @@ const Explore = () => {
 
             <div className="pagination">
                 <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>
-                <span>{currentPage} / {Math.ceil(filteredMovies.length / moviesPerPage)}</span>
-                <button onClick={goToNextPage} disabled={currentPage === Math.ceil(filteredMovies.length / moviesPerPage)}>→</button>
+                <span>{currentPage} / {totalPages}</span>
+                <button onClick={goToNextPage} disabled={currentPage === totalPages}>→</button>
             </div>
         </div>
     );
