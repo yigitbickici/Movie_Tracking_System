@@ -446,6 +446,27 @@ const MovieSocialPage = () => {
         navigate(`/UserProfile/${username}`);
     };
 
+    const handleDeletePost = async (postId) => {
+        if (!window.confirm('Are you sure you want to delete this post?')) {
+            return;
+        }
+
+        try {
+            const response = await axios.delete(`/api/posts/${postId}`);
+            if (response.status === 200) {
+                setPosts(posts.filter(post => post.id !== postId));
+                setModalMessage('Post is successfully deleted');
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            }
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            setModalMessage('Error deleting post');
+            setShowModal(true);
+            setTimeout(() => setShowModal(false), 2000);
+        }
+    };
+
     if (loading) {
         return (
             <div className="social-page-overlay">
@@ -561,13 +582,21 @@ const MovieSocialPage = () => {
                                     >
                                         {post.user.username}
                                     </span>
-                                    {console.log('Post User ID:', post.user.id, 'Current User ID:', currentUserId)}
                                     {parseInt(post.user.id) !== parseInt(currentUserId) && (
                                         <button 
                                             className={`follow-button ${post.user.isFollowing ? 'following' : ''}`}
                                             onClick={() => handleFollow(post.id, post.user.id)}
                                         >
                                             {post.user.isFollowing ? '✓ Following' : '+ Follow'}
+                                        </button>
+                                    )}
+                                    {parseInt(post.user.id) === parseInt(currentUserId) && (
+                                        <button 
+                                            className="delete-icon"
+                                            onClick={() => handleDeletePost(post.id)}
+                                            title="Delete post"
+                                        >
+                                            🗑️
                                         </button>
                                     )}
                                     <span className="timestamp">{new Date(post.createdAt).toLocaleString()}</span>

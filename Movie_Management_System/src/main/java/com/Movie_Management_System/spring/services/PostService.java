@@ -168,4 +168,28 @@ public class PostService {
     public Posts save(Posts post) {
         return postsRepository.save(post);
     }
+
+    public Optional<Posts> getPostById(Long postId) {
+        return postsRepository.findById(postId);
+    }
+
+    public void deletePost(Long postId) {
+        Posts post = postsRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        
+        // Delete all comments
+        post.getComments().clear();
+        
+        // Delete all likes
+        post.getLikes().clear();
+        
+        // Delete all spoiler requests
+        post.getSpoilerRequests().clear();
+        
+        // Save the changes to cascade the deletes
+        postsRepository.save(post);
+        
+        // Finally delete the post
+        postsRepository.delete(post);
+    }
 } 

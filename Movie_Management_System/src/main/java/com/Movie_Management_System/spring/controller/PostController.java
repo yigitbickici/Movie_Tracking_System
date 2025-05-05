@@ -244,4 +244,57 @@ public class PostController {
             return ResponseEntity.internalServerError().body("Failed to upload file");
         }
     }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        logger.info("Deleting post with ID: {}", postId);
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            logger.error("User not authenticated");
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+
+        String username = auth.getName();
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            logger.error("User not found: {}", username);
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        try {
+            Posts post = postService.getPostById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+            // Check if the authenticated user is the owner of the post
+            if (!post.getUser().getId().equals(user.getId())) {
+                logger.error("User {} is not authorized to delete post {}", username, postId);
+                return ResponseEntity.status(403).body("Not authorized to delete this post");
+            }
+
+            // Delete media from Azure if exists
+            if (post.getMediaUrl() != null && !post.getMediaUrl().isEmpty()) {
+                try {
+                    azureBlobService.deleteFile(post.getMediaUrl());
+                    logger.info("Media file deleted from Azure for post: {}", postId);
+                } catch (Exception e) {
+                    logger.error("Error deleting media from Azure: {}", e.getMessage());
+                }
+            }
+
+            // Delete the post
+            postService.deletePost(postId);
+            logger.info("Post deleted successfully: {}", postId);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Post deleted successfully"
+            ));
+        } catch (RuntimeException e) {
+            logger.error("Error deleting post: {}", e.getMessage());
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Unexpected error deleting post: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("An unexpected error occurred");
+        }
+    }
 } 

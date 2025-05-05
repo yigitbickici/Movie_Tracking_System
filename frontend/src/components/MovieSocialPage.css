@@ -545,4 +545,19 @@
 
 .spoiler-warning:hover {
     background-color: rgba(255, 0, 0, 0.15);
+}
+
+.delete-icon {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 16px;
+    transition: color 0.3s;
+    margin-left: 10px;
+}
+
+.delete-icon:hover {
+    color: #ff4444;
 } 

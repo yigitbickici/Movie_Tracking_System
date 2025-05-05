@@ -49,8 +49,15 @@ public class AzureBlobService {
     }
 
     public void deleteFile(String blobUrl) {
+        // Extract blob name from URL
         String blobName = blobUrl.substring(blobUrl.indexOf(containerName) + containerName.length() + 1);
+        
+        // Get a reference to the blob
         BlobClient blobClient = containerClient.getBlobClient(blobName);
-        blobClient.deleteIfExists();
+        
+        // Delete the blob if it exists
+        if (blobClient.exists()) {
+            blobClient.delete();
+        }
     }
 } 
