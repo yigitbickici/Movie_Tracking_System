@@ -4,9 +4,10 @@ import MovieDetail from "../components/MovieDetail";
 import './Explore.css';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
-const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-TR&page=${page}`;
-const SEARCH_API_URL = (query) => `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-TR&query=${query}`;
-const GENRES_API_URL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=en-TR`;
+const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=tr-TR&page=${page}`;
+const SEARCH_API_URL = (query) => `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=tr-TR&query=${query}`;
+const GENRES_API_URL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=tr-TR`;
+const DISCOVER_API_URL = (page, genreId) => `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=tr-TR&sort_by=popularity.desc&page=${page}&with_genres=${genreId}`;
 
 const Explore = () => {
     const [movies, setMovies] = useState([]);
@@ -35,7 +36,15 @@ const Explore = () => {
         const fetchMovies = async () => {
             setLoading(true);
             try {
-                const url = searchTerm ? SEARCH_API_URL(searchTerm) : API_URL(currentPage);
+                let url;
+                if (searchTerm) {
+                    url = SEARCH_API_URL(searchTerm);
+                } else if (selectedCategory !== 'all') {
+                    url = DISCOVER_API_URL(currentPage, selectedCategory);
+                } else {
+                    url = API_URL(currentPage);
+                }
+                
                 const response = await fetch(url);
                 const data = await response.json();
                 
@@ -47,8 +56,8 @@ const Explore = () => {
                 }));
 
                 setMovies(moviesWithGenreNames);
+                setFilteredMovies(moviesWithGenreNames);
                 setTotalPages(data.total_pages > 500 ? 500 : data.total_pages);
-                filterAndSortMovies(moviesWithGenreNames, selectedCategory, sortBy);
             } catch (error) {
                 console.error("Error fetching movies:", error);
             } finally {
@@ -57,21 +66,12 @@ const Explore = () => {
         };
 
         fetchMovies();
-    }, [currentPage, searchTerm, genres]);
+    }, [currentPage, searchTerm, selectedCategory, genres]);
 
     // Kategoriye ve sıralamaya göre filmleri filtrele ve sırala
-    const filterAndSortMovies = (moviesToFilter, category, sortingOption) => {
-        // Kategoriye göre filtrele
-        let filtered = category === 'all'
-            ? [...moviesToFilter]
-            : moviesToFilter.filter(movie =>
-                movie.genreNames.some(genre =>
-                    genre.toLowerCase() === category.toLowerCase()
-                )
-            );
-
+    const filterAndSortMovies = (moviesToFilter, sortingOption) => {
         // Sıralamayı uygula
-        let sortedMovies = [...filtered];
+        let sortedMovies = [...moviesToFilter];
 
         switch (sortingOption) {
             case 'az':
@@ -110,12 +110,12 @@ const Explore = () => {
 
     const handleSortChange = (sortOption) => {
         setSortBy(sortOption);
-        filterAndSortMovies(movies, selectedCategory, sortOption);
+        filterAndSortMovies(movies, sortOption);
     };
 
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
-        filterAndSortMovies(movies, category, sortBy);
+        filterAndSortMovies(movies, sortBy);
         setCurrentPage(1);
     };
 
@@ -200,14 +200,17 @@ const Explore = () => {
                 </div>
 
                 <div className="categories-container">
-                    <button className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>
+                    <button 
+                        className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} 
+                        onClick={() => handleCategoryClick('all')}
+                    >
                         All
                     </button>
                     {genres.slice(0, 6).map(genre => (
                         <button
                             key={genre.id}
-                            className={`category-button ${selectedCategory === genre.name.toLowerCase() ? 'active' : ''}`}
-                            onClick={() => handleCategoryClick(genre.name.toLowerCase())}
+                            className={`category-button ${selectedCategory === genre.id ? 'active' : ''}`}
+                            onClick={() => handleCategoryClick(genre.id)}
                         >
                             {genre.name}
                         </button>
