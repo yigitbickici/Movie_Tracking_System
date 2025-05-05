@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/spoiler-requests")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://moviary.com")
 public class SpoilerRequestController {
 
     @Autowired

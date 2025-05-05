@@ -25,7 +25,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/posts")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://moviary.com"})
 public class PostController {
 
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);

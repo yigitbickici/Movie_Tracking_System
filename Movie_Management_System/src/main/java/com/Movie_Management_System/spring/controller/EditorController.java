@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/editor")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://moviary.com")
 public class EditorController {
 
     @Autowired

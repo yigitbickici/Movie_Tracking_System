@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/movies")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://moviary.com")
 public class MovieController {
 
     @Autowired

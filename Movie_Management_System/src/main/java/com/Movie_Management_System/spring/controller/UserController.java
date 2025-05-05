@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://moviary.com")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
