@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './AdminDashboard.css';
 import { FaStar, FaTrash, FaChevronRight, FaUsers } from 'react-icons/fa';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [users, setUsers] = useState([]);
     const [banModal, setBanModal] = useState({ isOpen: false, userId: null, isBanned: false });
     const [selectedReason, setSelectedReason] = useState('');
@@ -147,13 +149,13 @@ const AdminDashboard = () => {
         // Daha fazla yorum eklenebilir
     ]);
 
-    // Ban sebepleri
+    // Ban sebepleri (çeviriye hazır)
     const banReasons = [
-        "Unsuitable content sharing",
-        "Spam/Advertising",
-        "Hate speech/Insult",
-        "Fake account",
-        "Other"
+        t('adminDashboard.banReasons.unsuitableContent'),
+        t('adminDashboard.banReasons.spam'),
+        t('adminDashboard.banReasons.hateSpeech'),
+        t('adminDashboard.banReasons.fakeAccount'),
+        t('adminDashboard.banReasons.other')
     ];
 
     // Ban işlemi için fonksiyon
@@ -176,7 +178,7 @@ const AdminDashboard = () => {
                 await fetchUsers(); 
             } else {
                 const errorData = await response.json();
-                alert("Ban process is unsuccessful: " + errorData.message);
+                alert(t('adminDashboard.errors.banFailed') + errorData.message);
             }
         } catch (error) {
             console.error("Ban error:", error);
@@ -203,7 +205,7 @@ const AdminDashboard = () => {
                 await fetchUsers(); 
             } else {
                 const errorData = await response.json();
-                alert("Unban process is unsuccessful: " + errorData.message);
+                alert(t('adminDashboard.errors.unbanFailed') + errorData.message);
             }
         } catch (error) {
             console.error("Unban error:", error);
@@ -233,14 +235,14 @@ const AdminDashboard = () => {
                 setDeleteModal({ isOpen: false, commentId: null });
                 
                 // Başarı mesajı göster
-                alert("Comment deleted successfully.");
+                alert(t('adminDashboard.errors.deleteSuccess'));
             } else {
                 const errorData = await response.json();
-                alert("Deletion failed: " + errorData.error);
+                alert(t('adminDashboard.errors.deleteFailed') + errorData.error);
             }
         } catch (error) {
             console.error('Error deleting comment:', error);
-            alert("An error occurred during deletion.");
+            alert(t('adminDashboard.errors.deleteError'));
         }
     };
 
@@ -285,20 +287,20 @@ const AdminDashboard = () => {
     const DeleteConfirmationModal = () => (
         <div className={`delete-modal-overlay ${deleteModal.isOpen ? 'active' : ''}`}>
             <div className="delete-modal-content">
-                <h3>Delete Comment</h3>
-                <p>Are you sure you want to delete this comment?</p>
+                <h3>{t('adminDashboard.modals.delete.title')}</h3>
+                <p>{t('adminDashboard.modals.delete.question')}</p>
                 <div className="delete-modal-buttons">
                     <button 
                         className="delete-modal-button cancel"
                         onClick={() => setDeleteModal({ isOpen: false, commentId: null })}
                     >
-                        Cancel
+                        {t('adminDashboard.modals.delete.cancel')}
                     </button>
                     <button 
                         className="delete-modal-button confirm"
                         onClick={() => handleDeleteComment(deleteModal.commentId)}
                     >
-                        Delete
+                        {t('adminDashboard.modals.delete.confirm')}
                     </button>
                 </div>
             </div>
@@ -310,7 +312,7 @@ const AdminDashboard = () => {
         <div className={`comments-modal-overlay ${isCommentsModalOpen ? 'active' : ''}`}>
             <div className="comments-modal-content">
                 <div className="modal-header">
-                    <h2>Last User Comments</h2>
+                    <h2>{t('adminDashboard.modals.comments.title')}</h2>
                     <button 
                         className="modal-close-button"
                         onClick={() => setIsCommentsModalOpen(false)}
@@ -341,7 +343,7 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="comment-footer">
                                         <span className="comment-date">
-                                            {new Date(comment.createdAt).toLocaleDateString()}
+                                            {new Date(comment.createdAt).toLocaleDateString(i18n.language === 'tr' ? 'tr-TR' : 'en-US')}
                                         </span>
                                         <button 
                                             className="delete-comment-button"
@@ -353,7 +355,7 @@ const AdminDashboard = () => {
                                 </div>
                             )) : 
                             <div className="empty-state">
-                                <p>No comments yet</p>
+                                <p>{t('adminDashboard.modals.comments.noComments')}</p>
                             </div>
                         }
                     </div>
@@ -368,7 +370,7 @@ const UsersModal = () => (
     <div className={`users-modal-overlay ${isUsersModalOpen ? 'active' : ''}`}>
         <div className="users-modal-content">
             <div className="modal-header">
-                <h2>All Users</h2>
+                <h2>{t('adminDashboard.modals.users.title')}</h2>
                 <button 
                     className="modal-close-button"
                     onClick={() => setIsUsersModalOpen(false)}
@@ -411,11 +413,11 @@ const UsersModal = () => (
                 <div className="user-info">
                     <h4>{user.username}</h4>
                     <div className="user-stats">
-                        <span>{user.movieCount} films</span>
+                        <span>{user.movieCount} {t('adminDashboard.labels.films')}</span>
                     </div>
                     {user.banned && (
                         <div className="ban-reason">
-                            Reason: {user.banReason}
+                            {t('adminDashboard.labels.banReason')}: {user.banReason}
                         </div>
                     )}
                 </div>
@@ -429,7 +431,7 @@ const UsersModal = () => (
                             handleUnbanUser(user.id);
                         }}
                     >
-                        Unban
+                        {t('adminDashboard.buttons.unban')}
                     </button>
                 ) : (
                     <button 
@@ -439,7 +441,7 @@ const UsersModal = () => (
                             setBanModal({ isOpen: true, userId: user.id });
                         }}
                     >
-                        Ban
+                        {t('adminDashboard.buttons.ban')}
                     </button>
                 )}
             </div>
@@ -452,7 +454,7 @@ const UsersModal = () => (
         <div className={`movies-modal-overlay ${isMoviesModalOpen ? 'active' : ''}`}>
             <div className="movies-modal-content">
                 <div className="modal-header">
-                    <h2>Top Favorited Movies</h2>
+                    <h2>{t('adminDashboard.modals.movies.title')}</h2>
                     <button 
                         className="modal-close-button"
                         onClick={() => setIsMoviesModalOpen(false)}
@@ -479,7 +481,7 @@ const UsersModal = () => (
                                     </div>
                                 </div>
                                 <div className="movie-list-favorites">
-                                    <span>{movie.favorites} favourite</span>
+                                    <span>{movie.favorites} {t('adminDashboard.labels.favorites')}</span>
                                 </div>
                             </div>
                         ))}
@@ -491,30 +493,30 @@ const UsersModal = () => (
 
     // Ban Modal komponenti
     const BanModal = () => {
-        const [selectedReason, setSelectedReason] = useState('');
-        const [customReason, setCustomReason] = useState('');
-
+        // Çeviriye uygun ban sebeplerini al
+        const banReasonOptions = t('adminDashboard.banReasons', { returnObjects: true });
+        
         return (
             <div className={`ban-modal-overlay ${banModal.isOpen ? 'active' : ''}`}>
                 <div className="ban-modal-content">
-                    <h3>Ban User</h3>
+                    <h3>{t('adminDashboard.modals.ban.title')}</h3>
                     <div className="ban-form">
                         <select 
                             value={selectedReason}
                             onChange={(e) => setSelectedReason(e.target.value)}
                             className="ban-reason-select"
                         >
-                            <option value="">Ban reason</option>
-                            {banReasons.map((reason, index) => (
+                            <option value="">{t('adminDashboard.modals.ban.selectReason')}</option>
+                            {banReasonOptions.map((reason, index) => (
                                 <option key={index} value={reason}>{reason}</option>
                             ))}
                         </select>
                         
-                        {selectedReason === "Other" && (
+                        {selectedReason === banReasonOptions[4] && ( // "Diğer" seçeneği için
                             <textarea
                                 value={customReason}
                                 onChange={(e) => setCustomReason(e.target.value)}
-                                placeholder="Write the reason for the ban..."
+                                placeholder={t('adminDashboard.modals.ban.customReasonPlaceholder')}
                                 className="custom-reason-input"
                             />
                         )}
@@ -524,15 +526,15 @@ const UsersModal = () => (
                             className="ban-modal-button cancel"
                             onClick={() => setBanModal({ isOpen: false, userId: null })}
                         >
-                            Cancel
+                            {t('adminDashboard.modals.ban.cancel')}
                         </button>
                         <button 
                             className="ban-modal-button confirm"
                             onClick={() => handleBanUser(banModal.userId, 
-                                selectedReason === "Other" ? customReason : selectedReason)}
+                                selectedReason === banReasonOptions[4] ? customReason : selectedReason)}
                             disabled={!selectedReason}
                         >
-                            Ban
+                            {t('adminDashboard.modals.ban.confirm')}
                         </button>
                     </div>
                 </div>
@@ -542,27 +544,27 @@ const UsersModal = () => (
 
     return (
         <div className="admin-dashboard">
-            <h1>Admin Dashboard</h1>
+            <h1>{t('adminDashboard.title')}</h1>
             
             <div className="stats-container">
                 <div className="stat-card">
                     <i className="fas fa-users"></i>
-                    <h3>Total User</h3>
+                    <h3>{t('adminDashboard.stats.totalUsers')}</h3>
                     <p>{stats.totalUsers}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-eye"></i>
-                    <h3>Daily Visitors</h3>
+                    <h3>{t('adminDashboard.stats.dailyVisitors')}</h3>
                     <p>{stats.dailyVisitors}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-film"></i>
-                    <h3>Total Movies</h3>
+                    <h3>{t('adminDashboard.stats.totalMovies')}</h3>
                     <p>{stats.totalMovies}</p>
                 </div>
                 <div className="stat-card">
                     <i className="fas fa-comments"></i>
-                    <h3>Total Reviews</h3>
+                    <h3>{t('adminDashboard.stats.totalReviews')}</h3>
                     <p>{stats.totalReviews}</p>
                 </div>
             </div>
@@ -570,12 +572,12 @@ const UsersModal = () => (
             <div className="dashboard-grid">
                 <div className="dashboard-card">
                     <div className="section-header">
-                        <h2>Top Favorited Movies</h2>
+                        <h2>{t('adminDashboard.sections.topMoviesTitle')}</h2>
                         <button 
                             className="see-all-button"
                             onClick={() => setIsMoviesModalOpen(true)}
                         >
-                            See All <FaChevronRight />
+                            {t('adminDashboard.buttons.seeAll')} <FaChevronRight />
                         </button>
                     </div>
                     <div className="top-movies-list">
@@ -596,7 +598,7 @@ const UsersModal = () => (
                                     </div>
                                 </div>
                                 <div className="movie-list-favorites">
-                                    <span>{movie.favorites} favourite</span>
+                                    <span>{movie.favorites} {t('adminDashboard.labels.favorites')}</span>
                                 </div>
                             </div>
                         ))}
@@ -605,12 +607,12 @@ const UsersModal = () => (
 
                 <div className="dashboard-card">
                     <div className="section-header">
-                        <h2>Last User Comments</h2>
+                        <h2>{t('adminDashboard.sections.recentCommentsTitle')}</h2>
                         <button 
                             className="see-all-button" 
                             onClick={() => setIsCommentsModalOpen(true)}
                         >
-                            See All <FaChevronRight />
+                            {t('adminDashboard.buttons.seeAll')} <FaChevronRight />
                         </button>
                     </div>
                     
@@ -637,7 +639,7 @@ const UsersModal = () => (
                                         </div>
                                         <div className="comment-footer">
                                             <span className="comment-date">
-                                                {new Date(comment.createdAt).toLocaleDateString()}
+                                                {new Date(comment.createdAt).toLocaleDateString(i18n.language === 'tr' ? 'tr-TR' : 'en-US')}
                                             </span>
                                             <button 
                                                 className="delete-comment-button"
@@ -651,7 +653,7 @@ const UsersModal = () => (
                             </div>
                         ) : (
                             <div className="empty-state">
-                                <p>No comments yet</p>
+                                <p>{t('adminDashboard.modals.comments.noComments')}</p>
                             </div>
                         )}
                     </div>
@@ -661,13 +663,13 @@ const UsersModal = () => (
                     <div className="section-header">
                         <h2>
                             <FaUsers className="section-icon" />
-                            Users
+                            {t('adminDashboard.sections.usersTitle')}
                         </h2>
                         <button 
                             className="see-all-button"
                             onClick={() => setIsUsersModalOpen(true)}
                         >
-                            See All <FaChevronRight />
+                            {t('adminDashboard.buttons.seeAll')} <FaChevronRight />
                         </button>
                     </div>
                     <div className="users-list">

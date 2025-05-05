@@ -1,0 +1,436 @@
+{
+  "app": {
+    "title": "Film Takip Sistemi"
+  },
+  "navbar": {
+    "home": "Ana Sayfa",
+    "movies": "Filmler",
+    "explore": "Keşfet",
+    "profile": "Profil",
+    "admin": "Yönetici Paneli",
+    "users": "Kullanıcılar",
+    "spoilerReports": "Spoiler Raporları",
+    "watchlist": "İzleme Listesi",
+    "searchUsers": "Kullanıcı ara...",
+    "noUsersFound": "Kullanıcı bulunamadı",
+    "logout": "Çıkış Yap"
+  },
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "edit": "Düzenle",
+    "delete": "Sil"
+  },
+  "language": {
+    "en": "İngilizce",
+    "tr": "Türkçe"
+  },
+  "home": {
+    "hero": {
+      "title": "Film Tutkunları İçin Buluşma Noktası",
+      "subtitle": "Binlerce film, sınırsız deneyim",
+      "joinNow": "Şimdi Katıl",
+      "emailPlaceholder": "E-posta adresiniz",
+      "start": "Başla"
+    },
+    "features": {
+      "title": "Neden .Moviary?",
+      "wideCollection": {
+        "title": "Geniş Film Koleksiyonu",
+        "description": "Klasiklerden modern gişe rekorlarına, binlerce film"
+      },
+      "socialInteraction": {
+        "title": "Sosyal Etkileşim",
+        "description": "Diğer film meraklılarıyla tanışın ve filmler hakkında tartışın"
+      },
+      "recommendations": {
+        "title": "Kişiselleştirilmiş Öneriler",
+        "description": "Tercihlerinize göre özelleştirilmiş film önerileri"
+      }
+    },
+    "devices": {
+      "title": ".Moviary'yi Her Yerde Kullanın",
+      "subtitle": "Film dünyasına herhangi bir cihazdan, istediğiniz zaman bağlanın",
+      "phone": "Telefon",
+      "tablet": "Tablet",
+      "laptop": "Dizüstü",
+      "desktop": "Masaüstü"
+    },
+    "collection": {
+      "tagline": "Filmleri takip etmenin yeni yolu",
+      "headline": "KÜLT KLASİKLERDEN MODERN GİŞE REKORLARINA\nTÜM ZAMANLARIN EN İYİ FİLMLERİ\nDÜNYANIN HER YERİNDEN",
+      "cta": "Ücretsiz Yararlanın"
+    }
+  },
+  "login": {
+    "title": "Giriş",
+    "backToMain": "← Ana sayfaya dön",
+    "email": "E-posta",
+    "password": "Şifre",
+    "forgotPassword": "Şifremi Unuttum?",
+    "loginButton": "Giriş Yap",
+    "loading": "Yükleniyor...",
+    "successMessage": "Giriş başarılı! Yönlendiriliyor...",
+    "noAccount": "Hesabınız yok mu?",
+    "register": "Kaydol",
+    "error": "Giriş başarısız. Lütfen tekrar deneyin."
+  },
+  "register": {
+    "title": "Kayıt Ol",
+    "backToMain": "← Ana sayfaya dön",
+    "username": "Kullanıcı Adı",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "registerButton": "Kayıt Ol",
+    "loading": "Yükleniyor...",
+    "successMessage": "Kayıt başarılı! Lütfen giriş yapın.",
+    "haveAccount": "Zaten hesabım var",
+    "login": "Giriş Yap",
+    "errors": {
+      "passwordsNotMatch": "Şifreler eşleşmiyor",
+      "registrationFailed": "Kayıt başarısız. Lütfen tekrar deneyin."
+    }
+  },
+  "forgotPassword": {
+    "title": "Şifre Sıfırlama",
+    "backToMain": "← Ana sayfaya dön",
+    "step1": {
+      "emailPlaceholder": "E-posta adresinizi girin",
+      "sendingButton": "Gönderiliyor...",
+      "sendButton": "Sıfırlama Kodu Gönder"
+    },
+    "step2": {
+      "codePlaceholder": "Sıfırlama kodunu girin",
+      "verifyingButton": "Doğrulanıyor...",
+      "verifyButton": "Kodu Doğrula"
+    },
+    "step3": {
+      "passwordPlaceholder": "Yeni şifrenizi girin",
+      "resettingButton": "Sıfırlanıyor...",
+      "resetButton": "Şifreyi Sıfırla"
+    },
+    "rememberPassword": "Şifrenizi hatırladınız mı?",
+    "login": "Giriş Yap",
+    "messages": {
+      "codeSent": "Sıfırlama kodu e-posta adresinize gönderildi",
+      "passwordReset": "Şifreniz başarıyla sıfırlandı!"
+    },
+    "errors": {
+      "codeSendFailed": "Sıfırlama kodu gönderilemedi. Lütfen tekrar deneyin.",
+      "invalidCode": "Geçersiz sıfırlama kodu. Lütfen tekrar deneyin.",
+      "resetFailed": "Şifre sıfırlama başarısız. Lütfen tekrar deneyin."
+    }
+  },
+  "explore": {
+    "searchPlaceholder": "Film ara...",
+    "categories": {
+      "all": "Tümü"
+    },
+    "sort": {
+      "sortBy": "Sırala: ",
+      "az": "A'dan Z'ye",
+      "za": "Z'den A'ya",
+      "topRated": "En Yüksek Puanlı",
+      "oldestFirst": "En Eski Önce",
+      "newestFirst": "En Yeni Önce"
+    },
+    "loading": {
+      "title": "Filmler Yükleniyor...",
+      "progress": "Yükleniyor..."
+    },
+    "pagination": {
+      "of": " / "
+    }
+  },
+  "profile": {
+    "edit": "DÜZENLE",
+    "following": "takip edilen",
+    "follower": "takipçi",
+    "followers": "Takipçiler",
+    "comments": "yorum",
+    "stats": "İstatistikler",
+    "movieTime": "Film süresi",
+    "months": "AY",
+    "days": "GÜN",
+    "hours": "SAAT",
+    "moviesWatched": "İzlenen filmler",
+    "seeAll": "Tümünü gör",
+    "showLess": "Daha az göster",
+    "noComments": "Henüz yorum yok",
+    "favorites": "Favoriler",
+    "watchedMovies": "İzlenen Filmler",
+    "watchlist": "İzleme Listesi",
+    "movieSections": {
+      "favorites": "Favoriler",
+      "watchedmovies": "İzlenen Filmler",
+      "watchlist": "İzleme Listesi"
+    },
+    "commentsSection": {
+      "title": "Yorumlar",
+      "spoiler": "SPOİLER",
+      "noComments": "Henüz yorum yok"
+    },
+    "modals": {
+      "deleteTitle": "Yorumu Sil",
+      "deleteConfirm": "Bu yorumu silmek istediğinizden emin misiniz?",
+      "cancel": "İptal",
+      "delete": "Sil",
+      "editTitle": "Yorumu Düzenle",
+      "editComment": "Yorum",
+      "editRating": "Puan",
+      "save": "Değişiklikleri Kaydet"
+    }
+  },
+  "profileEdit": {
+    "title": "Profili Düzenle",
+    "loading": "Yükleniyor...",
+    "error": "Profil güncellenirken bir hata oluştu",
+    "avatar": {
+      "changePhoto": "Fotoğrafı Değiştir"
+    },
+    "fields": {
+      "username": "Kullanıcı Adı",
+      "email": "E-posta",
+      "fullName": "Ad Soyad",
+      "about": "Hakkında"
+    },
+    "buttons": {
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor..."
+    }
+  },
+  "movieDetail": {
+    "runtime": "s dk",
+    "originalTitle": "Orijinal Başlık",
+    "markAsWatched": "İzlendi olarak işaretle",
+    "markAsUnwatched": "İzlenmedi olarak işaretle",
+    "platforms": {
+      "title": "Mevcut Platformlar (Türkiye):",
+      "noProviders": "Türkiye'de mevcut platform bulunmuyor.",
+      "subs": "Abonelik",
+      "renting": "Kiralama",
+      "purchase": "Satın Alma",
+      "watchOn": "İzle:"
+    },
+    "cast": {
+      "title": "Oyuncular:",
+      "searchFor": "Google'da ara:"
+    },
+    "actions": {
+      "seeDiscussions": "TARTIŞMALARI GÖR",
+      "rateMovie": "Bu filmi puanla",
+      "addToWatchlist": "İZLEME LİSTESİNE EKLE",
+      "removeFromWatchlist": "İZLEME LİSTESİNDEN ÇIKAR",
+      "seeAllPosts": "TÜM GÖNDERİLERİ GÖR"
+    }
+  },
+  "movieCard": {
+    "runtime": "dk",
+    "watched": "İzlendi",
+    "unwatched": "İzlendi olarak işaretle"
+  },
+  "watchlist": {
+    "loading": "Filmler yükleniyor...",
+    "tabs": {
+      "watchlist": "İzleme Listesi",
+      "watched": "İzlenenler"
+    },
+    "emptyState": {
+      "watchlist": "İzleme listeniz boş. Keşfet sayfasından film ekleyebilirsiniz.",
+      "watched": "Henüz izlendi olarak işaretlediğiniz film yok."
+    },
+    "error": {
+      "login": "İzleme listenizi görmek için lütfen giriş yapın.",
+      "loading": "Filmler yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+      "update": "Film durumu güncellenirken hata oluştu."
+    }
+  },
+  "userProfile": {
+    "loading": "Yükleniyor...",
+    "error": {
+      "generic": "Profil verileri yüklenemedi",
+      "followStatus": "Takip durumu kontrol edilemedi",
+      "follow": "Takip durumu güncellenirken bir hata oluştu",
+      "notFound": "Profil bulunamadı"
+    },
+    "buttons": {
+      "follow": "Takip Et",
+      "following": "Takip Ediliyor",
+      "seeAll": "Tümünü Gör",
+      "showLess": "Daha Az Göster"
+    },
+    "stats": {
+      "following": "takip edilen",
+      "follower": "takipçi",
+      "comments": "yorum",
+      "title": "İstatistikler",
+      "moviesWatched": "İzlenen filmler",
+      "movieTime": "Film süresi",
+      "months": "AY",
+      "days": "GÜN",
+      "hours": "SAAT"
+    },
+    "sections": {
+      "favorites": "Favoriler",
+      "watchedMovies": "İzlenen Filmler",
+      "watchlist": "İzleme Listesi",
+      "comments": "Yorumlar"
+    },
+    "emptyState": {
+      "noComments": "Henüz yorum yok"
+    }
+  },
+  "adminDashboard": {
+    "title": "Yönetici Paneli",
+    "stats": {
+      "totalUsers": "Toplam Kullanıcılar",
+      "dailyVisitors": "Günlük Ziyaretçiler",
+      "totalMovies": "Toplam Filmler",
+      "totalReviews": "Toplam Yorumlar"
+    },
+    "sections": {
+      "topMoviesTitle": "En Çok Favorilenen Filmler",
+      "recentCommentsTitle": "Son Kullanıcı Yorumları",
+      "usersTitle": "Kullanıcılar"
+    },
+    "labels": {
+      "favorites": "favori",
+      "films": "film",
+      "banReason": "Neden"
+    },
+    "buttons": {
+      "seeAll": "Tümünü Gör",
+      "ban": "Engelle",
+      "unban": "Engeli Kaldır"
+    },
+    "modals": {
+      "delete": {
+        "title": "Yorumu Sil",
+        "question": "Bu yorumu silmek istediğinizden emin misiniz?",
+        "cancel": "İptal",
+        "confirm": "Sil"
+      },
+      "comments": {
+        "title": "Son Kullanıcı Yorumları",
+        "noComments": "Henüz yorum yok"
+      },
+      "users": {
+        "title": "Tüm Kullanıcılar"
+      },
+      "movies": {
+        "title": "En Çok Favorilenen Filmler"
+      },
+      "ban": {
+        "title": "Kullanıcıyı Engelle",
+        "selectReason": "Engelleme nedeni",
+        "customReasonPlaceholder": "Engelleme nedenini yazın...",
+        "cancel": "İptal",
+        "confirm": "Engelle"
+      }
+    },
+    "banReasons": [
+      "Uygunsuz içerik paylaşımı",
+      "Spam/Reklam",
+      "Nefret söylemi/Hakaret",
+      "Sahte hesap",
+      "Diğer"
+    ],
+    "errors": {
+      "unbanFailed": "Engel kaldırma işlemi başarısız: ",
+      "banFailed": "Engelleme işlemi başarısız: ",
+      "deleteSuccess": "Yorum başarıyla silindi.",
+      "deleteFailed": "Silme işlemi başarısız: ",
+      "deleteError": "Silme işlemi sırasında bir hata oluştu."
+    }
+  },
+  "users": {
+    "title": "Kullanıcı Yönetimi",
+    "searchPlaceholder": "Bir kullanıcı ara...",
+    "movie": "film",
+    "comment": "yorum",
+    "joined": "Katılım:",
+    "banReason": "Sebep:",
+    "noResults": "Kullanıcı bulunamadı",
+    "banUser": "Kullanıcıyı Engelle",
+    "banAction": "Engelle",
+    "unbanAction": "Engeli Kaldır",
+    "selectReason": "Engelleme sebebini seçin",
+    "writeReason": "Engelleme sebebini yazın...",
+    "cancel": "İptal",
+    "banError": "Engelleme işlemi sırasında bir hata oluştu.",
+    "unbanError": "Engel kaldırma işlemi sırasında bir hata oluştu.",
+    "noPermission": "Bu sayfaya erişim izniniz bulunmamaktadır!"
+  },
+  "banReasons": {
+    "unsuitable": "Uygunsuz içerik paylaşımı",
+    "spam": "Spam/Reklam",
+    "hateSpeech": "Nefret söylemi/Hakaret",
+    "fakeAccount": "Sahte hesap",
+    "other": "Diğer"
+  },
+  "movieSocialPage": {
+    "postPlaceholder": "Bu film hakkında düşüncelerinizi paylaşın...",
+    "submitPost": "Paylaş",
+    "comment": "Yorum",
+    "comments": "Yorumlar",
+    "like": "Beğen",
+    "addComment": "Yorum ekle...",
+    "commentButton": "Gönder",
+    "spoilerWarning": "Bu içerik spoiler içerebilir. Görmek için tıklayın.",
+    "spoilerAlert": "Bu içerik spoiler içerir!",
+    "follow": "Takip Et",
+    "unfollow": "Takibi Bırak",
+    "reportSpoiler": "Spoiler Bildir",
+    "removeReport": "Bildirimi Kaldır",
+    "remove": "Kaldır",
+    "delete": "Sil",
+    "cancelMedia": "İptal",
+    "addMedia": "Medya Ekle",
+    "loginFirst": "Lütfen önce giriş yapın",
+    "sessionExpired": "Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın",
+    "errorLoading": "Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+    "failedUpload": "Medya yüklenemedi",
+    "errorCreatingPost": "Gönderi oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
+    "commentAdded": "Yorumunuz başarıyla eklendi",
+    "commentError": "Yorum yapılırken bir hata oluştu. Lütfen tekrar deneyin.",
+    "spoilerMarked": "İçerik spoiler olarak işaretlendi",
+    "spoilerRemoved": "Spoiler işareti kaldırıldı",
+    "spoilerReported": "Spoiler başarıyla bildirildi",
+    "deleteConfirm": "Bu gönderiyi silmek istediğinizden emin misiniz?",
+    "deleteSuccess": "Gönderi başarıyla silindi",
+    "deleteError": "Gönderi silinirken hata oluştu"
+  },
+  "footer": {
+    "tagline": "En iyi film takip arkadaşınız",
+    "navigation": "Menü",
+    "home": "Ana Sayfa",
+    "explore": "Keşfet",
+    "watchlist": "İzleme Listesi",
+    "profile": "Profil",
+    "connect": "Bağlantılar",
+    "madeIn": "Türkiye'de yapıldı",
+    "copyright": "© 2025 .MOVIARY - Tüm hakları saklıdır"
+  },
+  "homeNavbar": {
+    "register": "Kayıt Ol",
+    "login": "Giriş Yap"
+  },
+  "spoilerRequests": {
+    "title": "Spoiler Bildirimleri",
+    "loading": "Yükleniyor...",
+    "error": "Spoiler bildirimleri yüklenemedi",
+    "reporter": "Bildiren:",
+    "status": "Durum:",
+    "statusValues": {
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi"
+    },
+    "actions": {
+      "markAsSpoiler": "Spoiler Olarak İşaretle",
+      "decline": "Reddet"
+    },
+    "timestamp": "Tarih"
+  }
+}

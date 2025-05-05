@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Home.css';
 import backgroundVideo from '../assets/videos/movie-background.mp4';
 import { FaFilm, FaUserFriends, FaStar, FaMobileAlt, FaTabletAlt, FaLaptop, FaDesktop } from 'react-icons/fa';
@@ -7,6 +8,7 @@ import { FaFilm, FaUserFriends, FaStar, FaMobileAlt, FaTabletAlt, FaLaptop, FaDe
 const Home = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('userType');
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (isLoggedIn) {
@@ -28,59 +30,59 @@ const Home = () => {
           <div className="overlay"></div>
         </div>
         <div className="hero-content">
-          <h1>Meeting Point for Movie Enthusiasts</h1>
-          <p className="hero-subtitle">Thousands of movies, unlimited experiences</p>
+          <h1>{t('home.hero.title')}</h1>
+          <p className="hero-subtitle">{t('home.hero.subtitle')}</p>
           <div className="subscription-box">
-            <h2>Join Now</h2>
+            <h2>{t('home.hero.joinNow')}</h2>
             <div className="email-input-container">
-              <input type="email" placeholder="Your email" />
-              <button onClick={handleExplore}>Start</button>
+              <input type="email" placeholder={t('home.hero.emailPlaceholder')} />
+              <button onClick={handleExplore}>{t('home.hero.start')}</button>
             </div>
           </div>
         </div>
       </section>
 
       <section className="features-section">
-        <h2 className="section-title">Why .Moviary?</h2>
+        <h2 className="section-title">{t('home.features.title')}</h2>
         <div className="features-grid">
           <div className="feature-card">
             <FaFilm className="feature-icon" />
-            <h3>Wide Movie Collection</h3>
-            <p>From classics to modern blockbusters, thousands of movies</p>
+            <h3>{t('home.features.wideCollection.title')}</h3>
+            <p>{t('home.features.wideCollection.description')}</p>
           </div>
           <div className="feature-card">
             <FaUserFriends className="feature-icon" />
-            <h3>Social Interaction</h3>
-            <p>Meet and discuss movies with fellow enthusiasts</p>
+            <h3>{t('home.features.socialInteraction.title')}</h3>
+            <p>{t('home.features.socialInteraction.description')}</p>
           </div>
           <div className="feature-card">
             <FaStar className="feature-icon" />
-            <h3>Personalized Recommendations</h3>
-            <p>Customized movie recommendations based on your preferences</p>
+            <h3>{t('home.features.recommendations.title')}</h3>
+            <p>{t('home.features.recommendations.description')}</p>
           </div>
         </div>
       </section>
 
       <section className="devices-section">
         <div className="devices-content">
-          <h2>Use .Moviary Everywhere</h2>
-          <p>Connect to the movie world on any device, anytime</p>
+          <h2>{t('home.devices.title')}</h2>
+          <p>{t('home.devices.subtitle')}</p>
           <div className="device-frames">
             <div className="device-item">
               <FaMobileAlt className="device-icon" />
-              <span>Phone</span>
+              <span>{t('home.devices.phone')}</span>
             </div>
             <div className="device-item">
               <FaTabletAlt className="device-icon" />
-              <span>Tablet</span>
+              <span>{t('home.devices.tablet')}</span>
             </div>
             <div className="device-item">
               <FaLaptop className="device-icon" />
-              <span>Desktop</span>
+              <span>{t('home.devices.laptop')}</span>
             </div>
             <div className="device-item">
               <FaDesktop className="device-icon" />
-              <span>Desktop</span>
+              <span>{t('home.devices.desktop')}</span>
             </div>
           </div>
         </div>
@@ -90,14 +92,12 @@ const Home = () => {
         <div className="collection-content">
           <div className="collection-logo">
             <h2>.Moviary</h2>
-            <p className="tagline">The new way to track movies</p>
+            <p className="tagline">{t('home.collection.tagline')}</p>
           </div>
           <div className="collection-text">
-            <h2>CULT CLASSICS TO MODERN BLOCKBUSTERS<br />
-                THE BEST MOVIES OF ALL TIME<br />
-                FROM EVERYWHERE IN THE WORLD</h2>
+            <h2>{t('home.collection.headline')}</h2>
           </div>
-          <button className="cta-button" onClick={handleExplore}>Benefit for Free</button>
+          <button className="cta-button" onClick={handleExplore}>{t('home.collection.cta')}</button>
         </div>
       </section>
     </div>

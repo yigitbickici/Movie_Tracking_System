@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Profile.css';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { FaChevronRight, FaHeart, FaEye, FaList, FaComment, FaStar, FaTrash, FaEdit, FaUsers, FaUserFriends } from 'react-icons/fa';
@@ -7,6 +8,7 @@ import MovieCard from '../components/MovieCard';
 import axios from '../services/axiosConfig';
 
 const Profile = () => {
+    const { t, i18n } = useTranslation();
     const { username } = useParams();
     const [userProfile, setUserProfile] = useState(null);
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -83,26 +85,27 @@ const Profile = () => {
     };
 
     const handleMovieClick = (movie) => {
+        const language = i18n.language === 'tr' ? 'tr-TR' : 'en-US';
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/watch/providers?api_key=84e605aa45ef84282ba934b9b2648dc5`),
-            axios.get(`/api/movies/${movie.tmdbId}/watchlist/check`)
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=${language}`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=${language}`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/watch/providers?api_key=84e605aa45ef84282ba934b9b2648dc5`)
         ])
-        .then(([detailsRes, creditsRes, providersRes, watchlistRes]) => 
-            Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json(), watchlistRes.data])
+        .then(([detailsRes, creditsRes, providersRes]) => 
+            Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
         )
-        .then(([detailedMovie, credits, providers, watchlistStatus]) => {
+        .then(([detailedMovie, credits, providers]) => {
+            const countryCode = i18n.language === 'tr' ? 'TR' : 'US';
             setSelectedMovie({
+                ...movie,
                 ...detailedMovie,
-                id: movie.tmdbId,
-                tmdbId: movie.tmdbId,
-                poster_path: detailedMovie.poster_path || movie.posterPath,
-                release_date: detailedMovie.release_date || movie.releaseDate,
-                vote_average: detailedMovie.vote_average || movie.voteAverage,
+                tmdbId: movie.id || movie.tmdbId,
+                overview: detailedMovie.overview,
+                vote_average: detailedMovie.vote_average,
+                original_title: detailedMovie.original_title,
+                runtime: detailedMovie.runtime,
                 cast: credits.cast?.slice(0, 5),
-                providers: providers.results?.TR || {},
-                isInWatchlist: watchlistStatus.inWatchlist
+                providers: providers.results?.[countryCode] || {}
             });
         })
         .catch(error => console.error("Error fetching movie details:", error));
@@ -219,7 +222,15 @@ const Profile = () => {
     };
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
-        const [isModalOpen, setIsModalOpen] = useState(false);
+        // Güvenli bir şekilde çeviri anahtarını oluştur
+        const translationKey = title.toLowerCase().replace(/\s+/g, '');
+        
+        const [modalMovies, setModalMovies] = useState({
+            isOpen: false,
+            movies: [],
+            title: '',
+            icon: null
+        });
 
         // İzlenen filmleri watchlist'ten filtrele
         const filteredMovies = title === "Watchlist" 
@@ -240,16 +251,18 @@ const Profile = () => {
                 <div className="section-header">
                     <h2>
                         <Icon className="section-icon" />
-                        {title}
+                        {t(`profile.movieSections.${translationKey}`)}
                     </h2>
-                    <div className="section-buttons">
-                        <button 
-                            className="see-all-button modal-button" 
-                            onClick={() => setIsModalOpen(true)}
-                        >
-                            See all <FaChevronRight />
+                    {movies.length > 3 && (
+                        <button className="see-all-button" onClick={() => setModalMovies({ 
+                            isOpen: true, 
+                            movies, 
+                            title: t(`profile.movieSections.${translationKey}`), 
+                            icon: Icon 
+                        })}>
+                            {t('profile.seeAll')} <FaChevronRight />
                         </button>
-                    </div>
+                    )}
                 </div>
                 
                 <div className="movies-grid">
@@ -266,17 +279,17 @@ const Profile = () => {
                             onFavoriteToggle={handleFavoriteToggle}
                         />
                     ))}
-            </div>
+                </div>
 
-                <MovieModal 
-                    movies={filteredMovies}
-                    title={title}
-                    icon={Icon}
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                <MovieModal
+                    movies={modalMovies.movies}
+                    title={modalMovies.title}
+                    isOpen={modalMovies.isOpen}
+                    onClose={() => setModalMovies({ ...modalMovies, isOpen: false })}
+                    icon={modalMovies.icon}
                 />
-        </div>
-    );
+            </div>
+        );
     };
 
     const MovieModal = ({ movies, title, isOpen, onClose, icon: Icon }) => {
@@ -332,22 +345,16 @@ const Profile = () => {
     };
 
     const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => (
-        <div className={`delete-modal-overlay ${isOpen ? 'active' : ''}`}>
-            <div className="delete-modal-content">
-                <h3>Delete Comment</h3>
-                <p>Are you sure you want to delete this comment?</p>
-                <div className="delete-modal-buttons">
-                    <button 
-                        className="delete-modal-button cancel"
-                        onClick={onClose}
-                    >
-                        Cancel
+        <div className={`modal ${isOpen ? 'open' : ''}`}>
+            <div className="modal-content delete-modal">
+                <h2>{t('profile.modals.deleteTitle')}</h2>
+                <p>{t('profile.modals.deleteConfirm')}</p>
+                <div className="modal-actions">
+                    <button onClick={onClose} className="cancel-button">
+                        {t('profile.modals.cancel')}
                     </button>
-                    <button 
-                        className="delete-modal-button confirm"
-                        onClick={onConfirm}
-                    >
-                        Delete
+                    <button onClick={onConfirm} className="delete-button">
+                        {t('profile.modals.delete')}
                     </button>
                 </div>
             </div>
@@ -355,73 +362,60 @@ const Profile = () => {
     );
 
     const EditCommentModal = ({ isOpen, comment, onClose, onSave }) => {
-        const [editedComment, setEditedComment] = useState(comment?.comment || '');
-        const [editedRating, setEditedRating] = useState(comment?.rating || 5);
-        const [hoveredRating, setHoveredRating] = useState(0);
+        const [commentText, setCommentText] = useState('');
+        const [rating, setRating] = useState(5);
+        const [isSpoiler, setIsSpoiler] = useState(false);
 
         useEffect(() => {
             if (comment) {
-                setEditedComment(comment.comment);
-                setEditedRating(comment.rating);
+                setCommentText(comment.comment || '');
+                setRating(comment.rating || 5);
+                setIsSpoiler(comment.isSpoiler || false);
             }
         }, [comment]);
 
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            onSave(comment.id, commentText, rating, isSpoiler);
+        };
+
         return (
-            <div className={`edit-modal-overlay ${isOpen ? 'active' : ''}`}>
-                <div className="edit-modal-content">
-                    <h3>Edit Comment</h3>
-                    <div className="edit-modal-form">
-                        <div className="rating-input">
-                            <label>Rating:</label>
-                            <div className="star-rating">
-                                {[...Array(10)].map((_, index) => {
-                                    const ratingValue = index + 1;
-                                    return (
-                                        <button
-                                            type="button"
-                                            key={ratingValue}
-                                            className={`star-button ${
-                                                ratingValue <= (hoveredRating || editedRating) 
-                                                    ? 'active' 
-                                                    : ''
-                                            }`}
-                                            onClick={() => setEditedRating(ratingValue)}
-                                            onMouseEnter={() => setHoveredRating(ratingValue)}
-                                            onMouseLeave={() => setHoveredRating(0)}
-                                        >
-                                            ★
-                                        </button>
-                                    );
-                                })}
-                                {editedRating > 0 && (
-                                    <span className="rating-number">{editedRating}/10</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className="comment-input">
-                            <label>Comment:</label>
+            <div className={`modal ${isOpen ? 'open' : ''}`}>
+                <div className="modal-content edit-modal">
+                    <h2>{t('profile.modals.editTitle')}</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>{t('profile.modals.editComment')}</label>
                             <textarea
-                                value={editedComment}
-                                onChange={(e) => setEditedComment(e.target.value)}
-                                rows="4"
-                                placeholder="Write your comment..."
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                required
                             />
                         </div>
-                    </div>
-                    <div className="edit-modal-buttons">
-                        <button 
-                            className="edit-modal-button cancel"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            className="edit-modal-button confirm"
-                            onClick={() => onSave(comment.id, editedComment, editedRating)}
-                        >
-                            Save
-                        </button>
-                    </div>
+                        
+                        <div className="form-group">
+                            <label>{t('profile.modals.editRating')}</label>
+                            <div className="star-rating">
+                                {[...Array(10)].map((_, i) => (
+                                    <FaStar
+                                        key={i}
+                                        className={i < rating ? 'star active' : 'star'}
+                                        onClick={() => setRating(i + 1)}
+                                    />
+                                ))}
+                                <span>{rating}/10</span>
+                            </div>
+                        </div>
+                        
+                        <div className="modal-actions">
+                            <button type="button" onClick={onClose} className="cancel-button">
+                                {t('profile.modals.cancel')}
+                            </button>
+                            <button type="submit" className="save-button">
+                                {t('profile.modals.save')}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         );
@@ -429,43 +423,41 @@ const Profile = () => {
 
     const CommentCard = ({ comment, onEdit, onDelete }) => (
         <div className="comment-card">
-            <div className="comment-movie-info" onClick={() => handleMovieClick({ id: comment.movieId })}>
-                <img 
-                    src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`} 
-                    alt={comment.movieTitle}
-                    className="comment-movie-poster"
-                />
-                <div className="comment-movie-details">
-                    <h4>{comment.movieTitle}</h4>
-                    <div className="comment-rating">
-                        <FaStar className="star-icon" />
-                        <span>{comment.rating}</span>
+            <div className="comment-header">
+                <div className="movie-info">
+                    <img 
+                        src={`https://image.tmdb.org/t/p/w92${comment.movie.posterPath}`}
+                        alt={comment.movie.title}
+                        className="movie-thumbnail"
+                    />
+                    <div className="movie-details">
+                        <h4>{comment.movie.title}</h4>
+                        <div className="comment-rating">
+                            <span className="rating-value">{comment.rating}/10</span>
+                            <div className="star-container">
+                                {[...Array(10)].map((_, i) => (
+                                    <FaStar
+                                        key={i}
+                                        className={i < comment.rating ? 'star active' : 'star'}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <p className="comment-text">{comment.comment}</p>
-            <div className="comment-footer">
-                <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
                 <div className="comment-actions">
-                    <button 
-                        className="edit-comment-button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(comment);
-                        }}
-                    >
+                    {comment.isSpoiler && <span className="spoiler-tag">{t('profile.commentsSection.spoiler')}</span>}
+                    <button onClick={() => onEdit(comment)} className="action-button edit">
                         <FaEdit />
                     </button>
-                    <button 
-                        className="delete-comment-button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(comment.id);
-                        }}
-                    >
+                    <button onClick={() => onDelete(comment.id)} className="action-button delete">
                         <FaTrash />
                     </button>
                 </div>
+            </div>
+            <div className="comment-body">
+                <p>{comment.comment}</p>
+                <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
             </div>
         </div>
     );
@@ -584,48 +576,48 @@ const Profile = () => {
                 <h1 className="profile-username">{userProfile.username}</h1>
                 {!username && (
                     <Link to="/profile/edit" className="edit-button">
-                        EDIT
+                        {t('profile.edit')}
                     </Link>
                 )}
                 <div className="profile-stats">
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.following}</div>
-                        <div className="stat-label">following</div>
+                        <div className="stat-label">{t('profile.following')}</div>
                     </div>
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.followers}</div>
-                        <div className="stat-label">follower</div>
+                        <div className="stat-label">{t('profile.follower')}</div>
                     </div>
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.comments}</div>
-                        <div className="stat-label">comments</div>
+                        <div className="stat-label">{t('profile.comments')}</div>
                     </div>
                 </div>
             </div>
 
             <div className="profile-content">
                 <div className="stats-section">
-                    <h2>Stats</h2>
+                    <h2>{t('profile.stats')}</h2>
                     <div className="stats-grid">
                         <div className="stat-card">
-                            <h4>Movie time</h4>
+                            <h4>{t('profile.movieTime')}</h4>
                             <div className="time-stats">
                                 <div className="time-stat">
                                     <span>{movieTimeStats.months}</span>
-                                    <label>MONTHS</label>
+                                    <label>{t('profile.months')}</label>
                                 </div>
                                 <div className="time-stat">
                                     <span>{movieTimeStats.days}</span>
-                                    <label>DAYS</label>
+                                    <label>{t('profile.days')}</label>
                                 </div>
                                 <div className="time-stat">
                                     <span>{movieTimeStats.hours}</span>
-                                    <label>HOURS</label>
+                                    <label>{t('profile.hours')}</label>
                                 </div>
                             </div>
                         </div>
                         <div className="stat-card">
-                            <h4>Movies watched</h4>
+                            <h4>{t('profile.moviesWatched')}</h4>
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                     </div>
@@ -636,7 +628,7 @@ const Profile = () => {
                         <div className="connections-header">
                             <h3>
                                 <FaUsers className="section-icon" />
-                                Followers
+                                {t('profile.followers')}
                             </h3>
                             <div className="connections-header-right">
                                 <span>{userProfile.stats.followers}</span>
@@ -644,7 +636,7 @@ const Profile = () => {
                                     className="see-all-button modal-button"
                                     onClick={() => setFollowersModal(true)}
                                 >
-                                    See all <FaChevronRight />
+                                    {t('profile.seeAll')} <FaChevronRight />
                                 </button>
                             </div>
                         </div>
@@ -665,7 +657,7 @@ const Profile = () => {
                         <div className="connections-header">
                             <h3>
                                 <FaUserFriends className="section-icon" />
-                                Following
+                                {t('profile.following')}
                             </h3>
                             <div className="connections-header-right">
                                 <span>{userProfile.stats.following}</span>
@@ -673,7 +665,7 @@ const Profile = () => {
                                     className="see-all-button modal-button"
                                     onClick={() => setFollowingModal(true)}
                                 >
-                                    See all <FaChevronRight />
+                                    {t('profile.seeAll')} <FaChevronRight />
                                 </button>
                             </div>
                         </div>
@@ -691,7 +683,7 @@ const Profile = () => {
                     </div>
 
                     <ConnectionModal 
-                        title="Followers"
+                        title={t('profile.followers')}
                         users={userProfile.followers}
                         isOpen={followersModal}
                         onClose={() => setFollowersModal(false)}
@@ -702,7 +694,7 @@ const Profile = () => {
                     />
 
                     <ConnectionModal 
-                        title="Following"
+                        title={t('profile.following')}
                         users={userProfile.following}
                         isOpen={followingModal}
                         onClose={() => setFollowingModal(false)}
@@ -735,14 +727,14 @@ const Profile = () => {
                     <div className="section-header">
                         <h2>
                             <FaComment className="section-icon" />
-                            Comments
+                            {t('profile.commentsSection.title')}
                         </h2>
                         {userProfile.comments.length > 3 && (
                             <button 
                                 className="see-all-button" 
                                 onClick={() => setShowAllComments(!showAllComments)}
                             >
-                                {showAllComments ? 'Show Less' : 'See All'} 
+                                {showAllComments ? t('profile.showLess') : t('profile.seeAll')} 
                                 <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
                             </button>
                         )}
@@ -762,7 +754,7 @@ const Profile = () => {
                             </div>
                         ) : (
                             <div className="empty-state">
-                                <p>No comments yet</p>
+                                <p>{t('profile.commentsSection.noComments')}</p>
                             </div>
                         )}
                     </div>

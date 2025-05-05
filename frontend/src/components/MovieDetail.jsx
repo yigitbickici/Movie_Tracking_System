@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from '../services/axiosConfig';
 import './MovieDetail.css';
 import MovieSocialPage from './MovieSocialPage';
@@ -18,6 +19,7 @@ const PLATFORM_URLS = {
 
 const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedRating, setSelectedRating] = useState(0);
     const [showSocialPage, setShowSocialPage] = useState(false);
@@ -94,7 +96,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
         if (!minutes) return '';
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
-        return `${hours}s ${mins}dk`;
+        return `${hours}${t('movieDetail.runtime').split(' ')[0]} ${mins}${t('movieDetail.runtime').split(' ')[1]}`;
     };
 
     const handleProviderClick = (providerId) => {
@@ -231,7 +233,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                 className={`watched-button ${isWatched ? 'active' : ''}`}
                                 onClick={handleWatchedToggle}
                                 disabled={isLoading}
-                                title={isWatched ? "Mark as unwatched" : "Mark as watched"}
+                                title={isWatched ? t('movieDetail.markAsUnwatched') : t('movieDetail.markAsWatched')}
                             >
                                 ✓
                             </button>
@@ -239,7 +241,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                     </div>
                     <div className="movie-detail-info">
                         <h1>{movie.title}</h1>
-                        <p className="original-title">{movie.original_title}</p>
+                        <p className="original-title">{t('movieDetail.originalTitle')}: {movie.original_title}</p>
                         <div className="movie-meta">
                             <span>{(movie.release_date || movie.releaseDate)?.split("-")[0]}</span>
                             <span>⭐ {movie.vote_average || movie.voteAverage}</span>
@@ -257,25 +259,25 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                         {/* Add providers section */}
                         {movie.providers && (
                             <div className="providers-section">
-                                <h3>Available Platforms (Türkiye):</h3>
+                                <h3>{t('movieDetail.platforms.title')}</h3>
                                 <div className="providers-list">
                                     {(!movie.providers.flatrate && !movie.providers.rent && !movie.providers.buy) ? (
                                         <div className="no-providers">
                                             <span className="sad-face">😔</span>
-                                            <p>No platforms available in Türkiye.</p>
+                                            <p>{t('movieDetail.platforms.noProviders')}</p>
                                         </div>
                                     ) : (
                                         <>
                                             {movie.providers.flatrate && (
                                                 <div className="provider-category">
-                                                    <h4>Subs</h4>
+                                                    <h4>{t('movieDetail.platforms.subs')}</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.flatrate.map(provider => (
                                                             <div 
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`Watch in ${provider.provider_name}`}
+                                                                title={`${t('movieDetail.platforms.watchOn')} ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -289,14 +291,14 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                             
                                             {movie.providers.rent && (
                                                 <div className="provider-category">
-                                                    <h4>Renting</h4>
+                                                    <h4>{t('movieDetail.platforms.renting')}</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.rent.map(provider => (
                                                             <div 
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`Watch in ${provider.provider_name}`}
+                                                                title={`${t('movieDetail.platforms.watchOn')} ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -310,14 +312,14 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                             
                                             {movie.providers.buy && (
                                                 <div className="provider-category">
-                                                    <h4>Purchase</h4>
+                                                    <h4>{t('movieDetail.platforms.purchase')}</h4>
                                                     <div className="provider-items">
                                                         {movie.providers.buy.map(provider => (
                                                             <div 
                                                                 key={provider.provider_id} 
                                                                 className="provider-item"
                                                                 onClick={() => handleProviderClick(provider.provider_id)}
-                                                                title={`Watch in ${provider.provider_name}`}
+                                                                title={`${t('movieDetail.platforms.watchOn')} ${provider.provider_name}`}
                                                             >
                                                                 <img 
                                                                     src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
@@ -337,14 +339,14 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                         {/* Cast section */}
                         {movie.cast && (
                             <div className="cast-section">
-                                <h3>Cast:</h3>
+                                <h3>{t('movieDetail.cast.title')}</h3>
                                 <div className="cast-list">
                                     {movie.cast.map(actor => (
                                         <div 
                                             key={actor.id} 
                                             className="cast-item"
                                             onClick={() => handleActorClick(actor.name)}
-                                            title={`Search for ${actor.name} on Google`}
+                                            title={`${t('movieDetail.cast.searchFor')} ${actor.name}`}
                                         >
                                             {actor.profile_path ? (
                                                 <img 
@@ -372,14 +374,14 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                     className="see-posts-button"
                                     onClick={handleSeePostsClick}
                                 >
-                                    SEE DISCUSSIONS
+                                    {t('movieDetail.actions.seeDiscussions')}
                                 </button>
                             </div>
                         ) : (
                             isWatched ? (
                                 <div className="user-interaction">
                                     <div className="rating-section">
-                                        <h4>Rate this movie</h4>
+                                        <h4>{t('movieDetail.actions.rateMovie')}</h4>
                                         <div className="star-rating">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                                                 <button
@@ -395,34 +397,34 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                     </div>
                                     <div className="interaction-buttons">
                                         <button 
-                                            className={`favorite-button ${isFavorite ? 'active' : ''}`}
-                                            onClick={handleFavoriteToggle}
-                                        >
-                                            ♥
-                                        </button>
-                                        <button 
                                             className="see-posts-button"
                                             onClick={handleSeePostsClick}
                                         >
-                                            SEE DISCUSSIONS
+                                            {t('movieDetail.actions.seeAllPosts')}
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 isInWatchlist ? (
-                                    <button 
-                                        className="detail-remove-button" 
-                                        onClick={handleRemoveFromWatchlist}
-                                    >
-                                        - REMOVE FROM WATCHLIST
-                                    </button>
+                                    <div className="user-interaction">
+                                        <button 
+                                            className="remove-from-watchlist-button"
+                                            onClick={handleRemoveFromWatchlist}
+                                            disabled={isLoading}
+                                        >
+                                            {t('movieDetail.actions.removeFromWatchlist')}
+                                        </button>
+                                    </div>
                                 ) : (
-                                    <button 
-                                        className="detail-add-button" 
-                                        onClick={handleAddToWatchlist}
-                                    >
-                                        + ADD TO WATCHLIST
-                                    </button>
+                                    <div className="user-interaction">
+                                        <button 
+                                            className="add-to-watchlist-button"
+                                            onClick={handleAddToWatchlist}
+                                            disabled={isLoading}
+                                        >
+                                            {t('movieDetail.actions.addToWatchlist')}
+                                        </button>
+                                    </div>
                                 )
                             )
                         )}

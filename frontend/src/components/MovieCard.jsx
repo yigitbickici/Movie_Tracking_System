@@ -1,7 +1,10 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import './MovieCard.css';
 
 const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, isFavorite, onFavoriteToggle, isGridView }) => {
+    const { t } = useTranslation();
+    
     // Liste görünümü için
     if (!isGridView) {
         return (
@@ -22,7 +25,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                     <div className="movie-meta">
                         <span className="year">{(movie.release_date || movie.releaseDate)?.split('-')[0]}</span>
                         <span className="rating">⭐ {movie.vote_average?.toFixed(1)}</span>
-                        {movie.runtime && <span className="runtime">{movie.runtime} min</span>}
+                        {movie.runtime && <span className="runtime">{movie.runtime} {t('movieCard.runtime')}</span>}
                     </div>
                 </div>
                 {isWatchlist && (
@@ -32,7 +35,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                             e.stopPropagation();
                             onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                         }}
-                        title={isWatched ? "Watched" : "Unwatched"}
+                        title={isWatched ? t('movieCard.watched') : t('movieCard.unwatched')}
                     >
                         ✓
                     </button>
@@ -61,7 +64,7 @@ const MovieCard = ({ movie, onClick, isWatchlist, isWatched, onWatchedToggle, is
                         e.stopPropagation();
                         onWatchedToggle && onWatchedToggle(movie.tmdbId || movie.id, !isWatched);
                     }}
-                    title={isWatched ? "Watched" : "Unwatched"}
+                    title={isWatched ? t('movieCard.watched') : t('movieCard.unwatched')}
                 >
                     ✓
                 </button>

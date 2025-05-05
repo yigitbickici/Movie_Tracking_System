@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import MovieCard from "../components/MovieCard";
 import MovieDetail from "../components/MovieDetail";
 import './Explore.css';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
-const API_URL = (page) => `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=tr-TR&page=${page}`;
-const SEARCH_API_URL = (query) => `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=tr-TR&query=${query}`;
-const GENRES_API_URL = `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=tr-TR`;
-const DISCOVER_API_URL = (page, genreId) => `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=tr-TR&sort_by=popularity.desc&page=${page}&with_genres=${genreId}`;
 
 const Explore = () => {
+    const { t, i18n } = useTranslation();
     const [movies, setMovies] = useState([]);
     const [filteredMovies, setFilteredMovies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -23,26 +21,40 @@ const Explore = () => {
     const [loadedPages, setLoadedPages] = useState(0);
     const [genres, setGenres] = useState([]);
 
-    // Kategorileri (türleri) API'den al
+    const getApiLanguage = () => {
+        return i18n.language === 'tr' ? 'tr-TR' : 'en-US';
+    };
+
+    const getApiUrl = (page) => 
+        `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=${getApiLanguage()}&page=${page}`;
+    
+    const getSearchApiUrl = (query) => 
+        `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=${getApiLanguage()}&query=${query}`;
+    
+    const getGenresApiUrl = () => 
+        `https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=${getApiLanguage()}`;
+    
+    const getDiscoverApiUrl = (page, genreId) => 
+        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${getApiLanguage()}&sort_by=popularity.desc&page=${page}&with_genres=${genreId}`;
+
     useEffect(() => {
-        fetch(GENRES_API_URL)
+        fetch(getGenresApiUrl())
             .then(res => res.json())
             .then(data => setGenres(data.genres))
             .catch(error => console.error("Error fetching genres:", error));
-    }, []);
+    }, [i18n.language]);
 
-    // Sayfa değiştiğinde veya arama yapıldığında filmleri getir
     useEffect(() => {
         const fetchMovies = async () => {
             setLoading(true);
             try {
                 let url;
                 if (searchTerm) {
-                    url = SEARCH_API_URL(searchTerm);
+                    url = getSearchApiUrl(searchTerm);
                 } else if (selectedCategory !== 'all') {
-                    url = DISCOVER_API_URL(currentPage, selectedCategory);
+                    url = getDiscoverApiUrl(currentPage, selectedCategory);
                 } else {
-                    url = API_URL(currentPage);
+                    url = getApiUrl(currentPage);
                 }
                 
                 const response = await fetch(url);
@@ -66,11 +78,9 @@ const Explore = () => {
         };
 
         fetchMovies();
-    }, [currentPage, searchTerm, selectedCategory, genres]);
+    }, [currentPage, searchTerm, selectedCategory, genres, i18n.language]);
 
-    // Kategoriye ve sıralamaya göre filmleri filtrele ve sırala
     const filterAndSortMovies = (moviesToFilter, sortingOption) => {
-        // Sıralamayı uygula
         let sortedMovies = [...moviesToFilter];
 
         switch (sortingOption) {
@@ -133,14 +143,16 @@ const Explore = () => {
 
     const handleMovieClick = (movie) => {
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=${getApiLanguage()}`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=${API_KEY}&language=${getApiLanguage()}`),
             fetch(`https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=${API_KEY}`)
         ])
             .then(([detailsRes, creditsRes, providersRes]) =>
                 Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
             )
             .then(([detailedMovie, credits, providers]) => {
+                const countryCode = i18n.language === 'tr' ? 'TR' : 'US';
+                
                 setSelectedMovie({
                     ...movie,
                     ...detailedMovie,
@@ -150,7 +162,7 @@ const Explore = () => {
                     original_title: detailedMovie.original_title,
                     runtime: detailedMovie.runtime,
                     cast: credits.cast.slice(0, 5),
-                    providers: providers.results.TR || {}
+                    providers: providers.results[countryCode] || {}
                 });
             })
             .catch(error => console.error("Error fetching movie details:", error));
@@ -176,10 +188,10 @@ const Explore = () => {
         return (
             <div className="loading-container">
                 <div className="loading-content">
-                    <h2>Loading Movies...</h2>
+                    <h2>{t('explore.loading.title')}</h2>
                     <div className="progress-bar-container">
                         <div className="progress-bar" style={{ width: '100%' }}>
-                            <span className="progress-text">Loading...</span>
+                            <span className="progress-text">{t('explore.loading.progress')}</span>
                         </div>
                     </div>
                 </div>
@@ -193,7 +205,7 @@ const Explore = () => {
                 <div className="search-bar">
                     <input
                         type="text"
-                        placeholder="Search the movies..."
+                        placeholder={t('explore.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                     />
@@ -204,7 +216,7 @@ const Explore = () => {
                         className={`category-button ${selectedCategory === 'all' ? 'active' : ''}`} 
                         onClick={() => handleCategoryClick('all')}
                     >
-                        All
+                        {t('explore.categories.all')}
                     </button>
                     {genres.slice(0, 6).map(genre => (
                         <button
@@ -219,12 +231,12 @@ const Explore = () => {
             </header>
 
             <div className="sort-options">
-                <span>Sort by: </span>
-                <button className={`sort-button ${sortBy === 'az' ? 'active' : ''}`} onClick={() => handleSortChange('az')}>A to Z</button>
-                <button className={`sort-button ${sortBy === 'za' ? 'active' : ''}`} onClick={() => handleSortChange('za')}>Z to A</button>
-                <button className={`sort-button ${sortBy === 'rating' ? 'active' : ''}`} onClick={() => handleSortChange('rating')}>Top Rated</button>
-                <button className={`sort-button ${sortBy === 'year-asc' ? 'active' : ''}`} onClick={() => handleSortChange('year-asc')}>Oldest First</button>
-                <button className={`sort-button ${sortBy === 'year-desc' ? 'active' : ''}`} onClick={() => handleSortChange('year-desc')}>Newest First</button>
+                <span>{t('explore.sort.sortBy')}</span>
+                <button className={`sort-button ${sortBy === 'az' ? 'active' : ''}`} onClick={() => handleSortChange('az')}>{t('explore.sort.az')}</button>
+                <button className={`sort-button ${sortBy === 'za' ? 'active' : ''}`} onClick={() => handleSortChange('za')}>{t('explore.sort.za')}</button>
+                <button className={`sort-button ${sortBy === 'rating' ? 'active' : ''}`} onClick={() => handleSortChange('rating')}>{t('explore.sort.topRated')}</button>
+                <button className={`sort-button ${sortBy === 'year-asc' ? 'active' : ''}`} onClick={() => handleSortChange('year-asc')}>{t('explore.sort.oldestFirst')}</button>
+                <button className={`sort-button ${sortBy === 'year-desc' ? 'active' : ''}`} onClick={() => handleSortChange('year-desc')}>{t('explore.sort.newestFirst')}</button>
             </div>
 
             <div className="movie-list">
@@ -249,7 +261,7 @@ const Explore = () => {
 
             <div className="pagination">
                 <button onClick={goToPrevPage} disabled={currentPage === 1}>←</button>
-                <span>{currentPage} / {totalPages}</span>
+                <span>{currentPage}{t('explore.pagination.of')}{totalPages}</span>
                 <button onClick={goToNextPage} disabled={currentPage === totalPages}>→</button>
             </div>
         </div>

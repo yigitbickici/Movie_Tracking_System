@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from '../services/axiosConfig';
 import './Auth.css';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -39,7 +41,7 @@ const Login = () => {
                 localStorage.setItem('userType', response.data.role.toLowerCase());
                 localStorage.setItem('isAdmin', response.data.role === 'ADMIN' ? 'true' : 'false');
 
-                setModalMessage('Login successful! Redirecting...');
+                setModalMessage(t('login.successMessage'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
@@ -47,7 +49,7 @@ const Login = () => {
                 }, 2000);
             }
         } catch (error) {
-            setError(error.response?.data?.message || 'Login failed. Please try again.');
+            setError(error.response?.data?.message || t('login.error'));
             console.error('Login error:', error);
         } finally {
             setLoading(false);
@@ -57,10 +59,10 @@ const Login = () => {
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Back to Main page
+                {t('login.backToMain')}
             </Link>
             <div className="auth-box">
-                <h2>Login</h2>
+                <h2>{t('login.title')}</h2>
                 {error && <div className="error">{error}</div>}
                 {showModal && (
                     <div className="modal">
@@ -75,7 +77,7 @@ const Login = () => {
                             className="auth-input"
                             type="email"
                             name="email"
-                            placeholder="E-mail"
+                            placeholder={t('login.email')}
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -86,21 +88,21 @@ const Login = () => {
                             className="auth-input"
                             type="password"
                             name="password"
-                            placeholder="Password"
+                            placeholder={t('login.password')}
                             value={formData.password}
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <div className="forgot-password">
-                        <Link to="/forgot-password">Forgot Password?</Link>
+                        <Link to="/forgot-password">{t('login.forgotPassword')}</Link>
                     </div>
                     <button type="submit" disabled={loading} className="auth-button">
-                        {loading ? 'Loading...' : 'Login'}
+                        {loading ? t('login.loading') : t('login.loginButton')}
                     </button>
                 </form>
                 <p className="auth-link">
-                    Don't have an account? <Link to="/register">Register</Link>
+                    {t('login.noAccount')} <Link to="/register">{t('login.register')}</Link>
                 </p>
             </div>
         </div>

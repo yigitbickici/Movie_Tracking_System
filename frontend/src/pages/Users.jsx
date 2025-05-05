@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import './Users.css';
 import { FaUsers, FaChevronRight, FaSearch } from 'react-icons/fa';
 import axios from '../services/axiosConfig';
+import { useTranslation } from 'react-i18next';
 
 const Users = () => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         const userType = localStorage.getItem('userType');
         if (userType !== 'editor') {
             navigate('/login');
-            alert('You do not have permission to access this page!');
+            alert(t('users.noPermission'));
         }
-    }, [navigate]);
+    }, [navigate, t]);
 
     const [users, setUsers] = useState([]);
 
@@ -45,11 +47,11 @@ const Users = () => {
     });
 
     const banReasons = [
-        "Unsuitable content sharing",
-        "Spam/Advertising",
-        "Hate speech/Insult",
-        "Fake account",
-        "Other"
+        t('banReasons.unsuitable'),
+        t('banReasons.spam'),
+        t('banReasons.hateSpeech'),
+        t('banReasons.fakeAccount'),
+        t('banReasons.other')
     ];
 
     const handleBanUser = async (userId, reason) => {
@@ -59,7 +61,7 @@ const Users = () => {
             setBanModal({ isOpen: false, userId: null, isBanned: false });
         } catch (error) {
             console.error("Ban failed:", error);
-            alert("An error occurred during the ban process.");
+            alert(t('users.banError'));
         }
     };
 
@@ -69,7 +71,7 @@ const Users = () => {
             fetchUsers();
         } catch (error) {
             console.error("Unban failed:", error);
-            alert("An error occurred during the unban process.");
+            alert(t('users.unbanError'));
         }
     };
 
@@ -91,16 +93,16 @@ const Users = () => {
                 <div className="user-info">
                     <h4>{user.username}</h4>
                     <div className="user-stats">
-                        <span>{user.movieCount} movie</span>
+                        <span>{user.movieCount} {t('users.movie')}</span>
                         <span> • </span>
-                        <span>{user.commentCount} comment</span>
+                        <span>{user.commentCount} {t('users.comment')}</span>
                     </div>
                     <div className="user-join-date">
-                        Joined: {new Date(user.joinDate).toLocaleDateString('tr-TR')}
+                        {t('users.joined')} {new Date(user.joinDate).toLocaleDateString(i18n.language === 'tr' ? 'tr-TR' : 'en-US')}
                     </div>
                     {user.isBanned && (
                         <div className="ban-reason">
-                            Reason: {user.banReason}
+                            {t('users.banReason')} {user.banReason}
                         </div>
                     )}
                 </div>
@@ -114,7 +116,7 @@ const Users = () => {
                             handleUnbanUser(user.id);
                         }}
                     >
-                        Unban
+                        {t('users.unbanAction')}
                     </button>
                 ) : (
                     <button
@@ -124,7 +126,7 @@ const Users = () => {
                             setBanModal({ isOpen: true, userId: user.id });
                         }}
                     >
-                        Ban
+                        {t('users.banAction')}
                     </button>
                 )}
             </div>
@@ -138,23 +140,23 @@ const Users = () => {
         return (
             <div className={`ban-modal-overlay ${banModal.isOpen ? 'active' : ''}`}>
                 <div className="ban-modal-content">
-                    <h3>Ban User</h3>
+                    <h3>{t('users.banUser')}</h3>
                     <div className="ban-form">
                         <select
                             value={selectedReason}
                             onChange={(e) => setSelectedReason(e.target.value)}
                             className="ban-reason-select"
                         >
-                            <option value="">Select the reason for the ban</option>
+                            <option value="">{t('users.selectReason')}</option>
                             {banReasons.map((reason, index) => (
                                 <option key={index} value={reason}>{reason}</option>
                             ))}
                         </select>
-                        {selectedReason === "Other" && (
+                        {selectedReason === t('banReasons.other') && (
                             <textarea
                                 value={customReason}
                                 onChange={(e) => setCustomReason(e.target.value)}
-                                placeholder="Write the reason for the ban..."
+                                placeholder={t('users.writeReason')}
                                 className="custom-reason-input"
                             />
                         )}
@@ -164,15 +166,15 @@ const Users = () => {
                             className="ban-modal-button cancel"
                             onClick={() => setBanModal({ isOpen: false, userId: null })}
                         >
-                            Cancel
+                            {t('users.cancel')}
                         </button>
                         <button
                             className="ban-modal-button confirm"
                             onClick={() => handleBanUser(banModal.userId,
-                                selectedReason === "Other" ? customReason : selectedReason)}
+                                selectedReason === t('banReasons.other') ? customReason : selectedReason)}
                             disabled={!selectedReason}
                         >
-                            Ban
+                            {t('users.banAction')}
                         </button>
                     </div>
                 </div>
@@ -185,14 +187,14 @@ const Users = () => {
             <div className="users-header">
                 <h1>
                     <FaUsers className="header-icon" />
-                    User Management
+                    {t('users.title')}
                 </h1>
                 <div className="search-container">
                     <div className="search-input-wrapper">
                         <FaSearch className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Search for a user..."
+                            placeholder={t('users.searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="search-input"
@@ -207,7 +209,7 @@ const Users = () => {
                     ))
                 ) : (
                     <div className="no-results">
-                        <p>User not found</p>
+                        <p>{t('users.noResults')}</p>
                     </div>
                 )}
             </div>

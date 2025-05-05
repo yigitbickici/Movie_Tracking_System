@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../services/axiosConfig';
 import './SpoilerRequests.css';
+import { useTranslation } from 'react-i18next';
 
 const SpoilerRequests = () => {
+    const { t, i18n } = useTranslation();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,7 +20,7 @@ const SpoilerRequests = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error loading spoiler requests:', error);
-            setError('Spoiler requests could not be loaded');
+            setError(t('spoilerRequests.error'));
             setLoading(false);
         }
     };
@@ -49,12 +51,12 @@ const SpoilerRequests = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>{t('spoilerRequests.loading')}</div>;
     if (error) return <div>{error}</div>;
 
     return (
         <div className="spoiler-requests-container">
-            <h1>Spoiler Notifications</h1>
+            <h1>{t('spoilerRequests.title')}</h1>
             <div className="requests-list">
                 {requests.map((request, index) => {
                     console.log(`[${index}] Spoiler Request:`, request);
@@ -75,7 +77,9 @@ const SpoilerRequests = () => {
                                     <div className="request-header">
                                         <h3>{request.post?.movie?.title}</h3>
                                         <span className="timestamp">
-                                            {new Date(request.createdAt).toLocaleString()}
+                                            {new Date(request.createdAt).toLocaleString(
+                                                i18n.language === 'tr' ? 'tr-TR' : 'en-US'
+                                            )}
                                         </span>
                                     </div>
                                     <div className="request-content">
@@ -83,7 +87,7 @@ const SpoilerRequests = () => {
                                             {request.type === 'POST' ? request.post?.content : request.comment?.content}
                                         </p>
                                         <p className="reported-by">
-                                            Reporter: {request.requestedByUser?.username}
+                                            {t('spoilerRequests.reporter')} {request.requestedByUser?.username}
                                         </p>
                                     </div>
                                     {request.status === 'PENDING' && (
@@ -92,19 +96,23 @@ const SpoilerRequests = () => {
                                                 className="approve-button"
                                                 onClick={() => handleApprove(request.id)}
                                             >
-                                                Mark as Spoiler
+                                                {t('spoilerRequests.actions.markAsSpoiler')}
                                             </button>
                                             <button 
                                                 className="reject-button"
                                                 onClick={() => handleReject(request.id)}
                                             >
-                                                Decline
+                                                {t('spoilerRequests.actions.decline')}
                                             </button>
                                         </div>
                                     )}
                                     {request.status !== 'PENDING' && (
                                         <div className="request-status">
-                                            Status: {request.status === 'APPROVED' ? 'Onaylandı' : 'Reddedildi'}
+                                            {t('spoilerRequests.status')} {
+                                                request.status === 'APPROVED' 
+                                                    ? t('spoilerRequests.statusValues.approved') 
+                                                    : t('spoilerRequests.statusValues.rejected')
+                                            }
                                         </div>
                                     )}
                                 </div>
