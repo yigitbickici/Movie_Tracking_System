@@ -426,12 +426,12 @@ const Profile = () => {
             <div className="comment-header">
                 <div className="movie-info">
                     <img 
-                        src={`https://image.tmdb.org/t/p/w92${comment.movie.posterPath}`}
-                        alt={comment.movie.title}
+                        src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`}
+                        alt={comment.movieTitle}
                         className="movie-thumbnail"
                     />
                     <div className="movie-details">
-                        <h4>{comment.movie.title}</h4>
+                        <h4>{comment.movieTitle}</h4>
                         <div className="comment-rating">
                             <span className="rating-value">{comment.rating}/10</span>
                             <div className="star-container">
