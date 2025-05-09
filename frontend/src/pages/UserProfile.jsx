@@ -157,7 +157,7 @@ const UserProfile = () => {
     };
 
     const CommentCard = ({ comment }) => (
-        <div className="comment-card" onClick={() => handleMovieClick({ id: comment.movieId })}>
+        <div className="comment-card">
             <div className="comment-movie-info">
                 <img 
                     src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`} 
@@ -166,10 +166,7 @@ const UserProfile = () => {
                 />
                 <div className="comment-movie-details">
                     <h4>{comment.movieTitle}</h4>
-                    <div className="comment-rating">
-                        <FaStar className="star-icon" />
-                        <span>{comment.rating}</span>
-                    </div>
+
                 </div>
             </div>
             <p className="comment-text">{comment.comment}</p>

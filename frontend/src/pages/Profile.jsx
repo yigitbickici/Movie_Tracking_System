@@ -421,44 +421,20 @@ const Profile = () => {
         );
     };
 
-    const CommentCard = ({ comment, onEdit, onDelete }) => (
+    const CommentCard = ({ comment }) => (
         <div className="comment-card">
-            <div className="comment-header">
-                <div className="movie-info">
-                    <img 
-                        src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`}
-                        alt={comment.movieTitle}
-                        className="movie-thumbnail"
-                    />
-                    <div className="movie-details">
-                        <h4>{comment.movieTitle}</h4>
-                        <div className="comment-rating">
-                            <span className="rating-value">{comment.rating}/10</span>
-                            <div className="star-container">
-                                {[...Array(10)].map((_, i) => (
-                                    <FaStar
-                                        key={i}
-                                        className={i < comment.rating ? 'star active' : 'star'}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="comment-actions">
-                    {comment.isSpoiler && <span className="spoiler-tag">{t('profile.commentsSection.spoiler')}</span>}
-                    <button onClick={() => onEdit(comment)} className="action-button edit">
-                        <FaEdit />
-                    </button>
-                    <button onClick={() => onDelete(comment.id)} className="action-button delete">
-                        <FaTrash />
-                    </button>
+            <div className="comment-movie-info">
+                <img
+                    src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`}
+                    alt={comment.movieTitle}
+                    className="comment-movie-poster"
+                />
+                <div className="comment-movie-details">
+                    <h4>{comment.movieTitle}</h4>
                 </div>
             </div>
-            <div className="comment-body">
-                <p>{comment.comment}</p>
-                <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
-            </div>
+            <p className="comment-text">{comment.comment}</p>
+            <span className="comment-date">{new Date(comment.date).toLocaleDateString()}</span>
         </div>
     );
 
@@ -471,7 +447,8 @@ const Profile = () => {
         return (
             <div 
                 className="user-card"
-                onClick={() => navigate(`/user/${user.username}`)}
+                onClick={() => navigate(`/UserProfile/${user.username}`)}
+                style={{ cursor: 'pointer' }}
             >
                 <div className="user-avatar">
                     {user.avatar ? (
@@ -702,6 +679,7 @@ const Profile = () => {
                         type="following"
                         onFollow={handleFollow}
                         onUnfollow={handleUnfollow}
+                      
                     />
                 </div>
 
@@ -739,13 +717,13 @@ const Profile = () => {
                             </button>
                         )}
                     </div>
-                    
+
                     <div className="comments-container">
                         {userProfile.comments.length > 0 ? (
                             <div className="comments-grid">
                                 {(showAllComments ? userProfile.comments : userProfile.comments.slice(0, 3)).map(comment => (
-                                    <CommentCard 
-                                        key={comment.id} 
+                                    <CommentCard
+                                        key={comment.id}
                                         comment={comment}
                                         onEdit={(editedComment) => setEditModal({ isOpen: true, comment: editedComment })}
                                         onDelete={(commentId) => setDeleteModal({ isOpen: true, commentId })}
@@ -769,17 +747,6 @@ const Profile = () => {
                     onWatchlistUpdate={handleWatchlistUpdate}
                 />
             )}
-            <DeleteConfirmationModal 
-                isOpen={deleteModal.isOpen}
-                onClose={() => setDeleteModal({ isOpen: false, commentId: null })}
-                onConfirm={() => handleDeleteComment(deleteModal.commentId)}
-            />
-            <EditCommentModal 
-                isOpen={editModal.isOpen}
-                comment={editModal.comment}
-                onClose={() => setEditModal({ isOpen: false, comment: null })}
-                onSave={handleEditComment}
-            />
         </div>
     );
 };

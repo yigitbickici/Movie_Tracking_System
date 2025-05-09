@@ -408,7 +408,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                 isInWatchlist ? (
                                     <div className="user-interaction">
                                         <button 
-                                            className="remove-from-watchlist-button"
+                                            className="detail-remove-button"
                                             onClick={handleRemoveFromWatchlist}
                                             disabled={isLoading}
                                         >
@@ -418,7 +418,7 @@ const MovieDetail = ({ movie, onClose, onWatchlistUpdate }) => {
                                 ) : (
                                     <div className="user-interaction">
                                         <button 
-                                            className="add-to-watchlist-button"
+                                            className="detail-add-button"
                                             onClick={handleAddToWatchlist}
                                             disabled={isLoading}
                                         >
