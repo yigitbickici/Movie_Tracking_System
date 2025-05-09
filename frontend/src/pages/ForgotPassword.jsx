@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from '../services/axiosConfig';
 import './Auth.css';
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         email: '',
@@ -33,11 +35,11 @@ const ForgotPassword = () => {
                 params: { email: formData.email }
             });
 
-            setModalMessage('Reset code has been sent to your email');
+            setModalMessage(t('forgotPassword.messages.codeSent'));
             setShowModal(true);
             setStep(2);
         } catch (error) {
-            setError(error.response?.data?.message || 'Failed to send reset code. Please try again.');
+            setError(error.response?.data?.message || t('forgotPassword.errors.codeSendFailed'));
             console.error('Request code error:', error);
         } finally {
             setLoading(false);
@@ -59,7 +61,7 @@ const ForgotPassword = () => {
 
             setStep(3);
         } catch (error) {
-            setError(error.response?.data?.message || 'Invalid reset code. Please try again.');
+            setError(error.response?.data?.message || t('forgotPassword.errors.invalidCode'));
             console.error('Verify code error:', error);
         } finally {
             setLoading(false);
@@ -80,14 +82,14 @@ const ForgotPassword = () => {
                 }
             });
 
-            setModalMessage('Password has been reset successfully!');
+            setModalMessage(t('forgotPassword.messages.passwordReset'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
                 navigate('/login');
             }, 3000);
         } catch (error) {
-            setError(error.response?.data?.message || 'Failed to reset password. Please try again.');
+            setError(error.response?.data?.message || t('forgotPassword.errors.resetFailed'));
             console.error('Reset password error:', error);
         } finally {
             setLoading(false);
@@ -97,10 +99,10 @@ const ForgotPassword = () => {
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Back to Main page
+                {t('forgotPassword.backToMain')}
             </Link>
             <div className="auth-box">
-                <h2>Reset Password</h2>
+                <h2>{t('forgotPassword.title')}</h2>
                 {error && <div className="error">{error}</div>}
                 {showModal && (
                     <div className="modal">
@@ -117,14 +119,14 @@ const ForgotPassword = () => {
                                 className="auth-input"
                                 type="email"
                                 name="email"
-                                placeholder="Enter your email"
+                                placeholder={t('forgotPassword.step1.emailPlaceholder')}
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <button type="submit" disabled={loading} className="auth-button">
-                            {loading ? 'Sending...' : 'Send Reset Code'}
+                            {loading ? t('forgotPassword.step1.sendingButton') : t('forgotPassword.step1.sendButton')}
                         </button>
                     </form>
                 )}
@@ -136,14 +138,14 @@ const ForgotPassword = () => {
                                 className="auth-input"
                                 type="text"
                                 name="code"
-                                placeholder="Enter reset code"
+                                placeholder={t('forgotPassword.step2.codePlaceholder')}
                                 value={formData.code}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <button type="submit" disabled={loading} className="auth-button">
-                            {loading ? 'Verifying...' : 'Verify Code'}
+                            {loading ? t('forgotPassword.step2.verifyingButton') : t('forgotPassword.step2.verifyButton')}
                         </button>
                     </form>
                 )}
@@ -155,20 +157,20 @@ const ForgotPassword = () => {
                                 className="auth-input"
                                 type="password"
                                 name="newPassword"
-                                placeholder="Enter new password"
+                                placeholder={t('forgotPassword.step3.passwordPlaceholder')}
                                 value={formData.newPassword}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <button type="submit" disabled={loading} className="auth-button">
-                            {loading ? 'Resetting...' : 'Reset Password'}
+                            {loading ? t('forgotPassword.step3.resettingButton') : t('forgotPassword.step3.resetButton')}
                         </button>
                     </form>
                 )}
 
                 <p className="auth-link">
-                    Remember your password? <Link to="/login">Login</Link>
+                    {t('forgotPassword.rememberPassword')} <Link to="/login">{t('forgotPassword.login')}</Link>
                 </p>
             </div>
         </div>

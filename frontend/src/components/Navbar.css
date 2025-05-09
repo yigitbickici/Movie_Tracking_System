@@ -356,3 +356,81 @@
         right: -120px;
     }
 }
+
+/* Dil seçici için stiller */
+.language-selector {
+  position: relative;
+  margin-right: 15px;
+}
+
+.language-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.language-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.language-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #1f2937;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 120px;
+}
+
+.language-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.language-item:hover {
+  background: #374151;
+}
+
+.language-item.active {
+  background: #4f46e5;
+}
+
+/* Mobil menüdeki dil seçenekleri */
+.mobile-language-options {
+  display: flex;
+  margin-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 15px;
+}
+
+.mobile-language-item {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.mobile-language-item.active {
+  background: #4f46e5;
+}

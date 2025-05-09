@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './MovieSocialPage.css';
 import axios from '../services/axiosConfig';
+import { useTranslation } from 'react-i18next';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
 const MovieSocialPage = () => {
     const { movieId } = useParams();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [movie, setMovie] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newPost, setNewPost] = useState('');
@@ -33,7 +35,7 @@ const MovieSocialPage = () => {
         }
 
         if (!token) {
-            setModalMessage('Please login first');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -46,7 +48,7 @@ const MovieSocialPage = () => {
         const cleanMovieId = movieId.split('/')[0];
 
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${cleanMovieId}?api_key=${API_KEY}&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${cleanMovieId}?api_key=${API_KEY}&language=${i18n.language === 'tr' ? 'tr-TR' : 'en-US'}`),
             axios.get(`/api/posts/movie/${cleanMovieId}`)
         ])
         .then(([movieRes, postsRes]) => 
@@ -114,20 +116,20 @@ const MovieSocialPage = () => {
             console.error('Error fetching data:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Your session has expired, please log in again.');
+                setModalMessage(t('movieSocialPage.sessionExpired'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
                 }, 2000);
             } else {
-                setModalMessage('An error occurred while loading data. Please try again.');
+                setModalMessage(t('movieSocialPage.errorLoading'));
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
             setLoading(false);
         });
-    }, [movieId, navigate]);
+    }, [movieId, navigate, t, i18n.language]);
 
     const handleMediaSelect = async (e) => {
         const file = e.target.files[0];
@@ -150,7 +152,7 @@ const MovieSocialPage = () => {
                 }
             } catch (error) {
                 console.error('Error uploading media:', error);
-                setModalMessage('Failed to upload media');
+                setModalMessage(t('movieSocialPage.failedUpload'));
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -163,7 +165,7 @@ const MovieSocialPage = () => {
 
         const token = localStorage.getItem('token');
         if (!token) {
-            setModalMessage('Please login first');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -214,18 +216,18 @@ const MovieSocialPage = () => {
             console.error('Error creating post:', error);
             if (error.response) {
                 if (error.response.status === 401) {
-                    setModalMessage('Your session has expired. Please log in again.');
+                    setModalMessage(t('movieSocialPage.sessionExpired'));
                     setShowModal(true);
                     setTimeout(() => {
                         setShowModal(false);
                         navigate('/login');
                     }, 2000);
                 } else {
-                    setModalMessage('An error occurred while creating the post: ' + error.response.data);
+                    setModalMessage(t('movieSocialPage.errorCreatingPost') + ': ' + error.response.data);
                     setShowModal(true);
                 }
             } else {
-                setModalMessage('An error occurred while creating the post. Please try again.');
+                setModalMessage(t('movieSocialPage.errorCreatingPost'));
                 setShowModal(true);
             }
         }
@@ -235,7 +237,7 @@ const MovieSocialPage = () => {
     const handleLike = async (postId) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -259,7 +261,7 @@ const MovieSocialPage = () => {
             console.error('Error toggling like:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setModalMessage(t('movieSocialPage.sessionExpired'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
@@ -272,7 +274,7 @@ const MovieSocialPage = () => {
     const handleCommentSubmit = async (postId, comment) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -308,7 +310,7 @@ const MovieSocialPage = () => {
                     return post;
                 }));
 
-                setModalMessage('Yorumunuz başarıyla eklendi');
+                setModalMessage(t('movieSocialPage.commentAdded'));
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -316,14 +318,14 @@ const MovieSocialPage = () => {
             console.error('Error creating comment:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setModalMessage(t('movieSocialPage.sessionExpired'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
                     navigate('/login');
                 }, 2000);
             } else {
-                setModalMessage('Yorum yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
+                setModalMessage(t('movieSocialPage.commentError'));
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
@@ -334,7 +336,7 @@ const MovieSocialPage = () => {
     const handleFollow = async (postId, userId) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -361,7 +363,7 @@ const MovieSocialPage = () => {
             console.error('Error following user:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setModalMessage(t('movieSocialPage.sessionExpired'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
@@ -375,7 +377,7 @@ const MovieSocialPage = () => {
         const token = localStorage.getItem('token');
         console.log("Sending spoiler request with token:", localStorage.getItem('token'));
         if (!token) {
-            setModalMessage('Lütfen önce giriş yapın');
+            setModalMessage(t('movieSocialPage.loginFirst'));
             setShowModal(true);
             setTimeout(() => {
                 setShowModal(false);
@@ -390,7 +392,7 @@ const MovieSocialPage = () => {
                 setPosts(posts.map(post => {
                     if (postId === post.id) {
                         const newSpoilerState = !post.isSpoiler;
-                        setModalMessage(newSpoilerState ? 'İçerik spoiler olarak işaretlendi' : 'Spoiler işareti kaldırıldı');
+                        setModalMessage(newSpoilerState ? t('movieSocialPage.spoilerMarked') : t('movieSocialPage.spoilerRemoved'));
                         setShowModal(true);
                         setTimeout(() => setShowModal(false), 2000);
                         return { ...post, isSpoiler: newSpoilerState };
@@ -404,7 +406,7 @@ const MovieSocialPage = () => {
                         const updatedComments = post.comments.map(comment => {
                             if (comment.id === commentId) {
                                 const newSpoilerState = !comment.isSpoiler;
-                                setModalMessage(newSpoilerState ? 'Yorum spoiler olarak işaretlendi' : 'Spoiler işareti kaldırıldı');
+                                setModalMessage(newSpoilerState ? t('movieSocialPage.spoilerMarked') : t('movieSocialPage.spoilerRemoved'));
                                 setShowModal(true);
                                 setTimeout(() => setShowModal(false), 2000);
                                 return { ...comment, isSpoiler: newSpoilerState };
@@ -416,11 +418,14 @@ const MovieSocialPage = () => {
                     return post;
                 }));
             }
+            setModalMessage(t('movieSocialPage.spoilerReported'));
+            setShowModal(true);
+            setTimeout(() => setShowModal(false), 2000);
         } catch (error) {
             console.error('Error reporting spoiler:', error);
             if (error.response?.status === 401) {
                 localStorage.removeItem('token');
-                setModalMessage('Oturum süreniz dolmuş olabilir, lütfen tekrar giriş yapın');
+                setModalMessage(t('movieSocialPage.sessionExpired'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
@@ -447,23 +452,19 @@ const MovieSocialPage = () => {
     };
 
     const handleDeletePost = async (postId) => {
-        if (!window.confirm('Are you sure you want to delete this post?')) {
-            return;
-        }
-
-        try {
-            const response = await axios.delete(`/api/posts/${postId}`);
-            if (response.status === 200) {
+        if (window.confirm(t('movieSocialPage.deleteConfirm'))) {
+            try {
+                await axios.delete(`/api/posts/${postId}`);
                 setPosts(posts.filter(post => post.id !== postId));
-                setModalMessage('Post is successfully deleted');
+                setModalMessage(t('movieSocialPage.deleteSuccess'));
+                setShowModal(true);
+                setTimeout(() => setShowModal(false), 2000);
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                setModalMessage(t('movieSocialPage.deleteError'));
                 setShowModal(true);
                 setTimeout(() => setShowModal(false), 2000);
             }
-        } catch (error) {
-            console.error('Error deleting post:', error);
-            setModalMessage('Error deleting post');
-            setShowModal(true);
-            setTimeout(() => setShowModal(false), 2000);
         }
     };
 
@@ -518,12 +519,19 @@ const MovieSocialPage = () => {
                         <textarea
                             value={newPost}
                             onChange={(e) => setNewPost(e.target.value)}
-                            placeholder="What you think?"
+                            placeholder={t('movieSocialPage.postPlaceholder')}
                         />
                         
                         {mediaPreview && (
                             <div className="media-preview">
-                                <img src={mediaPreview} alt="Preview" />
+                                {selectedMedia.type.startsWith('image/') ? (
+                                    <img src={mediaPreview} alt="Preview" />
+                                ) : (
+                                    <video controls>
+                                        <source src={mediaPreview} type={selectedMedia.type} />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                )}
                                 <button 
                                     type="button" 
                                     className="remove-media"
@@ -532,7 +540,7 @@ const MovieSocialPage = () => {
                                         setMediaPreview(null);
                                     }}
                                 >
-                                    ×
+                                    {t('movieSocialPage.remove')}
                                 </button>
                             </div>
                         )}
@@ -542,23 +550,14 @@ const MovieSocialPage = () => {
                                 <label className="media-upload-button">
                                     <input
                                         type="file"
-                                        accept="image/*,image/gif"
+                                        accept="image/*,video/*"
                                         onChange={handleMediaSelect}
                                         style={{ display: 'none' }}
                                     />
-                                    📷 Photo
-                                </label>
-                                <label className="media-upload-button">
-                                    <input
-                                        type="file"
-                                        accept="image/gif"
-                                        onChange={handleMediaSelect}
-                                        style={{ display: 'none' }}
-                                    />
-                                    🎭 GIF
+                                    {t('movieSocialPage.addMedia')}
                                 </label>
                             </div>
-                            <button type="submit">Share</button>
+                            <button type="submit">{t('movieSocialPage.submitPost')}</button>
                         </div>
                     </form>
                 </div>
@@ -716,9 +715,9 @@ const MovieSocialPage = () => {
                                     <input
                                         type="text"
                                         name="comment"
-                                        placeholder="Write a comment..."
+                                        placeholder={t('movieSocialPage.addComment')}
                                     />
-                                    <button type="submit">Send</button>
+                                    <button type="submit">{t('movieSocialPage.commentButton')}</button>
                                 </form>
                             </div>
                         </div>

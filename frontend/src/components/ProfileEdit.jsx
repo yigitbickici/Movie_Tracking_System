@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from '../services/axiosConfig';
 import './ProfileEdit.css';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -29,7 +31,7 @@ const ProfileEdit = () => {
             setIsLoading(false);
         } catch (error) {
             console.error('Error fetching profile:', error);
-            setError('Failed to load profile data');
+            setError(t('profileEdit.error'));
             setIsLoading(false);
         }
     };
@@ -97,12 +99,12 @@ const ProfileEdit = () => {
     };
 
     if (isLoading) {
-        return <div className="loading">Loading...</div>;
+        return <div className="loading">{t('profileEdit.loading')}</div>;
     }
 
     return (
         <div className="profile-edit-container">
-            <h2>Edit Profile</h2>
+            <h2>{t('profileEdit.title')}</h2>
             {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit} className="profile-edit-form">
                 <div className="avatar-section">
@@ -119,7 +121,7 @@ const ProfileEdit = () => {
                     <div className="avatar-upload">
                         <label htmlFor="avatar-input" className="avatar-upload-button">
                             <i className="fas fa-camera"></i>
-                            Change Photo
+                            {t('profileEdit.avatar.changePhoto')}
                         </label>
                         <input
                             id="avatar-input"
@@ -132,7 +134,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Username</label>
+                    <label>{t('profileEdit.fields.username')}</label>
                     <input
                         type="text"
                         name="username"
@@ -142,7 +144,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Email</label>
+                    <label>{t('profileEdit.fields.email')}</label>
                     <input
                         type="email"
                         name="email"
@@ -152,7 +154,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Full Name</label>
+                    <label>{t('profileEdit.fields.fullName')}</label>
                     <input
                         type="text"
                         name="fullName"
@@ -162,7 +164,7 @@ const ProfileEdit = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>About</label>
+                    <label>{t('profileEdit.fields.about')}</label>
                     <textarea
                         name="bio"
                         value={formData.bio}
@@ -173,10 +175,10 @@ const ProfileEdit = () => {
 
                 <div className="form-actions">
                     <button type="button" onClick={handleCancel} className="cancel-button">
-                        Cancel
+                        {t('profileEdit.buttons.cancel')}
                     </button>
                     <button type="submit" className="save-button" disabled={isLoading}>
-                        {isLoading ? 'Saving...' : 'Save'}
+                        {isLoading ? t('profileEdit.buttons.saving') : t('profileEdit.buttons.save')}
                     </button>
                 </div>
             </form>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from '../services/axiosConfig';
 import './Auth.css';
 
 const Register = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -29,7 +31,7 @@ const Register = () => {
         setLoading(true);
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+            setError(t('register.errors.passwordsNotMatch'));
             setLoading(false);
             return;
         }
@@ -42,7 +44,7 @@ const Register = () => {
             });
 
             if (response.data) {
-                setModalMessage('Registration successful! Please login.');
+                setModalMessage(t('register.successMessage'));
                 setShowModal(true);
                 setTimeout(() => {
                     setShowModal(false);
@@ -50,7 +52,7 @@ const Register = () => {
                 }, 2000);
             }
         } catch (error) {
-            setError(error.response?.data?.message || 'Registration failed. Please try again.');
+            setError(error.response?.data?.message || t('register.errors.registrationFailed'));
             console.error('Registration error:', error);
         } finally {
             setLoading(false);
@@ -60,10 +62,10 @@ const Register = () => {
     return (
         <div className="auth-container">
             <Link to="/" className="home-button">
-                ← Back to Main page
+                {t('register.backToMain')}
             </Link>
             <div className="auth-box">
-                <h2>Register</h2>
+                <h2>{t('register.title')}</h2>
                 {error && <div className="error">{error}</div>}
                 {showModal && (
                     <div className="modal">
@@ -78,7 +80,7 @@ const Register = () => {
                             className="auth-input"
                             type="text"
                             name="username"
-                            placeholder="Username"
+                            placeholder={t('register.username')}
                             value={formData.username}
                             onChange={handleChange}
                             required
@@ -89,7 +91,7 @@ const Register = () => {
                             className="auth-input"
                             type="email"
                             name="email"
-                            placeholder="E-mail"
+                            placeholder={t('register.email')}
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -100,7 +102,7 @@ const Register = () => {
                             className="auth-input"
                             type="password"
                             name="password"
-                            placeholder="Password"
+                            placeholder={t('register.password')}
                             value={formData.password}
                             onChange={handleChange}
                             required
@@ -111,18 +113,18 @@ const Register = () => {
                             className="auth-input"
                             type="password"
                             name="confirmPassword"
-                            placeholder="Re-password"
+                            placeholder={t('register.confirmPassword')}
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <button type="submit" disabled={loading} className="auth-button">
-                        {loading ? 'Loading...' : 'Register'}
+                        {loading ? t('register.loading') : t('register.registerButton')}
                     </button>
                 </form>
                 <p className="auth-link">
-                    I only have a account <Link to="/login">Login</Link>
+                    {t('register.haveAccount')} <Link to="/login">{t('register.login')}</Link>
                 </p>
             </div>
         </div>

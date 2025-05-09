@@ -4,11 +4,13 @@ import MovieCard from '../components/MovieCard';
 import MovieDetail from '../components/MovieDetail';
 import axios from '../services/axiosConfig';
 import './Watchlist.css';
+import { useTranslation } from 'react-i18next';
 
 const API_KEY = "84e605aa45ef84282ba934b9b2648dc5";
 
 const Watchlist = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState('watchlist');
     const [isGridView, setIsGridView] = useState(true);
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -27,7 +29,7 @@ const Watchlist = () => {
             setError(null);
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('Please login');
+                setError(t('watchlist.error.login'));
                 setLoading(false);
                 return;
             }
@@ -59,7 +61,7 @@ const Watchlist = () => {
             }
         } catch (error) {
             console.error('An error occurred while loading movies:', error);
-            setError('An error occurred while loading movies');
+            setError(t('watchlist.error.loading'));
             if (activeTab === 'watchlist') {
                 setWatchlistMovies([]);
             } else {
@@ -74,7 +76,7 @@ const Watchlist = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('Please login');
+                setError(t('watchlist.error.login'));
                 return;
             }
 
@@ -91,25 +93,34 @@ const Watchlist = () => {
             }
         } catch (error) {
             console.error('An error occurred while updating the viewing status:', error);
-            setError('An error occurred while updating the viewing status');
+            setError(t('watchlist.error.update'));
         }
     };
 
     const handleMovieClick = (movie) => {
+        const language = i18n.language === 'tr' ? 'tr-TR' : 'en-US';
+
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=${API_KEY}&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits?api_key=${API_KEY}&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=${API_KEY}&language=${language}`),
+            fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/credits?api_key=${API_KEY}&language=${language}`),
             fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}/watch/providers?api_key=${API_KEY}`)
         ])
             .then(([detailsRes, creditsRes, providersRes]) => 
                 Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
             )
             .then(([detailedMovie, credits, providers]) => {
+                const countryCode = i18n.language === 'tr' ? 'TR' : 'US';
+                
                 setSelectedMovie({
                     ...movie,
+                    ...detailedMovie,
+                    tmdbId: movie.tmdbId,
+                    poster_path: movie.posterPath || detailedMovie.poster_path,
+                    release_date: movie.releaseDate || detailedMovie.release_date,
+                    vote_average: movie.voteAverage || detailedMovie.vote_average,
                     runtime: detailedMovie.runtime,
-                    cast: credits.cast.slice(0, 5),
-                    providers: providers.results.TR || {}
+                    cast: credits.cast?.slice(0, 5),
+                    providers: providers.results?.[countryCode] || {}
                 });
             })
             .catch(error => console.error("Error fetching movie details:", error));
@@ -126,7 +137,7 @@ const Watchlist = () => {
     };
 
     if (loading) {
-        return <div className="loading">Loading...</div>;
+        return <div className="loading">{t('watchlist.loading')}</div>;
     }
 
     if (error) {
@@ -145,13 +156,13 @@ const Watchlist = () => {
                         className={`tab-button ${activeTab === 'watchlist' ? 'active' : ''}`}
                         onClick={() => setActiveTab('watchlist')}
                     >
-                        WatchList
+                        {t('watchlist.tabs.watchlist')}
                     </button>
                     <button 
                         className={`tab-button ${activeTab === 'watched' ? 'active' : ''}`}
                         onClick={() => setActiveTab('watched')}
                     >
-                        Watched
+                        {t('watchlist.tabs.watched')}
                     </button>
                 </div>
                 <button className="view-toggle" onClick={toggleView}>
@@ -162,7 +173,7 @@ const Watchlist = () => {
             <div className={`movies-container ${isGridView ? 'grid-view' : 'list-view'}`}>
                 {currentMovies && currentMovies.length > 0 ? (
                     currentMovies.map(movie => (
-                    <MovieCard 
+                        <MovieCard 
                             key={movie.tmdbId}
                             movie={{
                                 ...movie,
@@ -171,16 +182,19 @@ const Watchlist = () => {
                                 release_date: movie.releaseDate,
                                 vote_average: movie.voteAverage
                             }}
-                        onClick={() => handleMovieClick(movie)}
-                        isWatchlist={activeTab === 'watchlist'}
+                            onClick={() => handleMovieClick(movie)}
+                            isWatchlist={activeTab === 'watchlist'}
                             isWatched={activeTab === 'watched'}
                             onWatchedToggle={activeTab === 'watchlist' ? () => handleWatchedToggle(movie.tmdbId) : null}
-                        isGridView={isGridView}
-                    />
+                            isGridView={isGridView}
+                        />
                     ))
                 ) : (
                     <div className="no-movies">
-                        {activeTab === 'watchlist' ? 'There are no movies in your watchlist yet.' : 'There are no movies watched yet.'}
+                        {activeTab === 'watchlist' 
+                            ? t('watchlist.emptyState.watchlist') 
+                            : t('watchlist.emptyState.watched')
+                        }
                     </div>
                 )}
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaChevronRight, FaUserPlus, FaUserCheck, FaComment, FaStar, FaHeart, FaEye, FaList } from 'react-icons/fa';
 import './UserProfile.css';
 import MovieDetail from '../components/MovieDetail';
@@ -16,6 +17,7 @@ const getAvatarUrl = (avatarPath) => {
 
 const UserProfile = () => {
     const { username } = useParams();
+    const { t, i18n } = useTranslation();
     const [isFollowing, setIsFollowing] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -35,7 +37,7 @@ const UserProfile = () => {
             setUserProfile(response.data);
         } catch (error) {
             console.error('Error fetching user profile:', error);
-            setError('Failed to load profile data');
+            setError(t('userProfile.error.generic'));
         } finally {
             setLoading(false);
         }
@@ -47,7 +49,7 @@ const UserProfile = () => {
             setIsFollowing(response.data.isFollowing);
         } catch (error) {
             console.error('Error checking follow status:', error);
-            setError('Failed to check follow status');
+            setError(t('userProfile.error.followStatus'));
         }
     };
 
@@ -59,7 +61,7 @@ const UserProfile = () => {
             await checkFollowStatus();
         } catch (error) {
             console.error('Error toggling follow:', error);
-            setError(error.response?.data?.message || 'An error occurred while updating follow status');
+            setError(error.response?.data?.message || t('userProfile.error.follow'));
             await checkFollowStatus();
         }
     };
@@ -72,15 +74,21 @@ const UserProfile = () => {
             return;
         }
 
+        // Dil parametresini ekleyelim
+        const language = i18n.language === 'tr' ? 'tr-TR' : 'en-US';
+
         Promise.all([
-            fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
-            fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=en-TR`),
+            fetch(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=84e605aa45ef84282ba934b9b2648dc5&language=${language}`),
+            fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=84e605aa45ef84282ba934b9b2648dc5&language=${language}`),
             fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers?api_key=84e605aa45ef84282ba934b9b2648dc5`)
         ])
         .then(([detailsRes, creditsRes, providersRes]) =>
             Promise.all([detailsRes.json(), creditsRes.json(), providersRes.json()])
         )
         .then(([detailedMovie, credits, providers]) => {
+            // Ülke kodunu dilinize göre belirleyin
+            const countryCode = i18n.language === 'tr' ? 'TR' : 'US';
+            
             setSelectedMovie({
                 ...movie, // Keep original movie data
                 ...detailedMovie, // Overwrite with detailed data
@@ -93,7 +101,7 @@ const UserProfile = () => {
                 original_title: detailedMovie.original_title,
                 runtime: detailedMovie.runtime,
                 cast: credits.cast?.slice(0, 5),
-                providers: providers.results?.TR || {}
+                providers: providers.results?.[countryCode] || {}
             });
         })
         .catch(error => console.error("Error fetching movie details:", error));
@@ -149,7 +157,7 @@ const UserProfile = () => {
     };
 
     const CommentCard = ({ comment }) => (
-        <div className="comment-card" onClick={() => handleMovieClick({ id: comment.movieId })}>
+        <div className="comment-card">
             <div className="comment-movie-info">
                 <img 
                     src={`https://image.tmdb.org/t/p/w92${comment.moviePoster}`} 
@@ -158,10 +166,7 @@ const UserProfile = () => {
                 />
                 <div className="comment-movie-details">
                     <h4>{comment.movieTitle}</h4>
-                    <div className="comment-rating">
-                        <FaStar className="star-icon" />
-                        <span>{comment.rating}</span>
-                    </div>
+
                 </div>
             </div>
             <p className="comment-text">{comment.comment}</p>
@@ -171,6 +176,16 @@ const UserProfile = () => {
 
     const MovieSection = ({ title, movies, icon: Icon }) => {
         const [isModalOpen, setIsModalOpen] = useState(false);
+        
+        // Çevirileri ekleyelim
+        let translatedTitle = title;
+        if (title === "Favorites") {
+            translatedTitle = t('userProfile.sections.favorites');
+        } else if (title === "Watched Movies") {
+            translatedTitle = t('userProfile.sections.watchedMovies');
+        } else if (title === "Watchlist") {
+            translatedTitle = t('userProfile.sections.watchlist');
+        }
         
         // İzlenen filmleri watchlist'ten filtrele
         const filteredMovies = title === "Watchlist" 
@@ -184,14 +199,14 @@ const UserProfile = () => {
                 <div className="section-header">
                     <h2>
                         <Icon className="section-icon" />
-                        {title}
+                        {translatedTitle}
                     </h2>
                     {filteredMovies.length > 5 && (
                         <button 
                             className="see-all-button" 
                             onClick={() => setIsModalOpen(true)}
                         >
-                            See All <FaChevronRight />
+                            {t('userProfile.buttons.seeAll')} <FaChevronRight />
                         </button>
                     )}
                 </div>
@@ -208,7 +223,7 @@ const UserProfile = () => {
                             <div className="modal-header">
                                 <h2>
                                     <Icon className="section-icon" />
-                                    {title}
+                                    {translatedTitle}
                                 </h2>
                                 <button 
                                     className="close-button"
@@ -230,7 +245,7 @@ const UserProfile = () => {
     };
 
     if (loading) {
-        return <div className="loading">Loading...</div>;
+        return <div className="loading">{t('userProfile.loading')}</div>;
     }
 
     if (error) {
@@ -238,7 +253,7 @@ const UserProfile = () => {
     }
 
     if (!userProfile) {
-        return <div className="error">Profile not found</div>;
+        return <div className="error">{t('userProfile.error.notFound')}</div>;
     }
 
     return (
@@ -247,7 +262,7 @@ const UserProfile = () => {
                 <div className="profile-avatar">
                     {userProfile.avatar ? (
                         <img
-                            src={getAvatarUrl(userProfile.avatar)} // Use helper function
+                            src={getAvatarUrl(userProfile.avatar)}
                             alt={userProfile.username}
                             className="profile-avatar-image"
                         />
@@ -262,53 +277,53 @@ const UserProfile = () => {
                 >
                     {isFollowing ? (
                         <>
-                            <FaUserCheck /> Following
+                            <FaUserCheck /> {t('userProfile.buttons.following')}
                         </>
                     ) : (
                         <>
-                            <FaUserPlus /> Follow
+                            <FaUserPlus /> {t('userProfile.buttons.follow')}
                         </>
                     )}
                 </button>
                 <div className="profile-stats">
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.following}</div>
-                        <div className="stat-label">following</div>
+                        <div className="stat-label">{t('userProfile.stats.following')}</div>
                     </div>
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.followers}</div>
-                        <div className="stat-label">follower</div>
+                        <div className="stat-label">{t('userProfile.stats.follower')}</div>
                     </div>
                     <div className="stat-item">
                         <div className="stat-value">{userProfile.stats.comments}</div>
-                        <div className="stat-label">comments</div>
+                        <div className="stat-label">{t('userProfile.stats.comments')}</div>
                     </div>
                 </div>
             </div>
 
             <div className="profile-content">
                 <div className="stats-section">
-                    <h2>Stats</h2>
+                    <h2>{t('userProfile.stats.title')}</h2>
                     <div className="stats-grid">
                         <div className="stat-card">
-                            <h4>Movies watched</h4>
+                            <h4>{t('userProfile.stats.moviesWatched')}</h4>
                             <div className="single-stat">{userProfile.stats.moviesWatched}</div>
                         </div>
                         {userProfile.stats.movieTime && (
                             <div className="stat-card">
-                                <h4>Movie time</h4>
+                                <h4>{t('userProfile.stats.movieTime')}</h4>
                                 <div className="time-stats">
                                     <div className="time-stat">
                                         <span>{userProfile.stats.movieTime.months}</span>
-                                        <label>MONTHS</label>
+                                        <label>{t('userProfile.stats.months')}</label>
                                     </div>
                                     <div className="time-stat">
                                         <span>{userProfile.stats.movieTime.days}</span>
-                                        <label>DAYS</label>
+                                        <label>{t('userProfile.stats.days')}</label>
                                     </div>
                                     <div className="time-stat">
                                         <span>{userProfile.stats.movieTime.hours}</span>
-                                        <label>HOURS</label>
+                                        <label>{t('userProfile.stats.hours')}</label>
                                     </div>
                                 </div>
                             </div>
@@ -338,14 +353,14 @@ const UserProfile = () => {
                     <div className="section-header">
                         <h2>
                             <FaComment className="section-icon" />
-                            Comments
+                            {t('userProfile.sections.comments')}
                         </h2>
                         {userProfile.comments.length > 3 && (
                             <button 
                                 className="see-all-button" 
                                 onClick={() => setShowAllComments(!showAllComments)}
                             >
-                                {showAllComments ? 'Show Less' : 'See All'} 
+                                {showAllComments ? t('userProfile.buttons.showLess') : t('userProfile.buttons.seeAll')} 
                                 <FaChevronRight className={showAllComments ? 'rotate-icon' : ''} />
                             </button>
                         )}
@@ -360,7 +375,7 @@ const UserProfile = () => {
                             </div>
                         ) : (
                             <div className="empty-state">
-                                <p>No comments yet</p>
+                                <p>{t('userProfile.emptyState.noComments')}</p>
                             </div>
                         )}
                     </div>

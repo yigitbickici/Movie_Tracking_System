@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes, FaUsers } from 'react-icons/fa';
+import { FaSearch, FaCompass, FaFilm, FaShieldAlt, FaCog, FaUserCircle, FaChevronDown, FaUser, FaSignOutAlt, FaBars, FaTimes, FaUsers, FaGlobe } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -13,6 +14,8 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+    const { t, i18n } = useTranslation();
 
     const handleLogout = () => {
         localStorage.removeItem('isAdmin');
@@ -65,6 +68,11 @@ const Navbar = () => {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
+    const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+        setShowLanguageMenu(false);
+    };
+
     const renderNavLinks = () => (
         <>
             {userType === 'admin' ? (
@@ -75,7 +83,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaCompass />
-                        <span>Explore</span>
+                        <span>{t('navbar.explore')}</span>
                     </Link>
                     <Link 
                         to="/admin" 
@@ -83,7 +91,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaCog />
-                        <span>Admin Panel</span>
+                        <span>{t('navbar.admin')}</span>
                     </Link>
                 </>
             ) : userType === 'editor' ? (
@@ -94,7 +102,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaCompass />
-                        <span>Explore</span>
+                        <span>{t('navbar.explore')}</span>
                     </Link>
                     <Link 
                         to="/users" 
@@ -102,7 +110,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaUsers />
-                        <span>Users</span>
+                        <span>{t('navbar.users')}</span>
                     </Link>
                     <Link 
                         to="/spoiler-requests" 
@@ -110,7 +118,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaShieldAlt />
-                        <span>Spoiler Reports</span>
+                        <span>{t('navbar.spoilerReports')}</span>
                     </Link>
                 </>
             ) : (
@@ -121,7 +129,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaCompass />
-                        <span>Explore</span>
+                        <span>{t('navbar.explore')}</span>
                     </Link>
                     <Link 
                         to="/watchlist" 
@@ -129,7 +137,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaFilm />
-                        <span>WatchList</span>
+                        <span>{t('navbar.watchlist')}</span>
                     </Link>
                 </>
             )}
@@ -151,6 +159,32 @@ const Navbar = () => {
                 </div>
 
                 <div className="nav-actions">
+                    <div className="language-selector">
+                        <button 
+                            className="language-button"
+                            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                        >
+                            <FaGlobe />
+                        </button>
+                        
+                        {showLanguageMenu && (
+                            <div className="language-dropdown">
+                                <button 
+                                    onClick={() => changeLanguage('en')} 
+                                    className={`language-item ${i18n.language === 'en' ? 'active' : ''}`}
+                                >
+                                    {t('language.en')}
+                                </button>
+                                <button 
+                                    onClick={() => changeLanguage('tr')} 
+                                    className={`language-item ${i18n.language === 'tr' ? 'active' : ''}`}
+                                >
+                                    {t('language.tr')}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="search-wrapper">
                         <button 
                             className="search-button"
@@ -163,7 +197,7 @@ const Navbar = () => {
                             <div className="search-dropdown">
                                 <input
                                     type="text"
-                                    placeholder="Search users..."
+                                    placeholder={t('navbar.searchUsers')}
                                     value={searchQuery}
                                     onChange={handleSearch}
                                     autoFocus
@@ -184,7 +218,7 @@ const Navbar = () => {
                                 )}
                                 {searchQuery && searchResults.length === 0 && (
                                     <div className="no-results">
-                                        No users found
+                                        {t('navbar.noUsersFound')}
                                     </div>
                                 )}
                             </div>
@@ -206,12 +240,12 @@ const Navbar = () => {
                                 {userType !== 'editor' && userType !=='admin' && (
                                     <Link to="/profile" className="dropdown-item">
                                         <FaUser />
-                                        <span>Profile</span>
+                                        <span>{t('navbar.profile')}</span>
                                     </Link>
                                 )}
                                 <button onClick={handleLogout} className="dropdown-item logout-item">
                                     <FaSignOutAlt />
-                                    <span>Log Out</span>
+                                    <span>{t('navbar.logout')}</span>
                                 </button>
                             </div>
                         )}
@@ -232,7 +266,7 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaUser />
-                        <span>Profile</span>
+                        <span>{t('navbar.profile')}</span>
                     </Link>
                 )}
                 <button 
@@ -243,8 +277,23 @@ const Navbar = () => {
                     className="mobile-logout-button"
                 >
                     <FaSignOutAlt />
-                    <span>Log Out</span>
+                    <span>{t('navbar.logout')}</span>
                 </button>
+                
+                <div className="mobile-language-options">
+                    <button 
+                        onClick={() => changeLanguage('en')} 
+                        className={`mobile-language-item ${i18n.language === 'en' ? 'active' : ''}`}
+                    >
+                        {t('language.en')}
+                    </button>
+                    <button 
+                        onClick={() => changeLanguage('tr')} 
+                        className={`mobile-language-item ${i18n.language === 'tr' ? 'active' : ''}`}
+                    >
+                        {t('language.tr')}
+                    </button>
+                </div>
             </div>
         </nav>
     );
