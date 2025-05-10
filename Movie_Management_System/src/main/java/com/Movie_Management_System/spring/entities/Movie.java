@@ -47,7 +47,7 @@ public class Movie {
     private Integer runtime;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    @JsonIgnore // 👈 Bu önemli: Döngüyü kırar ve movie içinde post'lar dönmez
+    @JsonIgnore
     private List<Posts> posts = new ArrayList<>();
 
     // Constructor
